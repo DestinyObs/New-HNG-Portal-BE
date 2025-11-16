@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('logo_url')->nullable();
-            $table->string('location')->nullable();
+            $table->foreignId('location_id')->constrained()->cascadeOnDelete();
             $table->string('website_url')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('official_email')->nullable();

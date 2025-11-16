@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('document_url');
             $table->text('reasons')->nullable();
+            $table->boolean('agreement');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
