@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->string('full_name');
             $table->string('phone');
-            $table->foreignId('category_id')->constrained()->onDelete('set null')->nullable();
-            $table->foreignId('job_type_id')->constrained('job_types')->onDelete('set null')->nullable();
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('job_type_id')->nullable()->constrained('job_types')->onDelete('set null');
             $table->timestamps();
         });
     }
