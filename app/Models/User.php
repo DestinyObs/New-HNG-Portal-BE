@@ -8,17 +8,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuid;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuid, HasRoles;
 
     protected $fillable = [
         'uuid',
         'first_name',
         'last_name',
         'email',
-        'role',
         'phone',
         'dob',
         'location',
