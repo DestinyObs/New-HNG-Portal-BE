@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('job_attributes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->enum('attribute_type', ['category', 'type', 'mode']);
