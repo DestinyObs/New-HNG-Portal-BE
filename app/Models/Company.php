@@ -17,7 +17,7 @@ class Company extends Model
         'slug',
         'description',
         'logo_url',
-        'location',
+        'country_id',
         'website_url',
         'is_verified',
         'official_email',
