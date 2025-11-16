@@ -9,6 +9,15 @@ return new class extends Migration {
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('conversation_id');
+            $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
+            $table->uuid('sender_id');
+            $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
+            $table->uuid('receiver_id');
+            $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
+            $table->text('content');
+            $table->boolean('is_read')->default(false);
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
     }

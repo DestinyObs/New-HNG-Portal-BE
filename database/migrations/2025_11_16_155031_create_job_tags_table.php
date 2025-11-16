@@ -9,6 +9,10 @@ return new class extends Migration {
     {
         Schema::create('job_tags', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('tag_id');
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+            $table->uuid('job_id');
+            $table->foreign('job_id')->references('id')->on('job_listings')->onDelete('cascade');
             $table->timestamps();
         });
     }

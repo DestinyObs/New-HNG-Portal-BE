@@ -9,8 +9,13 @@ return new class extends Migration {
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->uuid('job_id');
+            $table->foreign('job_id')->references('id')->on('job_listings')->onDelete('cascade');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
