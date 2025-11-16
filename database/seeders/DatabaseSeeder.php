@@ -13,10 +13,39 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $this->call([
+            // Lookup tables first (no dependencies)
+            CountrySeeder::class,
+            StateSeeder::class,
+            TagSeeder::class,
+            TrackSeeder::class,
+            LocationSeeder::class,
+            CategorySeeder::class,
+            JobTypeSeeder::class,
+            SkillSeeder::class,
+            MediaSeeder::class,
+
+            // Users (depends on nothing initially)
             UserSeeder::class,
+
+            // Addresses (depends on users, countries, states)
+            AddressSeeder::class,
+
+            // Companies (depends on users)
+            CompanySeeder::class,
+
+            // Job Listings (depends on companies, locations, tracks, categories, job_types)
+            JobListingSeeder::class,
+
+            // User-related data (depends on users, skills, media)
+            UserBioSeeder::class,
+            UserSkillSeeder::class,
+            TalentWorkExperienceSeeder::class,
+
+            // Other seeders
+            FaqSeeder::class,
         ]);
+
+        $this->command->info('✅ Database seeded successfully!');
     }
 }

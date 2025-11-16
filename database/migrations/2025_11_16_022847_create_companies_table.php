@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('companies', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid')->unique();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('logo_url')->nullable();
-            $table->string('location')->nullable();
+            $table->foreignUuid('country_id')->nullable()->references('id')->on('countries')->nullOnDelete();
             $table->string('website_url')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('official_email')->nullable();
