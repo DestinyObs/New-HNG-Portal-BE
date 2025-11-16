@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->date('dob')->nullable();
             $table->enum('status', ['banned', 'suspended', 'active'])->default('active');
-            $table->foreignId('address_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('address_id')->nullable();
             $table->string('photo_url')->nullable();
             $table->string('password');
             $table->timestamps();
