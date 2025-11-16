@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->string('document_url');
             $table->text('reasons')->nullable();
+            $table->boolean('agreement');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
