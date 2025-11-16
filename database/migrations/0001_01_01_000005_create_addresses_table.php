@@ -8,12 +8,15 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('addresses', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('street1');
             $table->string('street2')->nullable();
-            $table->foreignId('state_id')->constrained()->onDelete('cascade');
-            $table->foreignId('country_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->uuid('state_id');
+            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
+            $table->uuid('country_id');
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('postal_code')->nullable();
             $table->timestamps();
         });

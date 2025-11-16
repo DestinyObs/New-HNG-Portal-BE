@@ -24,7 +24,7 @@ enum PermissionEnum: string
     case Update_Company = 'company.update';
     case Delete_Company = 'company.delete';
 
-    // Skills
+    // Skill
     case View_Skill = 'skill.view';
     case Create_Skill = 'skill.create';
     case Update_Skill = 'skill.update';
@@ -47,7 +47,7 @@ enum PermissionEnum: string
     {
         return match ($role) {
             RoleEnum::ADMIN => self::cases(),
-            
+
             RoleEnum::EMPLOYER => [
                 self::View_Company,
                 self::Create_Company,

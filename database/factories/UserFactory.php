@@ -3,33 +3,47 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
+    protected static ?string $password = null;
+
     public function definition(): array
     {
         return [
-            'uuid' => Str::uuid(),
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
-            'dob' => $this->faker->date('Y-m-d', '2005-01-01'),
-            'location' => $this->faker->city(),
-            'postal_code' => $this->faker->postcode(),
-            'status' => 'active',
-            'is_verified' => $this->faker->boolean(),
-            'bio' => $this->faker->paragraph(),
-            'photo_url' => $this->faker->imageUrl(),
-            'min_salary' => 100000,
-            'max_salary' => 500000,
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), // Default password
-            'remember_token' => Str::random(10),
+            'firstname' => fake()->firstName(),
+            'lastname' => fake()->lastName(),
+            'othername' => fake()->optional(0.3)->firstName(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => '+234' . fake()->numerify('##########'),
+            'dob' => fake()->date('Y-m-d', '-18 years'),
+            'status' => fake()->randomElement(['active', 'active', 'active', 'suspended', 'banned']),
+            'address_id' => null,
+            'photo_url' => fake()->optional(0.4)->imageUrl(200, 200, 'people'),
+            'password' => static::$password ??= Hash::make('password'),
         ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'active',
+        ]);
+    }
+
+    public function suspended(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'suspended',
+        ]);
+    }
+
+    public function banned(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'banned',
+        ]);
     }
 }

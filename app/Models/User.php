@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,10 +12,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuid, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuids, HasRoles;
 
     protected $fillable = [
-        'uuid',
         'first_name',
         'last_name',
         'email',
@@ -44,7 +43,7 @@ class User extends Authenticatable
     // Relationships
     public function skills()
     {
-        return $this->belongsToMany(Skill::class, 'talent_skills', 'user_id', 'skill_id');
+        return $this->belongsToMany(Skill::class, 'user_skills', 'user_id', 'skill_id');
     }
 
 

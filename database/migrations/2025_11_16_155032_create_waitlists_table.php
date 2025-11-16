@@ -8,11 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('waitlists', function (Blueprint $table) {
-            $table->id();
-            $table->string('full_name');
-            $table->string('phone');
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('job_type_id')->nullable()->constrained('job_types')->onDelete('set null');
+            $table->uuid('id')->primary();
             $table->timestamps();
         });
     }

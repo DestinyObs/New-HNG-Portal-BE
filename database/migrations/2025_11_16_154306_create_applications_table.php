@@ -8,11 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('applications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('job_listing_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
-            $table->softDeletes();
+            $table->uuid('id')->primary();
+            $table->string('name');
             $table->timestamps();
         });
     }

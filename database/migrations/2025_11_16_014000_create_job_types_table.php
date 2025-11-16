@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('job_types', function (Blueprint $table) {
-            $table->id();
-            $table->enum('type', ['entry level', 'mid level', 'senior level', 'manager', 'executive']);
+            $table->uuid('id')->primary();
+            $table->string('name');
             $table->timestamps();
         });
     }

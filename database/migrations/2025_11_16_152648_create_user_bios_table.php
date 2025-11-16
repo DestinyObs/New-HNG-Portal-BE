@@ -8,15 +8,18 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('user_bios', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('content');
             $table->decimal('min_salary', 15, 2)->nullable();
             $table->decimal('max_salary', 15, 2)->nullable();
-            $table->unsignedBigInteger('track_id')->nullable();
+            $table->uuid('track_id')->nullable();
+            $table->foreign('track_id')->references('id')->on('tracks')->onDelete('set null');
             $table->boolean('is_verified')->default(false);
             $table->json('links')->nullable();
-            $table->foreignId('cv_id')->nullable()->constrained('media')->onDelete('set null');
+            $table->uuid('cv_id')->nullable();
+            $table->foreign('cv_id')->references('id')->on('media')->onDelete('set null');
             $table->timestamps();
         });
     }
