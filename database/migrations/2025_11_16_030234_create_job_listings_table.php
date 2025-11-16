@@ -12,12 +12,12 @@ return new class extends Migration {
             $table->string('title');
             $table->text('description');
             $table->text('acceptance_criteria')->nullable();
-            $table->foreignId('candidate_location_id')->constrained('locations')->onDelete('set null')->nullable();
+            $table->foreignId('candidate_location_id')->nullable()->constrained('locations')->onDelete('set null');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->decimal('price', 15, 2)->nullable();
-            $table->foreignId('track_id')->constrained()->onDelete('set null')->nullable();
-            $table->foreignId('category_id')->constrained()->onDelete('set null')->nullable();
-            $table->foreignId('job_type_id')->constrained('job_types')->onDelete('set null')->nullable();
+            $table->foreignId('track_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('job_type_id')->nullable()->constrained('job_types')->onDelete('set null');
             $table->softDeletes();
             $table->timestamps();
         });
