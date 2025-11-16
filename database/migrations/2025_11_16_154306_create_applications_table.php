@@ -9,7 +9,10 @@ return new class extends Migration {
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('job_listing_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -30,12 +30,6 @@ enum PermissionEnum: string
     case Update_Skill = 'skill.update';
     case Delete_Skill = 'skill.delete';
 
-    // Job Attribute
-    case View_JobAttribute = 'jobattribute.view';
-    case Create_JobAttribute = 'jobattribute.create';
-    case Update_JobAttribute = 'jobattribute.update';
-    case Delete_JobAttribute = 'jobattribute.delete';
-
     // Job Listing
     case View_JobListing = 'joblisting.view';
     case Create_JobListing = 'joblisting.create';
