@@ -4,29 +4,30 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Enums\RoleEnum;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
         // Create admin
-        User::factory()->create([
+        $admin = User::factory()->create([
             'first_name' => 'Admin',
             'last_name' => 'User',
             'email' => 'admin@example.com',
-            'role' => 'admin',
             'is_verified' => true,
             'password' => bcrypt('password'),
         ]);
+        $admin->assignRole(RoleEnum::ADMIN->value);
 
-        // Create 10 talents
-        User::factory(10)->create([
-            'role' => 'talent',
-        ]);
+        // Create 5 talents
+        User::factory(5)->create()->each(function ($user) {
+            $user->assignRole(RoleEnum::TALENT->value);
+        });
 
-        // Create 5 employers
-        User::factory(5)->create([
-            'role' => 'employer',
-        ]);
+        // Create 3 employers
+        User::factory(3)->create()->each(function ($user) {
+            $user->assignRole(RoleEnum::EMPLOYER->value);
+        });
     }
 }

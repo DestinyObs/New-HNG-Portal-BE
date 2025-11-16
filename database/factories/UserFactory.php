@@ -17,7 +17,6 @@ class UserFactory extends Factory
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
-            'role' => $this->faker->randomElement(['talent', 'employer', 'admin']),
             'phone' => $this->faker->phoneNumber(),
             'dob' => $this->faker->date('Y-m-d', '2005-01-01'),
             'location' => $this->faker->city(),
