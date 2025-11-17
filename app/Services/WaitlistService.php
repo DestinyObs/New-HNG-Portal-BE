@@ -14,7 +14,7 @@ class WaitlistService implements WaitlistInterface
         $waitlist = Waitlist::query()->create($data);
 
         Mail::to($waitlist->email)->send(new WaitlistJoined($waitlist));
-        
+
         return $waitlist;
     }
 }

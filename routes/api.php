@@ -11,4 +11,3 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
-
