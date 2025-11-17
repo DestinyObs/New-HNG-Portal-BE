@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
+use App\Exceptions\Handler as AppHandler;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$appBuilder = Application::configure(basePath: dirname(__DIR__));
+
+$app = $appBuilder
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -14,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+    ->withExceptions(function ($exceptions) {
+        
+    })
+    ->create();
+
+$app->singleton(ExceptionHandler::class, AppHandler::class);
+
+return $app;
