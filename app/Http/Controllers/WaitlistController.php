@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Http;
 use App\Http\Requests\WaitlistRequest;
 use App\Models\Waitlist;
-use App\Responses\SuccessResponse;
 use App\Services\Interfaces\WaitlistInterface;
 
 class WaitlistController extends Controller
@@ -16,15 +14,13 @@ class WaitlistController extends Controller
 
     public function show(Waitlist $waitlist)
     {
-        return SuccessResponse::make($waitlist);
+        return $this->successWithData($waitlist, 'Waitlist retrieved successfully');
     }
-
 
     public function store(WaitlistRequest $request)
     {
-       return SuccessResponse::make(
-            $this->waitlistService->create($request->validated(),
-       ), Http::CREATED);
-
+        $waitlist = $this->waitlistService->create($request->validated());
+        
+        return $this->created('Waitlist entry created successfully', $waitlist);
     }
 }
