@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Waitlist extends Model
 {
     use HasUuids;
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    protected $fillable = [
+        'full_name',
+        'email',
+        'role',
+    ];
 }
