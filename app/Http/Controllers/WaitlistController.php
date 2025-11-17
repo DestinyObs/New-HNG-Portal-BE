@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WaitlistJoined;
 use App\Models\Waitlist;
 use App\Models\WaitlistUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class WaitlistController extends Controller
@@ -18,6 +20,8 @@ class WaitlistController extends Controller
         ]);
 
         $waitlist = Waitlist::create($data);
+
+        Mail::to($waitlist->email)->send(new WaitlistJoined($waitlist));
 
 
         return response()->json([
