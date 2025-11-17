@@ -12,6 +12,7 @@ class TalentVerificationFactory extends Factory
             'user_id' => null, // Will be set by seeder
             'document_url' => fake()->url(),
             'reasons' => fake()->optional()->sentence(),
+            'agreement' => true,
             'status' => fake()->randomElement(['pending', 'approved', 'rejected']),
         ];
     }
