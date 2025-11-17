@@ -14,9 +14,12 @@ class WaitlistController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'full_name' => 'required|string|max:255',
+       	    'full_name' => 'required|string|max:255|min:2',
             'email' => 'required|email|unique:waitlists,email',
             'role' => ['required', Rule::in(['talent', 'company'])],
+        ], [
+            'email.unique' => 'This email is already on our waitlist!',
+            'role.in' => 'Please select either talent or company role.',
         ]);
 
         $waitlist = Waitlist::create($data);
