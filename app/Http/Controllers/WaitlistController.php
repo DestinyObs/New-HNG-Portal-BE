@@ -30,3 +30,4 @@ class WaitlistController extends Controller
         ], 201);
     }
 }
+
