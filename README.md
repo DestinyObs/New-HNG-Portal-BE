@@ -15,7 +15,7 @@ View the project design: [Figma Design Link](https://www.figma.com/design/if8xL6
 - PHP 8.2+
 - Composer
 - Laravel 12
-- MySQL/PostgreSQL
+- MySQL
 
 ## Installation
 
