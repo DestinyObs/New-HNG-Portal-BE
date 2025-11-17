@@ -2,35 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\WaitlistJoined;
+use App\Enums\Http;
+use App\Http\Requests\WaitlistRequest;
 use App\Models\Waitlist;
-use App\Models\WaitlistUser;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
+use App\Responses\SuccessResponse;
+use App\Services\Interfaces\WaitlistInterface;
 
 class WaitlistController extends Controller
 {
-    public function store(Request $request)
+    public function __construct(
+        private readonly WaitlistInterface $waitlistService
+    ){}
+
+    public function show(Waitlist $waitlist)
     {
-        $data = $request->validate([
-       	    'full_name' => 'required|string|max:255|min:2',
-            'email' => 'required|email|unique:waitlists,email',
-            'role' => ['required', Rule::in(['talent', 'company'])],
-        ], [
-            'email.unique' => 'This email is already on our waitlist!',
-            'role.in' => 'Please select either talent or company role.',
-        ]);
-
-        $waitlist = Waitlist::create($data);
-
-        Mail::to($waitlist->email)->send(new WaitlistJoined($waitlist));
+        return SuccessResponse::make($waitlist);
+    }
 
 
-        return response()->json([
-            'message' => 'Successfully joined the waitlist!',
-            'data' => $waitlist
-        ], 201);
+    public function store(WaitlistRequest $request)
+    {
+       return SuccessResponse::make(
+            $this->waitlistService->create($request->validated(),
+       ), Http::CREATED);
+
     }
 }
-
