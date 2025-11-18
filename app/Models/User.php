@@ -29,6 +29,10 @@ class User extends Authenticatable
 
     protected $hidden = ['password'];
 
+    protected $with = [
+        'roles', 'permissions' 
+    ];
+
     protected $casts = [
         'dob'         => 'date',
         'password'  => 'hashed'
