@@ -1186,7 +1186,7 @@
             }
           },
           "400": {
-            "description": "Invalid OAuth callback",
+            "description": "Invalid Google token or authentication failed",
             "content": {
               "application/json": {
                 "schema": {
@@ -1195,12 +1195,12 @@
               }
             }
           },
-          "401": {
-            "description": "OAuth authentication failed",
+          "422": {
+            "description": "Validation error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -1525,23 +1525,20 @@
                     "type": "string",
                     "example": "Doe"
                   },
+                  "company_name": {
+                    "type": "string",
+                    "example": "Tech Corp Inc",
+                    "description": "Company name (required for company role, nullable for talent)"
+                  },
                   "othername": {
                     "type": "string",
-                    "example": "Smith"
+                    "example": "Smith",
+                    "description": "Other/middle name (nullable)"
                   },
                   "email": {
                     "type": "string",
                     "format": "email",
                     "example": "john.doe@example.com"
-                  },
-                  "phone": {
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "dob": {
-                    "type": "string",
-                    "format": "date",
-                    "example": "1990-01-01"
                   },
                   "password": {
                     "type": "string",
@@ -1552,6 +1549,11 @@
                     "type": "string",
                     "format": "password",
                     "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "example": "talent"
                   }
                 }
               }
@@ -1565,16 +1567,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3238,10 +3230,15 @@
             "type": "string",
             "example": "Doe"
           },
+          "company_name": {
+            "type": "string",
+            "example": "Tech Corp Inc",
+            "description": "Company name (nullable - only for company role)"
+          },
           "othername": {
             "type": "string",
             "example": "Smith",
-            "nullable": true
+            "description": "Other/middle name (nullable)"
           },
           "email": {
             "type": "string",
@@ -3250,13 +3247,14 @@
           },
           "phone": {
             "type": "string",
-            "example": "+1234567890"
+            "example": "+1234567890",
+            "description": "Phone number (nullable)"
           },
           "dob": {
             "type": "string",
             "format": "date",
             "example": "1990-01-01",
-            "nullable": true
+            "description": "Date of birth (nullable)"
           },
           "status": {
             "type": "string",
@@ -3270,13 +3268,13 @@
           "photo_url": {
             "type": "string",
             "example": "https://example.com/photo.jpg",
-            "nullable": true
+            "description": "Profile photo URL (nullable)"
           },
           "email_verified_at": {
             "type": "string",
             "format": "date-time",
             "example": "2024-01-16T12:45:00Z",
-            "nullable": true
+            "description": "Email verification timestamp (nullable)"
           },
           "created_at": {
             "type": "string",
