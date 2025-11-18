@@ -36,7 +36,3 @@ $app = $appBuilder
 $app->singleton(ExceptionHandler::class, AppHandler::class);
 
 return $app;
-
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
