@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Concerns;
+namespace App\Traits;
 
 use App\Enums\Http;
 use Illuminate\Http\JsonResponse;
@@ -176,4 +176,3 @@ trait ApiResponse
         return response()->json($response, Http::UNPROCESSABLE_ENTITY->value, $headers);
     }
 }
-
