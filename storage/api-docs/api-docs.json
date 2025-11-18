@@ -94,6 +94,367 @@
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "User login",
+        "description": "Authenticate user and return access token with user data.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "summary": "Request password reset",
+        "description": "Send password reset link to user's email.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset link sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Reset user password using token from email.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "token", "password", "password_confirmation"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "token": {
+                    "type": "string",
+                    "example": "abc123def456"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "Get all users",
+        "description": "Retrieve paginated list of users (requires authentication).",
+        "tags": ["Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 15
+            },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create user",
+        "description": "Create a new user (requires authentication).",
+        "tags": ["Users"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstname", "lastname", "email", "phone", "password"],
+                "properties": {
+                  "firstname": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "othername": {
+                    "type": "string",
+                    "example": "Smith"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+1234567890"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1990-01-01"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Get user by ID",
+        "description": "Retrieve a specific user by UUID (requires authentication).",
+        "tags": ["Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "User UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -130,9 +491,235 @@
           }
         }
       },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "$ref": "#/components/schemas/User"
+              },
+              "token": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "1|abc123def456ghi789"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "User retrieved successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "UsersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Users retrieved successfully"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "example": 1
+              },
+              "per_page": {
+                "type": "integer",
+                "example": 15
+              },
+              "total": {
+                "type": "integer",
+                "example": 100
+              }
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Password reset link sent successfully"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019a979f-f86c-7102-9bbf-83fda33cd34d"
+          },
+          "firstname": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "othername": {
+            "type": "string",
+            "example": "Smith",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-01-01",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": ["banned", "suspended", "active"],
+            "example": "active"
+          },
+          "photo_url": {
+            "type": "string",
+            "example": "https://example.com/photo.jpg",
+            "nullable": true
+          },
+          "email_verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "user"
+          },
+          "guard_name": {
+            "type": "string",
+            "example": "web"
+          }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "view_profile"
+          },
+          "guard_name": {
+            "type": "string",
+            "example": "web"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid credentials"
+          },
+          "status": {
+            "type": "integer",
+            "example": 401
+          }
+        }
+      },
       "ValidationError": {
         "type": "object",
         "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
           "message": {
             "type": "string",
             "example": "The given data was invalid."
@@ -140,10 +727,22 @@
           "errors": {
             "type": "object",
             "example": {
-              "email": ["This email is already on our waitlist!"]
+              "email": ["The email field is required."],
+              "password": ["The password must be at least 8 characters."]
             }
+          },
+          "status": {
+            "type": "integer",
+            "example": 422
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

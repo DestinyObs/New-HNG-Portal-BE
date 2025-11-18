@@ -12,13 +12,13 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
   Route::post('/register', action: [UserController::class, 'store']);
-
+  
 Route::prefix('auth')->group(function () {
     Route::post('login', LoginController::class);
+    Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
+    Route::post('reset-password', [ForgotPasswordController::class, 'update']);
 });
-Route::post('reset/password', [ForgotPasswordController::class, 'update']);
-Route::post('user/forgot/password', [ForgotPasswordController::class, 'store']);
-
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
+
