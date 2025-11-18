@@ -10,6 +10,7 @@ use App\Services\{
     UserService,
     WaitlistService,
 };
+use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\Auth\LoginInterface;
 use App\Services\Interfaces\Auth\PasswordResetInterface;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,7 @@ class InterfaceServiceProvider extends ServiceProvider
         UserInterface::class => UserService::class,
         LoginInterface::class => \App\Services\Auth\LoginService::class,
         PasswordResetInterface::class => \App\Services\Auth\PasswordResetService::class,
+        GoogleAuthInterface::class => \App\Services\Auth\GoogleAuthService::class
     ];
 
     /**
