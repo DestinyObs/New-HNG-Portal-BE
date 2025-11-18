@@ -95,51 +95,29 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
+    "/api/auth/google": {
+      "post": {
+        "summary": "Google OAuth login",
+        "description": "Authenticate user using Google ID token from frontend.",
         "tags": ["Authentication"],
-        "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "URL to Google OAuth page"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token"],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Google ID token from frontend authentication",
+                    "example": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjFlOTcz..."
+                  }
+                }
               }
             }
           }
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Handle Google OAuth callback",
-        "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": ["Authentication"],
-        "parameters": [
-          {
-            "name": "code",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Authorization code from Google"
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "State parameter for CSRF protection"
-          }
-        ],
+        },
         "responses": {
           "200": {
             "description": "Google OAuth login successful",
@@ -152,7 +130,7 @@
             }
           },
           "400": {
-            "description": "Invalid OAuth callback",
+            "description": "Invalid Google token or authentication failed",
             "content": {
               "application/json": {
                 "schema": {
@@ -161,12 +139,12 @@
               }
             }
           },
-          "401": {
-            "description": "OAuth authentication failed",
+          "422": {
+            "description": "Validation error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -427,16 +405,15 @@
       },
       "post": {
         "summary": "Create user",
-        "description": "Create a new user (requires authentication).",
+        "description": "Create a new user account (public registration).",
         "tags": ["Users"],
-        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["firstname", "lastname", "email", "phone", "password"],
+                "required": ["firstname", "lastname", "email", "password", "role"],
                 "properties": {
                   "firstname": {
                     "type": "string",
@@ -446,23 +423,20 @@
                     "type": "string",
                     "example": "Doe"
                   },
+                  "company_name": {
+                    "type": "string",
+                    "example": "Tech Corp Inc",
+                    "description": "Company name (required for company role, nullable for talent)"
+                  },
                   "othername": {
                     "type": "string",
-                    "example": "Smith"
+                    "example": "Smith",
+                    "description": "Other/middle name (nullable)"
                   },
                   "email": {
                     "type": "string",
                     "format": "email",
                     "example": "john.doe@example.com"
-                  },
-                  "phone": {
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "dob": {
-                    "type": "string",
-                    "format": "date",
-                    "example": "1990-01-01"
                   },
                   "password": {
                     "type": "string",
@@ -473,6 +447,11 @@
                     "type": "string",
                     "format": "password",
                     "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "example": "talent"
                   }
                 }
               }
@@ -486,16 +465,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -711,10 +680,15 @@
             "type": "string",
             "example": "Doe"
           },
+          "company_name": {
+            "type": "string",
+            "example": "Tech Corp Inc",
+            "description": "Company name (nullable - only for company role)"
+          },
           "othername": {
             "type": "string",
             "example": "Smith",
-            "nullable": true
+            "description": "Other/middle name (nullable)"
           },
           "email": {
             "type": "string",
@@ -723,13 +697,14 @@
           },
           "phone": {
             "type": "string",
-            "example": "+1234567890"
+            "example": "+1234567890",
+            "description": "Phone number (nullable)"
           },
           "dob": {
             "type": "string",
             "format": "date",
             "example": "1990-01-01",
-            "nullable": true
+            "description": "Date of birth (nullable)"
           },
           "status": {
             "type": "string",
@@ -739,13 +714,13 @@
           "photo_url": {
             "type": "string",
             "example": "https://example.com/photo.jpg",
-            "nullable": true
+            "description": "Profile photo URL (nullable)"
           },
           "email_verified_at": {
             "type": "string",
             "format": "date-time",
             "example": "2024-01-16T12:45:00Z",
-            "nullable": true
+            "description": "Email verification timestamp (nullable)"
           },
           "created_at": {
             "type": "string",

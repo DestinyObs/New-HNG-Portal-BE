@@ -21,7 +21,7 @@ Route::prefix('auth')->group(function () {
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
 
 });
-Route::post('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+Route::post('/auth/google', [GoogleAuthController::class, 'callback']);
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
