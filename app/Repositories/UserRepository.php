@@ -5,24 +5,37 @@ namespace App\Repositories;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
-    protected User $user;
-
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
 
     public function getAll(): Collection
     {
-        return $this->user->all();
+        return $this->query()->get();
     }
 
     public function create(array $data): User
     {
-        return $this->user->create($data);
+        return $this->query()->create($data);
+    }
+
+    public function findBy(string $column, mixed $value): User
+    {
+        $query = $this->query()
+                    ->where(Str::lower($column), $value)
+                        ->firstOrFail();
+        return $query;
+    }
+
+    public function updatePassword(User $user, string $password): User
+    {
+        $user->update([
+            'password' => $password
+        ]);
+
+        return $user->refresh();
+
     }
 
     public function update(User $user, array $data): User

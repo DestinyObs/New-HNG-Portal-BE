@@ -15,10 +15,10 @@ $app = $appBuilder
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        
     })
     ->withExceptions(function ($exceptions) {
-        
+
     })
     ->create();
 

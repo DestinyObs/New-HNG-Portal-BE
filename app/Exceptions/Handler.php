@@ -2,36 +2,36 @@
 
 namespace App\Exceptions;
 
+use App\Http\Controllers\Concerns\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\QueryException;
 use Throwable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use App\Enums\Http;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
-     *
-     * @var array<int, string>
-     */
+    use ApiResponse; 
+
     protected $dontFlash = [
         'current_password',
         'password',
         'password_confirmation',
     ];
 
-    /**
-     * Register exception handling callbacks.
-     */
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            // Custom logging or reporting logic can go here
+            // Optional: custom logging
         });
     }
 
@@ -40,66 +40,80 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception): Response|JsonResponse
     {
-        // Handle validation errors
-        if ($exception instanceof ValidationException && $request->is('api/*')) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $exception->errors(),
-            ], 422);
-        }
-
-        // Handle API requests
         if ($request->is('api/*')) {
-            return $this->renderApiException($exception);
+
+            // Validation errors
+            if ($exception instanceof ValidationException) {
+                return $this->unprocessable(
+                    'Validation failed',
+                    $exception->errors()
+                );
+            }
+
+            // Authentication
+            if ($exception instanceof AuthenticationException) {
+                return $this->unauthorized('Unauthenticated');
+            }
+
+            // Authorization
+            if ($exception instanceof AuthorizationException) {
+                return $this->forbidden('You do not have permission');
+            }
+
+            // Model not found
+            if ($exception instanceof ModelNotFoundException) {
+                $model = class_basename($exception->getModel());
+                return $this->notFound("{$model} not found");
+            }
+
+            // Route not found
+            if ($exception instanceof NotFoundHttpException) {
+                return $this->notFound('Route not found');
+            }
+
+            // Method not allowed
+            if ($exception instanceof MethodNotAllowedHttpException) {
+                return $this->error('Method not allowed', Http::METHOD_NOT_ALLOWED);
+            }
+
+            // CSRF token mismatch
+            if ($exception instanceof TokenMismatchException) {
+                return $this->error('CSRF token mismatch', Http::UNAUTHORIZED);
+            }
+
+            // Too many requests / throttling
+            if ($exception instanceof ThrottleRequestsException) {
+                return $this->error('Too many requests', Http::TOO_MANY_REQUESTS);
+            }
+
+            // 9️Database query errors
+            if ($exception instanceof QueryException) {
+                return $this->error(
+                    app()->isLocal() ? $exception->getMessage() : 'Database error',
+                    Http::INTERNAL_SERVER_ERROR
+                );
+            }
+
+            // Fallback for all other exceptions
+            return $this->error(
+                app()->isLocal() ? $exception->getMessage() : 'Oops! An error occurred',
+                Http::INTERNAL_SERVER_ERROR
+            );
         }
 
-        // Fallback to default Laravel web rendering
+        // Fallback to default web rendering
         return parent::render($request, $exception);
     }
 
     /**
-     * Handle unauthenticated requests (API vs web).
+     * Handle unauthenticated requests.
      */
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|Response
     {
         if ($request->is('api/*')) {
-            return response()->json([
-                'message' => 'Unauthenticated',
-            ], 401);
+            return $this->unauthorized('Unauthenticated');
         }
 
         return parent::unauthenticated($request, $exception);
-    }
-
-    /**
-     * Render API exceptions as JSON responses.
-     */
-    protected function renderApiException(Throwable $exception): JsonResponse
-    {
-        // Method Not Allowed
-        if ($exception instanceof MethodNotAllowedHttpException) {
-            return response()->json([
-                'message' => 'Method not allowed',
-            ], 405);
-        }
-
-        // Token mismatch (CSRF)
-        if ($exception instanceof TokenMismatchException) {
-            return response()->json([
-                'message' => 'CSRF token mismatch',
-            ], 419);
-        }
-
-        // Too many requests / throttling
-        if ($exception instanceof ThrottleRequestsException) {
-            return response()->json([
-                'message' => 'Too many requests',
-            ], 429);
-        }
-
-        // Other uncaught exceptions
-        return response()->json([
-            'message' => app()->isLocal() ? $exception->getMessage() : 'Oops! An error occurred',
-        ], 500);
     }
 }

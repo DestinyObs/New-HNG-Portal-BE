@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\{
     UserRepository
@@ -9,6 +10,7 @@ use App\Repositories\{
 use App\Repositories\Interfaces\{
     UserRepositoryInterface
 };
+use Illuminate\Database\Eloquent\Model;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,9 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->when(UserRepository::class)
+            ->needs(Model::class)
+            ->give(User::class);
+
     }
 }
