@@ -2,7 +2,51 @@
 
 namespace App\Repositories\Employer;
 
+use App\Models\Company;
+use App\Models\JobListing;
+use App\Models\Application;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 class CompanyRepository
 {
     public function __construct() {}
+    public function getJobApplicants(string $companyUuid, string $jobUuid, array $filters = []): LengthAwarePaginator
+    {
+        $company = Company::where('uuid', $companyUuid)->firstOrFail();
+
+        $job = JobListing::where('uuid', $jobUuid)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        $query = Application::with(['candidate', 'candidate.skills', 'candidate.experiences'])
+            ->where('job_listing_id', $job->id);
+
+        // Apply filters
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['search'])) {
+            $query->whereHas('candidate', function($q) use ($filters) {
+                $q->where('first_name', 'like', "%{$filters['search']}%")
+                  ->orWhere('last_name', 'like', "%{$filters['search']}%")
+                  ->orWhere('email', 'like', "%{$filters['search']}%");
+            });
+        }
+
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
+    }
+
+    /** Verify company and job ownership */
+    public function verifyCompanyJobOwnership(string $companyUuid, string $jobUuid): array
+    {
+        $company = Company::where('uuid', $companyUuid)->firstOrFail();
+
+        $job = JobListing::where('uuid', $jobUuid)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        return compact('company', 'job');
+    }
+
 }

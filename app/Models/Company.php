@@ -2,35 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\JobListing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Company extends Model
 {
     use HasFactory, SoftDeletes, HasUuids;
+     use HasUuids, HasFactory;
 
     protected $fillable = [
-        'user_id',
         'name',
-        'slug',
         'description',
+        'industry',
+        'website',
+        'email',
+        'phone',
+        'address',
+        'city',
+        'country',
         'logo_url',
-        'country_id',
-        'website_url',
-        'is_verified',
-        'official_email',
-        'status',
+        'size',
+        'founded_year',
+        'user_id' // owner/employer
     ];
 
-    public function user()
+    // Relationships
+    public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function jobs()
+    public function jobs(): HasMany
     {
         return $this->hasMany(JobListing::class);
     }
+
 }
