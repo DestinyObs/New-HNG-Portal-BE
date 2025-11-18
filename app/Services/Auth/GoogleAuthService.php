@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Services\Auth;
 
@@ -12,25 +12,26 @@ class GoogleAuthService implements GoogleAuthInterface
 {
     public function handle(GoogleUser $googleUser): array
     {
-        // Split name into firstname + lastname
         [$firstname, $lastname] = $this->splitName($googleUser->getName());
 
         // Create or find user
         $user = User::firstOrCreate(
             ['email' => $googleUser->getEmail()],
             [
-                'firstname'         => $firstname,
-                'lastname'          => $lastname,
-                'password'  => Str::random(12), 
+                'firstname' => $firstname,
+                'lastname'  => $lastname,
+                'password'  => Str::random(12),
             ]
         );
 
+        // Save device
         $this->saveDevice($user);
 
-        $token = $user->createToken('API Token')->plainTextToken;
+        // Generate token
+        $token = $user->createToken('google-token')->plainTextToken;
 
         return [
-            'user'  => $user,
+            'user'  => $user->refresh(),
             'token' => $token,
         ];
     }

@@ -3,32 +3,49 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ApiResponse;
+use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
+    use ApiResponse;
+
     public function __construct(
         private readonly GoogleAuthInterface $googleService
     ) {}
 
-    public function redirectToGoogle()
+    /**
+     * Google login using an ID token from the frontend.
+     */
+    public function callback(GoogleAuthRequest $request)
     {
-        return Socialite::driver('google')
-            ->stateless()
-            ->redirect(); 
-    }
+        try {
+            // Retrieve Google user from token
+            $googleUser = Socialite::driver('google')
+                ->stateless()
+                ->userFromToken($request->token);
 
-    // Step 2: Handle Google callback
-    public function handleGoogleCallback()
-    {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+            if (!$googleUser) {
+                return $this->error('Invalid Google token.');
+            }
 
-        $response = $this->googleService->handle($googleUser);
+            $response = $this->googleService->handle($googleUser);
 
-        return $this->successWithData([
-            'user'  => $response['user'],
-            'token' => $response['token'],
-        ], 'Login successful');
+            return $this->successWithData(
+                [
+                    'user'  => $response['user'],
+                    'token' => $response['token'],
+                ],
+                'Login successful'
+            );
+
+        } catch (\Exception $e) {
+            return $this->error(
+                'Google authentication failed.',
+                status: \App\Enums\Http::BAD_REQUEST
+            );
+        }
     }
 }
