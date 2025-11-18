@@ -113,7 +113,7 @@ return [
          */
         
         App\Providers\AppServiceProvider::class,
-        //App\Providers\EventServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\InterfaceServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
