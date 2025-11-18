@@ -15,29 +15,27 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuids, HasRoles;
 
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'firstname',
+        'lastname',
+        'othername',
         'email',
         'phone',
         'dob',
-        'location',
-        'postal_code',
+        'address_id',
         'status',
-        'is_verified',
-        'bio',
         'photo_url',
-        'min_salary',
-        'max_salary',
         'password',
     ];
 
     protected $hidden = ['password'];
 
+    protected $with = [
+        'roles', 'permissions' 
+    ];
+
     protected $casts = [
         'dob'         => 'date',
-        'is_verified' => 'boolean',
-        'min_salary'  => 'integer',
-        'max_salary'  => 'integer'
+        'password'  => 'hashed'
     ];
 
     // Relationships

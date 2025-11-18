@@ -13,6 +13,16 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'frontend' => [
+        'base_url' => env('FRONTEND_BASE_URL', 'http://localhost:3000'),
+        'login' => env('FRONTEND_LOGIN_URL'),
+    ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', 'http://localhost:3000/home'),
+    ],
+
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),

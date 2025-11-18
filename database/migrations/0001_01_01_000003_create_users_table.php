@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('lastname');
             $table->string('othername')->nullable();
             $table->string('email')->unique();
-            $table->string('phone')->unique();
+            $table->string('phone')->nullable();
             $table->date('dob')->nullable();
             $table->enum('status', ['banned', 'suspended', 'active'])->default('active');
             $table->uuid('address_id')->nullable();
