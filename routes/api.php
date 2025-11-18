@@ -22,4 +22,3 @@ Route::post('user/forgot/password', [ForgotPasswordController::class, 'store']);
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
-
