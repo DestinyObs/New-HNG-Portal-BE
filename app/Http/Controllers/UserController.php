@@ -36,7 +36,13 @@ class UserController extends Controller
         $user = $this->userService->create($request->validated());
         return $this->created('User created successfully', $user);
     }
+    
+    public function logout()
+    {
+        $this->userService->logout();
 
+        return $this->success('Logged out successfully');
+    }
 
 
 }

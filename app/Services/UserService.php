@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\Status;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\UserInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 
@@ -35,7 +36,7 @@ public function create(array $data, array $meta = []): User
                 'role' => ['Invalid role provided.'],
             ]);
         }
-        
+
         unset($data['role']);
 
         // Create the user
@@ -51,5 +52,11 @@ public function create(array $data, array $meta = []): User
     });
 }
 
+    public function logout(): void
+    {
+        $user = Auth::user();
+        
+        $user->currentAccessToken()->delete();
+    }
 
 }
