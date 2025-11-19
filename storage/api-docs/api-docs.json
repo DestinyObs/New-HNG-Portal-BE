@@ -1156,22 +1156,13 @@
         ],
         "parameters": [
           {
-            "name": "code",
+            "name": "token",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string"
             },
             "description": "Authorization code from Google"
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "State parameter for CSRF protection"
           }
         ],
         "responses": {
