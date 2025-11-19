@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\JobTypeController;
+
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
+
 use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,3 +29,9 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
+
+
+
+// JOB TYPES ROUTES
+Route::apiResource('job-types', JobTypeController::class)
+    ->only(['index', 'show']);
