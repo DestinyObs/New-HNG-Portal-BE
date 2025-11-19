@@ -95,7 +95,86 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Create a new user account. For company role, a company record will also be created.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstname", "lastname", "email", "password", "password_confirmation", "role"],
+                "properties": {
+                  "firstname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "John"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Doe"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Acme Corporation",
+                    "description": "Required when role is 'company'"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "example": "talent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/redirect": {
       "get": {
         "summary": "Redirect to Google OAuth",
         "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
@@ -115,7 +194,7 @@
         }
       }
     },
-    "/api/auth/google/callback": {
+    "/auth/google/callback": {
       "get": {
         "summary": "Handle Google OAuth callback",
         "description": "Processes Google OAuth callback and returns user data with access token.",
@@ -174,7 +253,7 @@
         }
       }
     },
-    "/api/auth/login": {
+    "/auth/login": {
       "post": {
         "summary": "User login",
         "description": "Authenticate user and return access token with user data.",
@@ -236,7 +315,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/auth/logout": {
       "post": {
         "summary": "User logout",
         "description": "Logout user and revoke access token (requires authentication).",
@@ -266,10 +345,10 @@
         }
       }
     },
-    "/api/auth/forgot-password": {
+    "/auth/forgot-password": {
       "post": {
         "summary": "Request password reset",
-        "description": "Send password reset link to user's email.",
+        "description": "Send password reset link to user's email. The reset link will be valid for 10 minutes and contains a unique token (hash) that must be used with the reset-password endpoint.",
         "tags": ["Authentication"],
         "requestBody": {
           "required": true,
@@ -313,10 +392,10 @@
         }
       }
     },
-    "/api/auth/reset-password": {
+    "/auth/reset-password": {
       "post": {
         "summary": "Reset password",
-        "description": "Reset user password using token from email.",
+        "description": "Reset user password using token (hash) from the password reset email link. The token is the 'hash' query parameter from the reset link URL.",
         "tags": ["Authentication"],
         "requestBody": {
           "required": true,
@@ -329,21 +408,26 @@
                   "email": {
                     "type": "string",
                     "format": "email",
-                    "example": "user@example.com"
+                    "example": "user@example.com",
+                    "description": "User's email address"
                   },
                   "token": {
                     "type": "string",
-                    "example": "abc123def456"
+                    "example": "abc123def456ghi789jkl012mno345pqr678",
+                    "description": "The hash token from the password reset email link (32 character random string)"
                   },
                   "password": {
                     "type": "string",
                     "format": "password",
-                    "example": "NewPassword123!"
+                    "minLength": 8,
+                    "example": "NewPassword123!",
+                    "description": "New password (minimum 8 characters)"
                   },
                   "password_confirmation": {
                     "type": "string",
                     "format": "password",
-                    "example": "NewPassword123!"
+                    "example": "NewPassword123!",
+                    "description": "Password confirmation (must match password)"
                   }
                 }
               }
@@ -352,7 +436,7 @@
         },
         "responses": {
           "200": {
-            "description": "Password reset successfully",
+            "description": "Password reset successfully. A confirmation email will be sent to the user.",
             "content": {
               "application/json": {
                 "schema": {
@@ -362,7 +446,7 @@
             }
           },
           "422": {
-            "description": "Validation error or invalid token",
+            "description": "Validation error, invalid token, or expired token",
             "content": {
               "application/json": {
                 "schema": {
@@ -618,17 +702,19 @@
                 "$ref": "#/components/schemas/User"
               },
               "token": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "example": "1|abc123def456ghi789"
-                  }
-                }
+                "type": "string",
+                "example": "1|abc123def456ghi789jkl012mno345pqr678",
+                "description": "Laravel Sanctum bearer token for API authentication"
               }
-            }
+            },
+            "required": ["user", "token"]
+          },
+          "status": {
+            "type": "integer",
+            "example": 200
           }
-        }
+        },
+        "required": ["success", "message", "data", "status"]
       },
       "UserResponse": {
         "type": "object",
@@ -639,12 +725,17 @@
           },
           "message": {
             "type": "string",
-            "example": "User retrieved successfully"
+            "example": "User created successfully"
           },
           "data": {
             "$ref": "#/components/schemas/User"
+          },
+          "status": {
+            "type": "integer",
+            "example": 201
           }
-        }
+        },
+        "required": ["success", "message", "data", "status"]
       },
       "UsersResponse": {
         "type": "object",
@@ -692,8 +783,14 @@
           "message": {
             "type": "string",
             "example": "Password reset link sent successfully"
+          },
+          "status": {
+            "type": "integer",
+            "example": 200,
+            "description": "HTTP status code"
           }
-        }
+        },
+        "required": ["success", "message", "status"]
       },
       "User": {
         "type": "object",
@@ -851,7 +948,8 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "Sanctum Token",
+        "description": "Laravel Sanctum token authentication. Format: 'Bearer {token}' where token is returned from login endpoint."
       }
     }
   }

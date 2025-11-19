@@ -30,7 +30,7 @@ class User extends Authenticatable
     protected $hidden = ['password'];
 
     protected $with = [
-        'roles', 'permissions' 
+        'roles', 'permissions'
     ];
 
     protected $casts = [
@@ -61,9 +61,9 @@ class User extends Authenticatable
         return $this->hasMany(UserPreference::class, 'user_id');
     }
 
-    public function companies()
+    public function company()
     {
-        return $this->hasMany(Company::class, 'user_id');
+        return $this->hasOne(Company::class, 'user_id');
     }
 
     public function jobs()

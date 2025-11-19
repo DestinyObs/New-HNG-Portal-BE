@@ -1,5 +1,5 @@
 <x-mail::message>
-# Hi {{ $user->first_name }},
+# Hi {{ $user->firstname ?? $user->company->name }},
 
 We wanted to let you know that your password was successfully changed.
 
