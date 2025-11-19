@@ -10,4 +10,15 @@ class Country extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $fillable = [
+        'name',
+    ];
+
+    /**
+     * Get the states for the country.
+     */
+    public function states()
+    {
+        return $this->hasMany(State::class, 'country_id');
+    }
 }
