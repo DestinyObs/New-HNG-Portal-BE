@@ -92,7 +92,7 @@
       }
     },
 
-    "/employer/company": {
+    "/api/employer/company": {
       "post": {
         "summary": "Create a company",
         "description": "Creates a new company for an employer.",
@@ -126,7 +126,7 @@
       }
     },
 
-    "/employer/company/{id}": {
+    "/api/employer/company/{id}": {
       "get": {
         "summary": "Retrieve a company",
         "description": "Gets a single company by its ID.",
@@ -176,8 +176,8 @@
       }
     },
 
-    "/employer/company/{id}/logo": {
-      "put": {
+    "/api/employer/company/{id}/logo": {
+      "post": {
         "summary": "Update company logo",
         "description": "Uploads and updates the company's logo.",
         "tags": ["Company"],
@@ -192,7 +192,8 @@
                 "type": "object",
                 "required": ["logo"],
                 "properties": {
-                  "logo": { "type": "string", "format": "binary" }
+                  "logo": { "type": "string", "format": "binary" },
+                  "_method": { "type": "string", "format": "text" }
                 }
               }
             }
