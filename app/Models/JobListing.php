@@ -47,7 +47,7 @@ class JobListing extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function jobType()
+    public function JobType()
     {
         return $this->belongsTo(JobType::class);
     }
