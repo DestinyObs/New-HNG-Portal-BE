@@ -7,13 +7,14 @@ use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Admin\AdminUserController;
 
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
   Route::post('/register', action: [UserController::class, 'store']);
-  
+
 Route::prefix('auth')->group(function () {
     Route::post('login', LoginController::class)->name('login');
     Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
@@ -27,3 +28,13 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
+
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/users', [App\Http\Controllers\Admin\AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'show']);
+    Route::put('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'update']);
+    Route::delete('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'destroy']);
+    Route::post('/users/{id}/restore', [App\Http\Controllers\Admin\AdminUserController::class, 'restore']);
+    Route::post('/users/{id}/impersonate', [App\Http\Controllers\Admin\AdminUserController::class, 'impersonate']);
+});
+
