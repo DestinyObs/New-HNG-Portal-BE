@@ -20,7 +20,7 @@ Route::prefix('auth')->group(function () {
     Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
     Route::post('reset-password', [ForgotPasswordController::class, 'update']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
-
+    Route::post('/register', action: [UserController::class, 'store']);
 });
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
