@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
+use App\Exceptions\Handler as AppHandler;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 return Application::configure(basePath: dirname(__DIR__))
+$appBuilder = Application::configure(basePath: dirname(__DIR__));
+
+$app = $appBuilder
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
@@ -96,3 +100,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // End of render customized error message       
 
     })->create();
+        
+    })
+    ->withExceptions(function ($exceptions) {
+
+    })
+    ->create();
+
+$app->singleton(ExceptionHandler::class, AppHandler::class);
+
+return $app;
