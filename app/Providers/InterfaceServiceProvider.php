@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Services\Interfaces\{
     WaitlistInterface,
 };
 use App\Services\{
     WaitlistService,
 };
+use App\Services\Employer\CompanyService;
 use Illuminate\Support\ServiceProvider;
 
 class InterfaceServiceProvider extends ServiceProvider
@@ -19,6 +21,7 @@ class InterfaceServiceProvider extends ServiceProvider
      */
     public $bindings = [
         WaitlistInterface::class => WaitlistService::class,
+        CompanyRepositoryInterface::class => CompanyService::class,
     ];
 
     /**
