@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Models\Skill;
+use App\Models\Track;
 use Illuminate\Database\Eloquent\Collection;
 
-interface SkillRepositoryInterface
+interface TrackRepositoryInterface
 {
     public function getAll(): Collection;
-    public function findById(string $id): Skill;
+    public function findById(string $id): Track;
 }
 

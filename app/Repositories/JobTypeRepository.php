@@ -51,3 +51,29 @@ class JobTypeRepository
 
 
 }
+<?php
+
+namespace App\Repositories;
+
+use App\Models\JobType;
+use App\Repositories\Interfaces\JobTypeRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
+
+class JobTypeRepository extends BaseRepository implements JobTypeRepositoryInterface
+{
+    public function __construct(JobType $model)
+    {
+        parent::__construct($model);
+    }
+
+    public function getAll(): Collection
+    {
+        return $this->query()->get();
+    }
+
+    public function findById(string $id): JobType
+    {
+        return $this->query()->findOrFail($id);
+    }
+}
+
