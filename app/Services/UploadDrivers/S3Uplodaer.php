@@ -5,7 +5,7 @@ namespace App\Services\UploadDrivers;
 use App\Services\Interfaces\UploaderInterface;
 use Illuminate\Support\Facades\Storage;
 
-class S3Uplodaer implements UploaderInterface
+class S3Uplodaer
 {
     public function upload($file): string
     {
