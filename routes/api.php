@@ -7,7 +7,7 @@ use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleAuthController;
-
+use App\Http\Controllers\SkillController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -26,3 +26,9 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
+
+
+
+// SKILLS ROUTES
+Route::apiResource('skills', SkillController::class)
+    ->only(['index', 'show']);
