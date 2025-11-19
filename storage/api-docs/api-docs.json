@@ -1,150 +1,253 @@
 {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "HNG-PORTAL-BE API",
-    "version": "1.0.0",
-    "description": "API endpoints for hng portal creation."
-  },
-  "paths": {
-    "/waitlist": {
-      "post": {
-        "summary": "Join the waitlist",
-        "description": "Creates a new waitlist entry and sends a confirmation email.",
-        "tags": ["Waitlist"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["full_name", "email", "role"],
-                "properties": {
-                  "full_name": {
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "johndoe@example.com"
-                  },
-                  "role": {
-                    "type": "string",
-                    "enum": ["talent", "company"],
-                    "example": "talent"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Waitlist entry created successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Waitlist"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
+    "openapi": "3.0.0",
+    "info": {
+        "title": "HNG Portal API Documentation",
+        "description": "API documentation for HNG Portal backend",
+        "version": "1.0.0"
     },
-    "/waitlist/{id}": {
-      "get": {
-        "summary": "Get waitlist entry",
-        "description": "Returns the details of a single waitlist entry.",
-        "tags": ["Waitlist"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The ID of the waitlist entry"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Waitlist entry retrieved successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Waitlist"
+    "servers": [
+        {
+            "url": "/",
+            "description": "Base API Server"
+        }
+    ],
+    "paths": {
+        "/api/faq": {
+            "get": {
+                "tags": [
+                    "FAQ"
+                ],
+                "summary": "Get list of FAQs",
+                "operationId": "3c5e434ed5df3403c3229ae9b6a177b1",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "FAQ type: company or talent",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "company",
+                                "talent"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "FAQs retrieved successfully"
+                    }
                 }
-              }
             }
-          },
-          "404": {
-            "description": "Waitlist entry not found"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Waitlist": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 12
-          },
-          "full_name": {
-            "type": "string",
-            "example": "John Doe"
-          },
-          "email": {
-            "type": "string",
-            "example": "johndoe@example.com"
-          },
-          "role": {
-            "type": "string",
-            "enum": ["talent", "company"],
-            "example": "talent"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-01-16T12:45:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-01-16T12:45:00Z"
-          }
-        }
-      },
-      "ValidationError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "example": "The given data was invalid."
-          },
-          "errors": {
-            "type": "object",
-            "example": {
-              "email": ["This email is already on our waitlist!"]
+        },
+        "/api/faq/{faq}": {
+            "get": {
+                "tags": [
+                    "FAQ"
+                ],
+                "summary": "Get a single FAQ by ID",
+                "operationId": "7c9e8435e2a5a34a0c625c0eb92064e4",
+                "parameters": [
+                    {
+                        "name": "faq",
+                        "in": "path",
+                        "description": "FAQ ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "FAQ retrieved successfully"
+                    },
+                    "404": {
+                        "description": "FAQ not found"
+                    }
+                }
             }
-          }
+        },
+        "/api/jobs": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "List all jobs with filters",
+                "operationId": "9538d30d530d4c3680ea31fe228944e2",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by job title or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "location_id",
+                        "in": "query",
+                        "description": "Filter by location ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "description": "Filter by location name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "job_type_id",
+                        "in": "query",
+                        "description": "Filter by job type ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "track_id",
+                        "in": "query",
+                        "description": "Filter by track ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filter by category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Minimum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Maximum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved list of jobs"
+                    }
+                }
+            }
+        },
+        "/api/jobs/{job}": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Get a single job by ID",
+                "operationId": "9c31b377241c635bf2819779f358d414",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "description": "Job ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job details retrieved"
+                    },
+                    "404": {
+                        "description": "Job not found"
+                    }
+                }
+            }
+        },
+        "/api/jobs/{job}/related": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Get related jobs",
+                "operationId": "5a5c9e3acd17081f3093c654e4766ca1",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "description": "Job ID to fetch related jobs for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Related jobs retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Job not found"
+                    }
+                }
+            }
+        },
+        "/api/jobs/search": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Search jobs using keyword",
+                "operationId": "0c0290a245c580348856b16cf6be0b81",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search keyword",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results returned"
+                    }
+                }
+            }
         }
-      }
-    }
-  }
+    },
+    "tags": [
+        {
+            "name": "FAQ",
+            "description": "FAQ"
+        },
+        {
+            "name": "Jobs",
+            "description": "Jobs"
+        }
+    ]
 }

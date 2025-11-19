@@ -24,7 +24,7 @@ class JobListingSeeder extends Seeder
                 'candidate_location_id' => fn() => Location::factory(),
                 'track_id' => fn() => Track::factory(),
                 'category_id' => fn() => Category::factory(),
-                'job_type_id' => fn() => jobType::factory(),
+                'job_type_id' => fn() => JobType::factory(),
             ]);
     }
 }
