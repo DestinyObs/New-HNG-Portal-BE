@@ -46,7 +46,7 @@ class PasswordResetService implements PasswordResetInterface
                );
                
                $expiresAt = $now->copy()->addMinutes($this->expiresAfter);
-               $url = config('services.base_url') . '/reset-password?hash=' . $token . '&email=' . $user->email;
+               $url = config('services.frontend.base_url') . '/reset-password?hash=' . $token . '&email=' . $user->email;
                
                Mail::to($user->email)->send(
                    new PasswordResetLink($user, $url, $expiresAt)

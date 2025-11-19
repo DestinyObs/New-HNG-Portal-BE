@@ -174,26 +174,6 @@
         }
       }
     },
-    "/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
-        "tags": ["Authentication"],
-        "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "URL to Google OAuth page"
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/google/callback": {
       "get": {
         "summary": "Handle Google OAuth callback",
@@ -201,22 +181,13 @@
         "tags": ["Authentication"],
         "parameters": [
           {
-            "name": "code",
+            "name": "token",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string"
             },
             "description": "Authorization code from Google"
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "State parameter for CSRF protection"
           }
         ],
         "responses": {
