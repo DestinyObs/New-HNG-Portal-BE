@@ -44,11 +44,6 @@ public function create(array $data, array $meta = []): User|Exception
 
         $company = null;
         if ($data['role'] == 'company') {
-            $isAvailable = Company::query()->where('name', $data['company_name'])->exists();
-            if ($isAvailable) {
-                throw new Exception('Company already exists');
-            }
-
             $company = Company::create([
                 'user_id' => $user->id,
                 'name' => $data['company_name'],
