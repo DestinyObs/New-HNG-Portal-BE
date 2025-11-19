@@ -53,9 +53,9 @@ class JobController extends Controller
         ], 201);
     }
 
-    /**
-     * GET /employer/company/{uuid}/jobs/{job_id}
-     */
+    
+    //   GET /employer/company/{uuid}/jobs/{job_id}
+     
     public function show($uuid, $job_id): JsonResponse
     {
         $job = $this->service->getForCompany($uuid, $job_id);
@@ -67,9 +67,9 @@ class JobController extends Controller
         return response()->json(['data' => $job]);
     }
 
-    /**
-     * PUT /employer/company/{uuid}/jobs/{job_id}
-     */
+    
+    //   PUT /employer/company/{uuid}/jobs/{job_id}
+     
     public function update(Request $request, $uuid, $job_id): JsonResponse
     {
         $validated = $request->validate([
@@ -92,9 +92,9 @@ class JobController extends Controller
         return response()->json(['message' => 'Job updated', 'data' => $updated]);
     }
 
-    /**
-     * DELETE /employer/company/{uuid}/jobs/{job_id}
-     */
+    
+    //  DELETE /employer/company/{uuid}/jobs/{job_id}
+     
     public function destroy($uuid, $job_id): JsonResponse
     {
         $deleted = $this->service->deleteForCompany($uuid, $job_id);
@@ -106,9 +106,9 @@ class JobController extends Controller
         return response()->json(['message' => 'Job soft-deleted']);
     }
 
-    /**
-     * POST /employer/company/{uuid}/jobs/{job_id}/restore
-     */
+    
+    //   POST /employer/company/{uuid}/jobs/{job_id}/restore
+     
     public function restore($uuid, $job_id): JsonResponse
     {
         $job = $this->service->restore($job_id);
@@ -120,10 +120,10 @@ class JobController extends Controller
         return response()->json(['message' => 'Job restored', 'data' => $job]);
     }
 
-    /**
-     * PUT /employer/company/{uuid}/jobs/{job_id}/publish
-     * Currently a placeholder because job_listings table has no status column.
-     */
+    
+    //   PUT /employer/company/{uuid}/jobs/{job_id}/publish
+    //  Currently a placeholder because job_listings table has no status column.
+     
     public function publish($uuid, $job_id): JsonResponse
     {
         return response()->json([
@@ -131,10 +131,10 @@ class JobController extends Controller
         ], 501);
     }
 
-    /**
-     * PUT /employer/company/{uuid}/jobs/{job_id}/unpublish
-     * Currently a placeholder because job_listings table has no status column.
-     */
+    
+    //   PUT /employer/company/{uuid}/jobs/{job_id}/unpublish
+    //  Currently a placeholder because job_listings table has no status column.
+     
     public function unpublish($uuid, $job_id): JsonResponse
     {
         return response()->json([

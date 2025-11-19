@@ -24,7 +24,7 @@ class JobListing extends Model
         'job_type_id',
     ];
 
-    // 🔹 Relationships
+    // Relationships
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
