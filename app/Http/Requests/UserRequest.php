@@ -30,7 +30,6 @@ class UserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => ['required', Rule::in(['talent', 'company'])],
-            'phone' => 'required|string|max:255',
         ];
     }
 
