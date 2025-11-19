@@ -2,68 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Http;
-use App\Http\Requests\SkillRequest;
-use App\Services\SkillService;
-use Illuminate\Http\Request;
+use App\Models\Skill;
+use App\Services\Interfaces\SkillInterface;
 
 class SkillController extends Controller
 {
-    protected $skillService;
-
-    public function __construct(SkillService $skillService)
-    {
-        $this->skillService = $skillService;
-    }
+    public function __construct(
+        private readonly SkillInterface $skillService
+    ) {}
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of skills.
      */
     public function index()
     {
-        $data = $this->skillService->getAllSkills();
-        if ($data->isEmpty()) {
-            // not found
-            return $this->notFound('Skill no found');
-        }
-        return $this->successWithData($data, 'Skills retrieved successfully'); // 200
+        $skills = $this->skillService->getAll();
+        return $this->successWithData($skills, 'Skills retrieved successfully');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display the specified skill.
      */
-    public function store(SkillRequest $request)
+    public function show(Skill $skill)
     {
-        $validated = $request->validated();
-        $data = $this->skillService->createSkill($validated);
-        return $this->successWithData($data, 'created', Http::CREATED); // 201
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        $data = $this->skillService->getSkillById($id);
-        return $this->successWithData($data, 'Skill retrieved successfully'); // 200
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(SkillRequest $request, string $id)
-    {
-        $validated = $request->validated();
-        $data = $this->skillService->updateSkill($id, $validated);
-        return $this->successWithData($data, 'updated'); // 200
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $this->skillService->deleteSkill($id);
-        return $this->success('deleted', Http::NO_CONTENT); // 204
+        return $this->successWithData($skill, 'Skill retrieved successfully');
     }
 }
+
