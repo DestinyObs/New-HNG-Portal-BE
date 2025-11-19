@@ -4,6 +4,9 @@ use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__ . '/api/employer.php';
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
