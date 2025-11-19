@@ -25,12 +25,10 @@ class UserRequest extends FormRequest
         return [
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'company_name' => 'nullable|string|max:255',
-            'othername' => 'nullable|string|max:255',
+            'company_name' => 'required_if:role,company|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => ['required', Rule::in(['talent', 'company'])],
-            'phone' => 'required|string|max:255',
         ];
     }
 

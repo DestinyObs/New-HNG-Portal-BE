@@ -30,7 +30,7 @@ class User extends Authenticatable
     protected $hidden = ['password'];
 
     protected $with = [
-        'roles', 'permissions' 
+        'roles', 'permissions'
     ];
 
     protected $casts = [

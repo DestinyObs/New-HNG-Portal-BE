@@ -12,14 +12,13 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-  Route::post('/register', action: [UserController::class, 'store']);
-  
+
 Route::prefix('auth')->group(function () {
     Route::post('login', LoginController::class)->name('login');
     Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
     Route::post('reset-password', [ForgotPasswordController::class, 'update']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
-
+    Route::post('/register', action: [UserController::class, 'store']);
 });
 Route::post('/auth/google', [GoogleAuthController::class, 'callback']);
 
