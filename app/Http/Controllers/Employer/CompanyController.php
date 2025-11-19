@@ -19,11 +19,7 @@ class CompanyController extends Controller
         private CompanyService $companyService
     ) {}
 
-    // ==================== APPLICATION MANAGEMENT ====================
-    /*
-     * Get applicants for a specific job
-     * GET /employer/company/{uuid}/jobs/{job_uuid}/applications
-     */
+    // ===== APPLICATION MANAGEMENT ======
     public function getJobApplicants(Request $request, string $companyUuid, string $jobUuid)
     {
         try {
