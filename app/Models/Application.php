@@ -28,7 +28,7 @@ class Application extends Model
     // Relationships
     public function job(): BelongsTo
     {
-        return $this->belongsTo(JobListing::class, 'job_listing_id');
+        return $this->belongsTo(JobListing::class, 'job_id');
     }
 
     public function candidate(): BelongsTo

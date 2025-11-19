@@ -14,4 +14,6 @@ Route::prefix('employer')->group(function () {
         Route::get('/applications', [CompanyController::class, 'getJobApplicants']);
     });
 
+    Route::get('/company/{companyUuid}/talents', [CompanyController::class, 'searchTalents']);
+
 });
