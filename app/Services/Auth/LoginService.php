@@ -21,20 +21,19 @@ class LoginService implements LoginInterface
      */
     public function attempt(array $credentials)
     {
-        $guard = 'web';
-        // Attempt login with the specified guard
-        if (!Auth::guard($guard)->attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
            throw new AuthenticationException(__('auth.failed'));
         }
 
-        $user = Auth::guard($guard)->user();
+        $user = Auth::user();
 
-        // Return user data with token
+        if ($user->has('company')) {
+            $user->load('company');
+        }
+
         return collect([
             'user' => $user,
-            'token' => [
-                'token' => $user->createToken('auth_token', [$guard])->plainTextToken
-            ],
+            'token' => $user->createToken('auth_token')->plainTextToken
         ]);
     }
 }
