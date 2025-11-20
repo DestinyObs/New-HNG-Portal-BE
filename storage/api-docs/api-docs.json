@@ -648,7 +648,97 @@
           }
         }
       }
+    },
+
+    "/api/otp/verify-otp": {
+      "post": {
+        "summary": "Verify user OTP",
+        "description": "Verify a 4-digit OTP sent to the user's email. Marks the email as verified if OTP is valid and sends registration email accordingly.",
+        "tags": ["Authentication"],
+        "security": [
+          {
+            "sanctum": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["otp"],
+                "properties": {
+                  "otp": {
+                    "type": "string",
+                    "maxLength": 6,
+                    "example": "1234",
+                    "description": "4-digit OTP sent to user email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired OTP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User already verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/otp/resend-otp": {
+      "post": {
+        "summary": "Resend OTP to user email",
+        "description": "Generate a new 4-digit OTP for the authenticated user and send it to their email.",
+        "tags": ["Authentication"],
+        "security": [
+          {
+            "sanctum": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
+
   },
   "components": {
     "schemas": {
