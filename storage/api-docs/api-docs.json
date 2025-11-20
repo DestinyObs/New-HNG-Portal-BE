@@ -64,7 +64,7 @@
       }
     },
 
-    "/employer/company/{uuid}/jobs": {
+    "/api/employer/company/{uuid}/jobs": {
       "get": {
         "summary": "List all jobs for a company",
         "tags": ["Employer - Jobs"],
@@ -107,7 +107,7 @@
       }
     },
 
-    "/employer/company/{uuid}/jobs/{job_id}": {
+    "/api/employer/company/{uuid}/jobs/{job_id}": {
       "get": {
         "summary": "Get job details",
         "tags": ["Employer - Jobs"],
@@ -154,7 +154,7 @@
       }
     },
 
-    "/employer/company/{uuid}/jobs/{job_id}/restore": {
+    "/api/employer/company/{uuid}/jobs/{job_id}/restore": {
       "post": {
         "summary": "Restore a deleted job",
         "tags": ["Employer - Jobs"],
@@ -169,7 +169,7 @@
       }
     },
 
-    "/employer/company/{uuid}/jobs/{job_id}/publish": {
+    "/api/employer/company/{uuid}/jobs/{job_id}/publish": {
       "put": {
         "summary": "Publish job",
         "tags": ["Employer - Jobs"],
@@ -181,7 +181,7 @@
       }
     },
 
-    "/employer/company/{uuid}/jobs/{job_id}/unpublish": {
+    "/api/employer/company/{uuid}/jobs/{job_id}/unpublish": {
       "put": {
         "summary": "Unpublish job",
         "tags": ["Employer - Jobs"],
