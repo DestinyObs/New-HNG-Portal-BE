@@ -649,6 +649,95 @@
         }
       }
     },
+    "/api/locations": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get all location",
+        "description": "Retrieve a list of all available locations in the system",
+        "operationId": "getLocation",
+        "responses": {
+          "200": {
+            "description": "List of location retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Location retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Lagos, Nigeria"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/locations/{id}": {
+      "get": {
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a specific Location",
+        "operationId": "getLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location retrieved successfully"
+          },
+          "404": {
+            "description": "Location not found"
+          }
+        }
+      }
+    },    
     "/api/admin/locations": {
       "get": {
         "tags": [
