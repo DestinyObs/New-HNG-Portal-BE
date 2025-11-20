@@ -178,6 +178,94 @@
           }
         }
       }
+    },
+    "employer/company/{companyUuid}/applications/{applicationUuid}": {
+      "get": {
+        "summary": "Get Application Details",
+        "description": "Retrieve the details of a specific job application for a company.",
+        "tags": ["Company Job Applications"],
+        "parameters": [
+          {
+            "name": "companyUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The UUID of the company"
+          },
+          {
+            "name": "applicationUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The UUID of the application"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application not found."
+          }
+        }
+      }
+    },
+    "employer/company/{companyUuid}/applications/{applicationUuid}/status": {
+      "put": {
+        "summary": "Update Application Status",
+        "description": "Update the status of a specific job application for a company.",
+        "tags": ["Company Job Applications"],
+        "parameters": [
+          {
+            "name": "companyUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The UUID of the company"
+          },
+          {
+            "name": "applicationUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The UUID of the application"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application status updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application not found."
+          }
+        }
+      }
     }
   },
   "components": {
