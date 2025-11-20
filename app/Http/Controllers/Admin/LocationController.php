@@ -21,6 +21,9 @@ class LocationController extends Controller
     public function index()
     {
         $data = $this->locationService->getAllLocations();
+        if($data->isEmpty()){
+            return $this->error('Location not found!.');
+        }
         return $this->successWithData($data, 'location retrieved successfully');
     }
 
