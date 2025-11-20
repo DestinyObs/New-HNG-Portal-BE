@@ -23,8 +23,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function findBy(string $column, mixed $value): User
     {
         $query = $this->query()
-                    ->where(Str::lower($column), $value)
-                        ->firstOrFail();
+            ->where(Str::lower($column), $value)
+            ->firstOrFail();
         return $query;
     }
 
@@ -35,7 +35,6 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         ]);
 
         return $user->refresh();
-
     }
 
     public function update(User $user, array $data): User
