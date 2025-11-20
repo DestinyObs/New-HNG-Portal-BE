@@ -10,4 +10,6 @@ class Location extends Model
 {
     use HasUuids, HasFactory;
 
+    protected $fillable = ['name'];
+
 }
