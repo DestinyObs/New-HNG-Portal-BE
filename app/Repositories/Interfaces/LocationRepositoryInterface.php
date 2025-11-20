@@ -2,13 +2,11 @@
 
 namespace App\Repositories\Interfaces;
 
-class LocationRepositoryInterface
+interface LocationRepositoryInterface
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+     public function fetchAll();
+     public function findById(string $id);
+     public function create(array $data);
+     public function update(string $id, array $data);
+     public function destroy(string $id);
 }

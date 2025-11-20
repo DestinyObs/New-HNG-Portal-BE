@@ -3,8 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Location;
+use App\Repositories\Interfaces\LocationRepositoryInterface;
 
-class LocationRepository
+class LocationRepository implements LocationRepositoryInterface
 {
 
     protected Location $location;

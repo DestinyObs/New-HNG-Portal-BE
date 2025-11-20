@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Repositories\LocationRepository;
+use App\Services\Interfaces\LocationServiceInterface;
 
-class LocationService
+class LocationService implements LocationServiceInterface
 {
     protected $locationRepository;
 
