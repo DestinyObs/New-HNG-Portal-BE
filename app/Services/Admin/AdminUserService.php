@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -24,16 +24,22 @@ class AdminUserService
         $user = User::withTrashed()->find($id);
         if (!$user) return false;
 
+        // Handle role separately
         if (isset($data['role'])) {
-            $user->assignRole($data['role']);
+            $user->syncRoles([$data['role']]);
+            unset($data['role']); // remove so fill() doesn't break
         }
-        if (isset($data['status'])) {
-            $user->status = $data['status'];
+
+        // Apply all other updatable fields
+        if (!empty($data)) {
+            $user->fill($data);
         }
 
         $user->save();
+
         return $user->fresh();
     }
+
 
     public function softDeleteUser(string $id)
     {
@@ -52,18 +58,18 @@ class AdminUserService
         return true;
     }
 
-    public function startImpersonation(string $id)
-    {
-        $user = User::withTrashed()->find($id);
-        if (!$user) return false;
+    // public function startImpersonation(string $id)
+    // {
+    //     $user = User::withTrashed()->find($id);
+    //     if (!$user) return false;
 
-        session(['admin_impersonator_id' => Auth::id()]);
-        Auth::login($user);
+    //     session(['admin_impersonator_id' => Auth::id()]);
+    //     Auth::login($user);
 
-        return [
-            'impersonating' => true,
-            'user_id' => $user->id,
-            'user' => $user
-        ];
-    }
+    //     return [
+    //         'impersonating' => true,
+    //         'user_id' => $user->id,
+    //         'user' => $user
+    //     ];
+    // }
 }

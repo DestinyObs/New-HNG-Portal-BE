@@ -20,7 +20,7 @@ Route::prefix('auth')->group(function () {
     Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
     Route::post('reset-password', [ForgotPasswordController::class, 'update']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
-    Route::post('/register', action: [UserController::class, 'store']);
+    // Route::post('/register', action: [UserController::class, 'store']);
 });
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
@@ -29,12 +29,4 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
 
-Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
-    Route::get('/users', [App\Http\Controllers\Admin\AdminUserController::class, 'index']);
-    Route::get('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'show']);
-    Route::put('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'update']);
-    Route::delete('/users/{id}', [App\Http\Controllers\Admin\AdminUserController::class, 'destroy']);
-    Route::post('/users/{id}/restore', [App\Http\Controllers\Admin\AdminUserController::class, 'restore']);
-    Route::post('/users/{id}/impersonate', [App\Http\Controllers\Admin\AdminUserController::class, 'impersonate']);
-});
 

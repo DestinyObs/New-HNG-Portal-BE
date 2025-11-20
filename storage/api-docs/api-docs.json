@@ -648,8 +648,198 @@
           }
         }
       }
+    },
+
+      "/api/admin/users": {
+      "get": {
+        "summary": "Get paginated list of users (Admin)",
+        "description": "Retrieve a paginated list of all users including soft-deleted ones. Only accessible to admins/superadmins.",
+        "tags": ["Admin - Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "example": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "example": 20, "default": 20 },
+            "description": "Number of items per page (default 20)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/admin/users/{id}": {
+      "get": {
+        "summary": "Get user by ID (Admin)",
+        "description": "Retrieve a specific user (including soft-deleted) by UUID. Admin only.",
+        "tags": ["Admin - Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "User UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": {
+            "description": "User not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      },
+
+      "patch": {
+        "summary": "Update user (Admin)",
+        "description": "Update user details and/or role. Admin only.",
+        "tags": ["Admin - Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstname":   { "type": "string", "maxLength": 255, "nullable": true, "example": "Jane" },
+                  "lastname":    { "type": "string", "maxLength": 255, "nullable": true, "example": "Doe" },
+                  "othername":   { "type": "string", "maxLength": 255, "nullable": true, "example": "Marie" },
+                  "email":       { "type": "string", "format": "email", "maxLength": 255, "nullable": true, "example": "jane@example.com" },
+                  "phone":       { "type": "string", "maxLength": 50, "nullable": true, "example": "+19876543210" },
+                  "dob":         { "type": "string", "format": "date", "nullable": true, "example": "1995-05-20" },
+                  "status":      { "type": "string", "enum": ["active", "inactive", "banned"], "nullable": true, "example": "active" },
+                  "address_id":  { "type": ["string", "integer"], "nullable": true },
+                  "photo_url":   { "type": "string", "nullable": true, "example": "https://example.com/avatar.jpg" },
+                  "role":        { "type": "string", "enum": ["user", "talent", "admin", "superadmin"], "nullable": true, "example": "admin" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+
+      "delete": {
+        "summary": "Soft delete user (Admin)",
+        "description": "Soft delete a user (marks as deleted but keeps record). Admin only.",
+        "tags": ["Admin - Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/api/admin/users/{id}/restore": {
+      "post": {
+        "summary": "Restore soft-deleted user (Admin)",
+        "description": "Restore a previously soft-deleted user. Admin only.",
+        "tags": ["Admin - Users"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User restored successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "User not found or not deleted",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
     }
-  },
+},
   "components": {
     "schemas": {
       "Waitlist": {

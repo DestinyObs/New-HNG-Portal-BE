@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\AdminUserService;
+use App\Services\Admin\AdminUserService;
 use App\Enums\Http;
 use App\Models\User;
+use App\Http\Requests\Admin\AdminUserRequest;
 
 class AdminUserController extends Controller
 {
@@ -31,18 +32,20 @@ class AdminUserController extends Controller
         return $this->successWithData($user);
     }
 
-    public function update(Request $request, string $id)
-    {
-        $validated = $request->validate([
-            'role' => 'required|string|in:user,talent,admin,superadmin',
-            'status' => 'required|string|in:active,inactive,banned',
-        ]);
-        $updatedUser = $this->adminuserService->updateUser($id, $validated);
-        if (!$updatedUser) {
-            return $this->notFound('User not found');
-        }
-        return $this->successWithData($updatedUser, 'User updated successfully');
+    public function update(AdminUserRequest $request, string $id)
+{
+    $validated = $request->validated();
+
+    $updatedUser = $this->adminuserService->updateUser($id, $validated);
+
+    if (!$updatedUser) {
+        return $this->notFound('User not found');
     }
+
+    return $this->successWithData($updatedUser, 'User updated successfully');
+}
+
+
 
     public function destroy(string $id)
     {
@@ -63,13 +66,13 @@ class AdminUserController extends Controller
         return $this->success('User restored successfully');
     }
 
-    public function impersonate(string $id)
-    {
-        $session = $this->adminuserService->startImpersonation($id);
+    // public function impersonate(string $id)
+    // {
+    //     $session = $this->adminuserService->startImpersonation($id);
 
-        if (!$session) {
-            return $this->notFound('User not found');
-        }
-        return $this->successWithData($session, 'Impersonation started successfully');
-    }
+    //     if (!$session) {
+    //         return $this->notFound('User not found');
+    //     }
+    //     return $this->successWithData($session, 'Impersonation started successfully');
+    // }
 }
