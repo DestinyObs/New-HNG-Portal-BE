@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Employer\CompanyService;
 use App\Http\Requests\SearchTalentsRequest;
 use App\Repositories\Employer\CompanyRepository;
+use App\Http\Requests\UpdateApplicationStatusRequest;
 
 class CompanyController extends Controller
 {
@@ -39,6 +40,35 @@ class CompanyController extends Controller
         }
     }
 
+       public function getApplication(string $companyUuid, string $applicationUuid)
+    {
+        try {
+            $application = $this->companyService->getApplication($companyUuid, $applicationUuid);
+            return $this->successWithData($application, 'Application retrieved successfully');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Application not found');
+        } catch (Exception $e) {
+            return $this->error('Failed to retrieve application: ' . $e->getMessage());
+        }
+    }
+       public function updateApplicationStatus(UpdateApplicationStatusRequest $request, string $companyUuid, string $applicationUuid)
+    {
+        try {
+            // Verify ownership
+            $this->companyService->verifyCompanyApplicationOwnership($companyUuid, $applicationUuid);
+
+            // Update status
+            $application = $this->companyService->updateApplicationStatus($applicationUuid, $request->status);
+
+            return $this->successWithData($application, 'Application status updated successfully');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Application not found');
+        } catch (Exception $e) {
+            return $this->error('Failed to update application status: ' . $e->getMessage());
+        }
+    }
     // TALENTS SEARCH
     public function searchTalents(SearchTalentsRequest $request, string $companyUuid)
     {

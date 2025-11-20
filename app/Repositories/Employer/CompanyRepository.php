@@ -12,7 +12,7 @@ class CompanyRepository implements \App\Repositories\Interfaces\CompanyRepositor
 {
     public function __construct() {}
 
-    /** Find company by ID */
+
     public function findCompanyById(string $companyId): Company
     {
         return Company::findOrFail($companyId);
@@ -45,7 +45,32 @@ class CompanyRepository implements \App\Repositories\Interfaces\CompanyRepositor
         return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 
-    /** Search talents scoped to a specific company with filters */
+      public function getApplication(string $companyUuid, string $applicationUuid): Application
+    {
+        $company = Company::findOrFail($companyUuid);
+
+        return Application::with([
+            'candidate',
+            'candidate.skills',
+            'candidate.experiences',
+            'candidate.verification',
+            'job',
+            // 'notes.author'
+        ])
+        ->whereHas('job', function($query) use ($company) {
+            $query->where('company_id', $company->id);
+        })
+        ->findOrFail($applicationUuid);
+    }
+     /*Update application status*/
+    public function updateApplicationStatus(string $applicationUuid, string $status): Application
+    {
+        $application = Application::findOrFail($applicationUuid);
+        $application->update(['status' => $status]);
+
+        return $application->fresh(['candidate', 'job']);
+    }
+
     public function searchTalents(string $companyId, array $filters = []): LengthAwarePaginator
     {
         $query = User::with(['skills', 'track', 'candidateLocation', 'verification'])

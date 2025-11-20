@@ -2,6 +2,7 @@
 
 namespace App\Services\Employer;
 
+use App\Models\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Repositories\Employer\CompanyRepository;
 
@@ -16,7 +17,14 @@ class CompanyService
     {
         return $this->companyRepository->getJobApplicants($companyUuid, $jobUuid, $filters);
     }
-
+      public function getApplication(string $companyUuid, string $applicationUuid): Application
+    {
+        return $this->companyRepository->getApplication($companyUuid, $applicationUuid);
+    }
+     public function updateApplicationStatus(string $applicationUuid, string $status): Application
+    {
+        return $this->companyRepository->updateApplicationStatus($applicationUuid, $status);
+    }
     /** Verify that the job belongs to the company */
     public function verifyCompanyJobOwnership(string $companyUuid, string $jobUuid): array
     {
