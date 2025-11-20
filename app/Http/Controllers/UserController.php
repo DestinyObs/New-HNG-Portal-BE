@@ -33,8 +33,9 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $user = $this->userService->create($request->validated());
-        return $this->created('User created successfully', $user);
+        $userCredentials = $this->userService->create($request->validated());
+        // dd($userCredentials);
+        return $this->created('User created successfully', $userCredentials);
     }
 
     public function logout()

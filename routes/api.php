@@ -35,7 +35,6 @@ Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
 Route::controller(OtpTokenController::class)
     ->prefix('otp')
     ->group(function () {
-        Route::post('verify', 'verifyOtp')->middleware('auth::sanctum');
-        Route::post('resend', 'resendOtp')->middleware('auth::sanctum');
+        Route::post('verify-otp', 'verifyOtp')->middleware('auth:sanctum');
+        Route::post('resend-otp', 'resendOtp')->middleware('auth:sanctum');
     });
-
