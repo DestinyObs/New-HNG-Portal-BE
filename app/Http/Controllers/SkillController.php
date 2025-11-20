@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class SkillController extends Controller
 {
-     protected $skillService;
+    protected $skillService;
 
     public function __construct(SkillService $skillService)
     {
@@ -22,13 +22,18 @@ class SkillController extends Controller
     public function index()
     {
         $data = $this->skillService->getAllSkills();
-        return $this->successWithData($data, 'Job types retrieved successfully'); // 200
+        if ($data->isEmpty()) {
+            // not found
+            return $this->notFound('Skill no found');
+        }
+        return $this->successWithData($data, 'Skills retrieved successfully'); // 200
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SkillRequest $request) {
+    public function store(SkillRequest $request)
+    {
         $validated = $request->validated();
         $data = $this->skillService->createSkill($validated);
         return $this->successWithData($data, 'created', Http::CREATED); // 201
@@ -40,7 +45,7 @@ class SkillController extends Controller
     public function show($id)
     {
         $data = $this->skillService->getSkillById($id);
-        return $this->successWithData($data, 'Job type retrieved successfully'); // 200
+        return $this->successWithData($data, 'Skill retrieved successfully'); // 200
     }
 
     /**
