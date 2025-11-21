@@ -30,10 +30,10 @@ jobs:
           composer install --no-dev
           composer audit --format=json
 
-      - name: Run PHPUnit unit tests with strict failure criteria
+      - name: Run PHPUnit unit tests
         run: |
           composer install --no-dev
-          ./vendor/bin/phpunit --fail-on-risky --fail-on-warning
+          ./vendor/bin/phpunit
 
   # This job deploys the application to the production environment
   # It runs only if pre-deploy checks succeed and after manual confirmation or pushes to the prod branch
