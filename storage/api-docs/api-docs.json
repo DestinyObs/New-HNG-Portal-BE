@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "description": "API endpoints for hng portal creation."
   },
+
   "paths": {
     "/api/waitlist": {
       "post": {
@@ -19,18 +20,9 @@
                 "type": "object",
                 "required": ["full_name", "email", "role"],
                 "properties": {
-                  "full_name": {
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "johndoe@example.com"
-                  },
-                  "role": {
-                    "type": "string",
-                    "enum": ["talent", "company"],
+                  "full_name": { "type": "string", "example": "John Doe" },
+                  "email": { "type": "string", "format": "email", "example": "johndoe@example.com" },
+                  "role": { "type": "string",                    "enum": ["talent", "company"],
                     "example": "talent"
                   }
                 }
@@ -42,21 +34,13 @@
           "201": {
             "description": "Waitlist entry created successfully.",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Waitlist"
-                }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/Waitlist" } }
             }
           },
           "422": {
             "description": "Validation error",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
             }
           }
         }
@@ -65,34 +49,147 @@
     "/api/waitlist/{id}": {
       "get": {
         "summary": "Get waitlist entry",
-        "description": "Returns the details of a single waitlist entry.",
+        "description": "Returns the details of a waitlist entry.",
         "tags": ["Waitlist"],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The ID of the waitlist entry"
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
             "description": "Waitlist entry retrieved successfully.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Waitlist" } } }
+          },
+          "404": { "description": "Waitlist entry not found" }
+        }
+      }
+    },
+
+    "/api/employer/company/{uuid}/jobs": {
+      "get": {
+        "summary": "List all jobs for a company",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of company job listings",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Waitlist"
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Job" } }
+                  }
                 }
               }
             }
-          },
-          "404": {
-            "description": "Waitlist entry not found"
           }
         }
+      },
+
+      "post": {
+        "summary": "Create a new job",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/JobCreateRequest" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Job created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Job" } } } },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
+
+    "/api/employer/company/{uuid}/jobs/{job_id}": {
+      "get": {
+        "summary": "Get job details",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Job details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Job" } } } },
+          "404": { "description": "Job not found" }
+        }
+      },
+
+      "put": {
+        "summary": "Update a job posting",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/JobUpdateRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Job updated" },
+          "404": { "description": "Job not found" }
+        }
+      },
+
+      "delete": {
+        "summary": "Soft delete job",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Job deleted" },
+          "404": { "description": "Job not found" }
+        }
+      }
+    },
+
+    "/api/employer/company/{uuid}/jobs/{job_id}/restore": {
+      "post": {
+        "summary": "Restore a deleted job",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Job restored" },
+          "404": { "description": "Job not found" }
+        }
+      }
+    },
+
+    "/api/employer/company/{uuid}/jobs/{job_id}/publish": {
+      "put": {
+        "summary": "Publish job",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Job published" }, "404": { "description": "Job not found" } }
+      }
+    },
+
+    "/api/employer/company/{uuid}/jobs/{job_id}/unpublish": {
+      "put": {
+        "summary": "Unpublish job",
+        "tags": ["Employer - Jobs"],
+        "parameters": [
+          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Job unpublished" }, "404": { "description": "Job not found" } }
       }
     },
     "/api/auth/register": {
@@ -740,38 +837,18 @@
     }
 
   },
+
   "components": {
     "schemas": {
       "Waitlist": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 12
-          },
-          "full_name": {
-            "type": "string",
-            "example": "John Doe"
-          },
-          "email": {
-            "type": "string",
-            "example": "johndoe@example.com"
-          },
-          "role": {
-            "type": "string",
-            "enum": ["talent", "company"],
-            "example": "talent"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-01-16T12:45:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-01-16T12:45:00Z"
-          }
+          "id": { "type": "integer", "example": 12 },
+          "full_name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "example": "johndoe@example.com" },
+          "role": { "type": "string", "enum": ["talent", "company"], "example": "talent" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
         }
       },
       "LoginResponse": {
@@ -1031,6 +1108,52 @@
             "type": "integer",
             "example": 422
           }
+        }
+      },
+
+      "Job": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "019abcde-1234-5678-9999-jobid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "acceptance_criteria": { "type": "string", "nullable": true },
+          "candidate_location_id": { "type": "string", "nullable": true },
+          "company_id": { "type": "string" },
+          "price": { "type": "number", "nullable": true },
+          "track_id": { "type": "string", "nullable": true },
+          "category_id": { "type": "string", "nullable": true },
+          "job_type_id": { "type": "string", "nullable": true },
+          "status": { "type": "string", "example": "draft" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+
+      "JobCreateRequest": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": { "type": "string", "example": "Backend Developer" },
+          "description": { "type": "string", "example": "Write and maintain API logic" },
+          "acceptance_criteria": { "type": "string", "nullable": true },
+          "price": { "type": "number", "nullable": true },
+          "track_id": { "type": "string", "nullable": true },
+          "category_id": { "type": "string", "nullable": true },
+          "job_type_id": { "type": "string", "nullable": true }
+        }
+      },
+
+      "JobUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "acceptance_criteria": { "type": "string" },
+          "price": { "type": "number" },
+          "track_id": { "type": "string" },
+          "category_id": { "type": "string" },
+          "job_type_id": { "type": "string" }
         }
       }
     },
