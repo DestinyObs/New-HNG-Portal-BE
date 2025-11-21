@@ -12,5 +12,13 @@ class Skill extends Model
 
     protected $fillable = ['slug', 'name'];
 
-
+    public function jobListings()
+    {
+        return $this->belongsToMany(
+            JobListing::class,
+            'job_listing_skill',
+            'job_skill_id',
+            'job_listing_id'
+        );
+    }
 }
