@@ -664,6 +664,455 @@
         }
       }
     },
+    "/countries": {
+      "get": {
+        "summary": "List countries",
+        "description": "Retrieve all countries configured in the system.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Countries retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/countries/{country}": {
+      "get": {
+        "summary": "Get country details",
+        "description": "Retrieve a single country by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Country retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found"
+          }
+        }
+      }
+    },
+    "/countries/{country}/states": {
+      "get": {
+        "summary": "List states for a country",
+        "description": "Retrieve all states that belong to the specified country.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "States retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found"
+          }
+        }
+      }
+    },
+    "/states": {
+      "get": {
+        "summary": "List states",
+        "description": "Retrieve all states configured in the system.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "States retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/states/{state}": {
+      "get": {
+        "summary": "Get state details",
+        "description": "Retrieve a single state by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "State retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "State not found"
+          }
+        }
+      }
+    },
+    "/tracks": {
+      "get": {
+        "summary": "List tracks",
+        "description": "Retrieve all talent tracks.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Tracks retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tracks/{track}": {
+      "get": {
+        "summary": "Get track details",
+        "description": "Retrieve a single track by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "track",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Track retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Track not found"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "List categories",
+        "description": "Retrieve all job categories.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{category}": {
+      "get": {
+        "summary": "Get category details",
+        "description": "Retrieve a single category by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found"
+          }
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "summary": "List locations",
+        "description": "Retrieve all locations.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Locations retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations/{location}": {
+      "get": {
+        "summary": "Get location details",
+        "description": "Retrieve a single location by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found"
+          }
+        }
+      }
+    },
+    "/job-types": {
+      "get": {
+        "summary": "List job types",
+        "description": "Retrieve all job types.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Job types retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTypeListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-types/{jobType}": {
+      "get": {
+        "summary": "Get job type details",
+        "description": "Retrieve a single job type by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "jobType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job type retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTypeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job type not found"
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "List tags",
+        "description": "Retrieve all tags.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Tags retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{tag}": {
+      "get": {
+        "summary": "Get tag details",
+        "description": "Retrieve a single tag by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tag not found"
+          }
+        }
+      }
+    },
+    "/skills": {
+      "get": {
+        "summary": "List skills",
+        "description": "Retrieve all skills.",
+        "tags": ["Reference Data"],
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skills/{skill}": {
+      "get": {
+        "summary": "Get skill details",
+        "description": "Retrieve a single skill by ID.",
+        "tags": ["Reference Data"],
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found"
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "summary": "Register a new user",
