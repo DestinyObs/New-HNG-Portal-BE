@@ -1,4 +1,4 @@
-name: Deploy Laravel Backend to Staging (Self-Hosted Runner)
+name: Deploy Laravel Backend to Staging
 
 on:
   push:
