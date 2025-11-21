@@ -58,6 +58,7 @@ jobs:
             php artisan migrate:fresh --force
 
             # Restart backend service (assumes passwordless sudo)
+            sudo systemctl daemon-reload
             sudo systemctl restart staging-backend
             sudo systemctl status staging-backend --no-pager
 
