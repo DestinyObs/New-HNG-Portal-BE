@@ -23,7 +23,7 @@ class LoginController extends Controller
 
         return $this->successWithData([
             'user'  => $response['user'],
-            'token' => $response['token'], 
+            'token' => $response['token'],
         ], 'Login successful');
     }
 }

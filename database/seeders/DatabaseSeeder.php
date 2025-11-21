@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             JobTypeSeeder::class,
             SkillSeeder::class,
+            WorkModeSeeder::class,
             MediaSeeder::class,
 
             // Users (depends on nothing initially)
@@ -34,7 +35,7 @@ class DatabaseSeeder extends Seeder
             // Companies (depends on users)
             CompanySeeder::class,
 
-            // Job Listings (depends on companies, locations, tracks, categories, job_types)
+            // Job Listings (depends on companies, locations, tracks, categories, job_types, work_modes)
             JobListingSeeder::class,
 
             // User-related data (depends on users, skills, media)
