@@ -18,6 +18,7 @@ use App\Services\Interfaces\Admin\CountryServiceInterface;
 use App\Services\Interfaces\Admin\StateServiceInterface;
 use App\Services\Interfaces\Admin\TrackServiceInterface;
 use App\Services\Interfaces\Admin\WorkModeServiceInterface;
+use App\Services\Employer\CompanyService;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\Auth\LoginInterface;
 use App\Services\Interfaces\Auth\PasswordResetInterface;

@@ -84,6 +84,134 @@
                 }
               }
             }
+                "schema": { "$ref": "#/components/schemas/Waitlist" }
+              }
+            }
+          },
+          "404": { "description": "Waitlist entry not found" }
+        }
+      }
+    },
+
+    "/api/employer/company": {
+      "post": {
+        "summary": "Create a company",
+        "description": "Creates a new company for an employer.",
+        "tags": ["Company"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompanyCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CompanyResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/employer/company/{id}": {
+      "get": {
+        "summary": "Retrieve a company",
+        "description": "Gets a single company by its ID.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company retrieved successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "404": { "description": "Company not found." }
+        }
+      },
+      "put": {
+        "summary": "Update company details",
+        "description": "Updates fields for an existing company.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompanyUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/employer/company/{id}/logo": {
+      "post": {
+        "summary": "Update company logo",
+        "description": "Uploads and updates the company's logo.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["logo"],
+                "properties": {
+                  "logo": { "type": "string", "format": "binary" },
+                  "_method": { "type": "string", "format": "text" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo updated successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+            }
           }
         }
       },
@@ -836,6 +964,78 @@
       }
     }
 
+            "description": "Skills retrieved successfully"
+          },
+          "404": {
+            "description": "Skills not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Update skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "new type update"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Skills updated successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Delete skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Skills deleted successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }    
   },
 
   "components": {
