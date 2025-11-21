@@ -8,7 +8,6 @@ use App\Models\User;
 
 interface UserInterface
 {
-      public function create(array $data): User|\Exception;
+      public function create(array $data): array|\Exception;
       public function logout(): void;
-
 }
