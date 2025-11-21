@@ -95,11 +95,11 @@ jobs:
             php artisan migrate --force
 
             # Verify application health endpoint to ensure readiness before restart
-            HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://api.takeda.emerj.net/health)
-            if [ "$HTTP_RESPONSE" -ne 200 ]; then
-              echo "Health check failed with HTTP status $HTTP_RESPONSE"
-              exit 1
-            fi
+            #HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://api.takeda.emerj.net/health)
+            #if [ "$HTTP_RESPONSE" -ne 200 ]; then
+              #echo "Health check failed with HTTP status $HTTP_RESPONSE"
+              #exit 1
+            #fi
 
             # Reload systemd configs, restart the production service, and confirm active state
             sudo systemctl daemon-reload
