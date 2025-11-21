@@ -12,6 +12,7 @@ class JobListing extends Model
     use HasUuids, HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'id',
         'title',
         'description',
         'acceptance_criteria',
@@ -47,9 +48,9 @@ class JobListing extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function JobType()
+    public function jobType()
     {
-        return $this->belongsTo(JobType::class);
+        return $this->belongsTo(JobType::class, 'job_type_id');
     }
 
     public function tags()
@@ -60,6 +61,5 @@ class JobListing extends Model
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'job_skills');
-        // create if your team plans it
     }
 }

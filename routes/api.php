@@ -1,14 +1,31 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\OtpTokenController;
+use App\Models\OtpToken;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::prefix('auth')->group(function () {
+    Route::post('login', LoginController::class)->name('login');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'store']);
+    Route::post('reset-password', [ForgotPasswordController::class, 'update']);
+    Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
+    Route::post('/register', action: [UserController::class, 'store']);
+});
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
@@ -22,3 +39,15 @@ Route::get('/jobs/{job}/related', [JobController::class, 'related']);
 //FAQs
 Route::get('/faq', [FaqController::class, 'index']);
 Route::get('/faq/{faq}', [FaqController::class, 'show']);
+
+
+
+
+
+// Route::post('verify-otp', [])
+Route::controller(OtpTokenController::class)
+    ->prefix('otp')
+    ->group(function () {
+        Route::post('verify-otp', 'verifyOtp')->middleware('auth:sanctum');
+        Route::post('resend-otp', 'resendOtp')->middleware('auth:sanctum');
+    });
