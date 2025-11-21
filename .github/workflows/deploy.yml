@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, hng-portal-be, linux]
+    runs-on: [self-hosted, hng-13-runner, linux]
 
     steps:
       - name: Checkout code
