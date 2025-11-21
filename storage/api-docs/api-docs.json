@@ -6,6 +6,215 @@
     "description": "API endpoints for hng portal creation."
   },
   "paths": {
+    "/api/waitlist": {
+      "post": {
+        "summary": "Join the waitlist",
+        "description": "Creates a new waitlist entry and sends a confirmation email.",
+        "tags": ["Waitlist"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["full_name", "email", "role"],
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "johndoe@example.com"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "example": "talent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Waitlist entry created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Waitlist"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waitlist/{id}": {
+      "get": {
+        "summary": "Get waitlist entry",
+        "description": "Returns the details of a single waitlist entry.",
+        "tags": ["Waitlist"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the waitlist entry"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Waitlist entry retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Waitlist" }
+              }
+            }
+          },
+          "404": { "description": "Waitlist entry not found" }
+        }
+      }
+    },
+
+    "/api/employer/company": {
+      "post": {
+        "summary": "Create a company",
+        "description": "Creates a new company for an employer.",
+        "tags": ["Company"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompanyCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CompanyResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/employer/company/{id}": {
+      "get": {
+        "summary": "Retrieve a company",
+        "description": "Gets a single company by its ID.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company retrieved successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "404": { "description": "Company not found." }
+        }
+      },
+      "put": {
+        "summary": "Update company details",
+        "description": "Updates fields for an existing company.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompanyUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/employer/company/{id}/logo": {
+      "post": {
+        "summary": "Update company logo",
+        "description": "Uploads and updates the company's logo.",
+        "tags": ["Company"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["logo"],
+                "properties": {
+                  "logo": { "type": "string", "format": "binary" },
+                  "_method": { "type": "string", "format": "text" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo updated successfully.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CompanyResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/register": {
       "post": {
         "summary": "Register a new user",
@@ -19,21 +228,148 @@
                 "type": "object",
                 "required": ["firstname", "lastname", "email", "password", "password_confirmation", "role"],
                 "properties": {
-                  "firstname": {"type": "string", "maxLength": 255, "example": "John"},
-                  "lastname": {"type": "string", "maxLength": 255, "example": "Doe"},
-                  "company_name": {"type": "string", "maxLength": 255, "example": "Acme Corporation", "description": "Required when role is 'company'"},
-                  "email": {"type": "string", "format": "email", "example": "user@example.com"},
-                  "password": {"type": "string", "format": "password", "minLength": 8, "example": "Password123!"},
-                  "password_confirmation": {"type": "string", "format": "password", "example": "Password123!"},
-                  "role": {"type": "string", "enum": ["talent", "company"], "example": "talent"}
+                  "firstname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "John"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Doe"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Acme Corporation",
+                    "description": "Required when role is 'company'"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "example": "talent"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": {"description": "User created successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserResponse"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/google/redirect": {
+      "get": {
+        "summary": "Redirect to Google OAuth",
+        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
+        "tags": ["Authentication"],
+        "responses": {
+          "302": {
+            "description": "Redirect to Google OAuth",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL to Google OAuth page"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/google/callback": {
+      "get": {
+        "summary": "Handle Google OAuth callback",
+        "description": "Processes Google OAuth callback and returns user data with access token.",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Authorization code from Google"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "State parameter for CSRF protection"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Google OAuth login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid OAuth callback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "OAuth authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -50,17 +386,52 @@
                 "type": "object",
                 "required": ["email", "password"],
                 "properties": {
-                  "email": {"type": "string", "format": "email", "example": "user@example.com"},
-                  "password": {"type": "string", "format": "password", "example": "Password123!"}
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {"description": "Login successful", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LoginResponse"}}}},
-          "401": {"description": "Invalid credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -71,15 +442,33 @@
         "tags": ["Authentication"],
         "security": [{"bearerAuth": []}],
         "responses": {
-          "200": {"description": "Logged out successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+          "200": {
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
         }
       }
     },
     "/api/auth/forgot-password": {
       "post": {
         "summary": "Request password reset",
-        "description": "Send password reset link to user's email.",
+        "description": "Send password reset link to user's email. The reset link will be valid for 10 minutes and contains a unique token (hash) that must be used with the reset-password endpoint.",
         "tags": ["Authentication"],
         "requestBody": {
           "required": true,
@@ -88,21 +477,45 @@
               "schema": {
                 "type": "object",
                 "required": ["email"],
-                "properties": {"email": {"type": "string", "format": "email", "example": "user@example.com"}}
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
-          "200": {"description": "Password reset link sent successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
+          "200": {
+            "description": "Password reset link sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
         }
       }
     },
     "/api/auth/reset-password": {
       "post": {
         "summary": "Reset password",
-        "description": "Reset user password using token from the password reset email link.",
+        "description": "Reset user password using token (hash) from the password reset email link. The token is the 'hash' query parameter from the reset link URL.",
         "tags": ["Authentication"],
         "requestBody": {
           "required": true,
@@ -112,458 +525,56 @@
                 "type": "object",
                 "required": ["email", "token", "password", "password_confirmation"],
                 "properties": {
-                  "email": {"type": "string", "format": "email", "example": "user@example.com"},
-                  "token": {"type": "string", "example": "abc123def456ghi789jkl012mno345pqr678"},
-                  "password": {"type": "string", "format": "password", "minLength": 8, "example": "NewPassword123!"},
-                  "password_confirmation": {"type": "string", "format": "password", "example": "NewPassword123!"}
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com",
+                    "description": "User's email address"
+                  },
+                  "token": {
+                    "type": "string",
+                    "example": "abc123def456ghi789jkl012mno345pqr678",
+                    "description": "The hash token from the password reset email link (32 character random string)"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "NewPassword123!",
+                    "description": "New password (minimum 8 characters)"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123!",
+                    "description": "Password confirmation (must match password)"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {"description": "Password reset successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "422": {"description": "Validation error, invalid token, or expired token", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
-        "tags": ["Authentication"],
-        "responses": {
-          "302": {"description": "Redirect to Google OAuth"}
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Handle Google OAuth callback",
-        "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": ["Authentication"],
-        "parameters": [
-          {"name": "code", "in": "query", "required": true, "schema": {"type": "string"}},
-          {"name": "state", "in": "query", "required": false, "schema": {"type": "string"}}
-        ],
-        "responses": {
-          "200": {"description": "Google OAuth login successful", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LoginResponse"}}}},
-          "400": {"description": "Invalid OAuth callback", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "401": {"description": "OAuth authentication failed", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
-        }
-      }
-    },
-    "/api/auth/verify-otp": {
-      "post": {
-        "summary": "Verify OTP",
-        "description": "Verify OTP token for authenticated user.",
-        "tags": ["Authentication"],
-        "security": [{"bearerAuth": []}],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["otp_token"],
-                "properties": {"otp_token": {"type": "string", "example": "123456"}}
+          "200": {
+            "description": "Password reset successfully. A confirmation email will be sent to the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "200": {"description": "OTP verified successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "422": {"description": "Invalid or expired OTP", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/auth/resend-otp": {
-      "post": {
-        "summary": "Resend OTP",
-        "description": "Resend OTP token to authenticated user.",
-        "tags": ["Authentication"],
-        "security": [{"bearerAuth": []}],
-        "responses": {
-          "200": {"description": "OTP resent successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "429": {"description": "Too many resend attempts", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
-        }
-      }
-    },
-    "/api/waitlist": {
-      "post": {
-        "summary": "Join the waitlist",
-        "description": "Creates a new waitlist entry and sends a confirmation email.",
-        "tags": ["Waitlist"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["full_name", "email", "role"],
-                "properties": {
-                  "full_name": {"type": "string", "example": "John Doe"},
-                  "email": {"type": "string", "format": "email", "example": "johndoe@example.com"},
-                  "role": {"type": "string", "enum": ["talent", "company"], "example": "talent"}
+          },
+          "422": {
+            "description": "Validation error, invalid token, or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
           }
-        },
-        "responses": {
-          "201": {"description": "Waitlist entry created successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Waitlist"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/waitlist/{id}": {
-      "get": {
-        "summary": "Get waitlist entry",
-        "description": "Returns the details of a single waitlist entry.",
-        "tags": ["Waitlist"],
-        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
-        "responses": {
-          "200": {"description": "Waitlist entry retrieved successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Waitlist"}}}},
-          "404": {"description": "Waitlist entry not found"}
-        }
-      }
-    },
-    "/api/lookups/countries": {
-      "get": {
-        "summary": "List all countries",
-        "description": "Retrieve all countries for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Countries retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/Country"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/states": {
-      "get": {
-        "summary": "List all states",
-        "description": "Retrieve all states for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "States retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/State"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/job-types": {
-      "get": {
-        "summary": "List all job types",
-        "description": "Retrieve all job types for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Job types retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/JobType"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/skills": {
-      "get": {
-        "summary": "List all skills",
-        "description": "Retrieve all skills for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Skills retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/Skill"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/tracks": {
-      "get": {
-        "summary": "List all tracks",
-        "description": "Retrieve all talent tracks for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Tracks retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/Track"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/categories": {
-      "get": {
-        "summary": "List all categories",
-        "description": "Retrieve all job categories for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Categories retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/Category"}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/lookups/work-modes": {
-      "get": {
-        "summary": "List all work modes",
-        "description": "Retrieve all work modes for lookup/dropdown purposes.",
-        "tags": ["Lookups"],
-        "responses": {
-          "200": {"description": "Work modes retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string"}, "name": {"type": "string"}}}}, "status": {"type": "integer"}}}}}}
-        }
-      }
-    },
-    "/api/employer/company": {
-      "post": {
-        "summary": "Create a company",
-        "description": "Creates a new company for an employer.",
-        "tags": ["Employer - Company"],
-        "security": [{"bearerAuth": []}],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"$ref": "#/components/schemas/CompanyCreateRequest"}
-            }
-          }
-        },
-        "responses": {
-          "201": {"description": "Company created successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CompanyResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}": {
-      "get": {
-        "summary": "Retrieve a company",
-        "description": "Gets a single company by its UUID.",
-        "tags": ["Employer - Company"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
-        "responses": {
-          "200": {"description": "Company retrieved successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CompanyResponse"}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Company not found"}
-        }
-      },
-      "put": {
-        "summary": "Update company details",
-        "description": "Updates fields for an existing company.",
-        "tags": ["Employer - Company"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
-        "requestBody": {
-          "required": false,
-          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CompanyUpdateRequest"}}}
-        },
-        "responses": {
-          "200": {"description": "Company updated successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CompanyResponse"}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Company not found"},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/logo": {
-      "put": {
-        "summary": "Update company logo",
-        "description": "Uploads and updates the company's logo.",
-        "tags": ["Employer - Company"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": ["logo"],
-                "properties": {"logo": {"type": "string", "format": "binary"}}
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {"description": "Logo updated successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CompanyResponse"}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Company not found"},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/jobs": {
-      "get": {
-        "summary": "List company jobs",
-        "description": "Retrieve all jobs for a specific company.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
-        "responses": {
-          "200": {"description": "Jobs retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"type": "array", "items": {"$ref": "#/components/schemas/Job"}}, "status": {"type": "integer"}}}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Company not found"}
-        }
-      },
-      "post": {
-        "summary": "Create a job posting",
-        "description": "Create a new job posting for a company.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
-        "requestBody": {
-          "required": true,
-          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StoreJobRequest"}}}
-        },
-        "responses": {
-          "201": {"description": "Job created successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"$ref": "#/components/schemas/Job"}, "status": {"type": "integer"}}}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Company not found"},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/jobs/{job_id}": {
-      "get": {
-        "summary": "Get job details",
-        "description": "Retrieve details of a specific job.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "responses": {
-          "200": {"description": "Job retrieved successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"$ref": "#/components/schemas/Job"}, "status": {"type": "integer"}}}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"}
-        }
-      },
-      "put": {
-        "summary": "Update job posting",
-        "description": "Update an existing job posting.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateJobRequest"}}}
-        },
-        "responses": {
-          "200": {"description": "Job updated successfully", "content": {"application/json": {"schema": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "data": {"$ref": "#/components/schemas/Job"}, "status": {"type": "integer"}}}}}},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"},
-          "422": {"description": "Validation error"}
-        }
-      },
-      "delete": {
-        "summary": "Delete job posting",
-        "description": "Delete (soft delete) a job posting.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "responses": {
-          "204": {"description": "Job deleted successfully"},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/jobs/{job_id}/restore": {
-      "post": {
-        "summary": "Restore deleted job",
-        "description": "Restore a soft-deleted job posting.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "responses": {
-          "200": {"description": "Job restored successfully"},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/jobs/{job_id}/publish": {
-      "put": {
-        "summary": "Publish job",
-        "description": "Publish a job posting.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "responses": {
-          "200": {"description": "Job published successfully"},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"}
-        }
-      }
-    },
-    "/api/employer/company/{uuid}/jobs/{job_id}/unpublish": {
-      "put": {
-        "summary": "Unpublish job",
-        "description": "Unpublish a job posting.",
-        "tags": ["Employer - Jobs"],
-        "security": [{"bearerAuth": []}],
-        "parameters": [
-          {"name": "uuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
-          {"name": "job_id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "responses": {
-          "200": {"description": "Job unpublished successfully"},
-          "401": {"description": "Unauthorized"},
-          "404": {"description": "Job or company not found"}
-        }
-      }
-    },
-    "/api/talent/update-password": {
-      "put": {
-        "summary": "Update password",
-        "description": "Update talent user password (requires authentication).",
-        "tags": ["Talent"],
-        "security": [{"bearerAuth": []}],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["current_password", "new_password", "new_password_confirmation"],
-                "properties": {
-                  "current_password": {"type": "string", "format": "password"},
-                  "new_password": {"type": "string", "format": "password", "minLength": 8},
-                  "new_password_confirmation": {"type": "string", "format": "password"}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {"description": "Password updated successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SuccessResponse"}}}},
-          "401": {"description": "Unauthorized"},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
-        }
-      }
-    },
-    "/api/talent/update-photo": {
-      "put": {
-        "summary": "Update profile photo",
-        "description": "Upload and update talent user profile photo (requires authentication).",
-        "tags": ["Talent"],
-        "security": [{"bearerAuth": []}],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": ["photo"],
-                "properties": {"photo": {"type": "string", "format": "binary"}}
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {"description": "Photo updated successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserResponse"}}}},
-          "401": {"description": "Unauthorized"},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
         }
       }
     },
@@ -574,12 +585,48 @@
         "tags": ["Users"],
         "security": [{"bearerAuth": []}],
         "parameters": [
-          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
-          {"name": "per_page", "in": "query", "required": false, "schema": {"type": "integer"}}
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 15
+            },
+            "description": "Number of items per page"
+          }
         ],
         "responses": {
-          "200": {"description": "Users retrieved successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UsersResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
         }
       },
       "post": {
@@ -593,25 +640,80 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["firstname", "lastname", "email", "password"],
+                "required": ["firstname", "lastname", "email", "phone", "password"],
                 "properties": {
-                  "firstname": {"type": "string"},
-                  "lastname": {"type": "string"},
-                  "othername": {"type": "string"},
-                  "email": {"type": "string", "format": "email"},
-                  "phone": {"type": "string"},
-                  "dob": {"type": "string", "format": "date"},
-                  "password": {"type": "string", "format": "password"},
-                  "password_confirmation": {"type": "string", "format": "password"}
+                  "firstname": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "othername": {
+                    "type": "string",
+                    "example": "Smith"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+1234567890"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1990-01-01"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": {"description": "User created successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "422": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}}
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -621,202 +723,627 @@
         "description": "Retrieve a specific user by UUID (requires authentication).",
         "tags": ["Users"],
         "security": [{"bearerAuth": []}],
-        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "User UUID"
+          }
+        ],
         "responses": {
-          "200": {"description": "User retrieved successfully", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-          "404": {"description": "User not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
         }
       }
-    }
+    },
+    "/api/skills": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Get all skills",
+        "description": "Retrieve a list of all available skills in the system",
+        "operationId": "getSkills",
+        "responses": {
+          "200": {
+            "description": "List of skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Skills retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Full-time"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/skills/{id}": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Get a specific skill",
+        "operationId": "getSkillId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill retrieved successfully"
+          },
+          "404": {
+            "description": "Skill not found"
+          }
+        }
+      }
+    },
+    "/api/admin/skills": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Get all skills",
+        "description": "Retrieve a list of all available skills",
+        "operationId": "getSkill",
+        "responses": {
+          "200": {
+            "description": "List of skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/skills/{id}": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Get skill by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully"
+          },
+          "404": {
+            "description": "Skills not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Update skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "new type update"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Skills updated successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Delete skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Skills deleted successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }    
   },
+
   "components": {
     "schemas": {
       "Waitlist": {
         "type": "object",
         "properties": {
-          "id": {"type": "integer"},
-          "full_name": {"type": "string"},
-          "email": {"type": "string"},
-          "role": {"type": "string", "enum": ["talent", "company"]},
-          "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"}
+          "id": { "type": "integer", "example": 12 },
+          "full_name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "example": "johndoe@example.com" },
+          "role": {
+            "type": "string",
+            "enum": ["talent", "company"],
+            "example": "talent"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:45:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:45:00Z"
+          }
         }
       },
-      "Country": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}, "code": {"type": "string"}}},
-      "State": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}, "country_id": {"type": "string", "format": "uuid"}}},
-      "Track": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}}},
-      "Category": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}}},
-      "Skill": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}}},
-      "JobType": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}}},
-      "Job": {
-        "type": "object",
-        "properties": {
-          "id": {"type": "string", "format": "uuid"},
-          "company_id": {"type": "string", "format": "uuid"},
-          "title": {"type": "string"},
-          "description": {"type": "string"},
-          "location": {"type": "string"},
-          "salary_min": {"type": "number"},
-          "salary_max": {"type": "number"},
-          "job_type_id": {"type": "string", "format": "uuid"},
-          "category_id": {"type": "string", "format": "uuid"},
-          "is_published": {"type": "boolean"},
-          "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"}
-        }
-      },
-      "StoreJobRequest": {
-        "type": "object",
-        "required": ["title", "description"],
-        "properties": {
-          "title": {"type": "string"},
-          "description": {"type": "string"},
-          "location": {"type": "string"},
-          "salary_min": {"type": "number"},
-          "salary_max": {"type": "number"},
-          "job_type_id": {"type": "string", "format": "uuid"},
-          "category_id": {"type": "string", "format": "uuid"},
-          "skills": {"type": "array", "items": {"type": "string", "format": "uuid"}}
-        }
-      },
-      "UpdateJobRequest": {
-        "type": "object",
-        "properties": {
-          "title": {"type": "string"},
-          "description": {"type": "string"},
-          "location": {"type": "string"},
-          "salary_min": {"type": "number"},
-          "salary_max": {"type": "number"},
-          "job_type_id": {"type": "string", "format": "uuid"},
-          "category_id": {"type": "string", "format": "uuid"},
-          "skills": {"type": "array", "items": {"type": "string", "format": "uuid"}}
-        }
-      },
+
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "data": {"type": "object", "properties": {"user": {"$ref": "#/components/schemas/User"}, "token": {"type": "string"}}},
-          "status": {"type": "integer"}
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "$ref": "#/components/schemas/User"
+              },
+              "token": {
+                "type": "string",
+                "example": "1|abc123def456ghi789jkl012mno345pqr678",
+                "description": "Laravel Sanctum bearer token for API authentication"
+              }
+            },
+            "required": ["user", "token"]
+          },
+          "status": {
+            "type": "integer",
+            "example": 200
+          }
         },
         "required": ["success", "message", "data", "status"]
       },
       "UserResponse": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "data": {"$ref": "#/components/schemas/User"},
-          "status": {"type": "integer"}
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "User created successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          },
+          "status": {
+            "type": "integer",
+            "example": 201
+          }
         },
         "required": ["success", "message", "data", "status"]
       },
       "UsersResponse": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "data": {"type": "array", "items": {"$ref": "#/components/schemas/User"}},
-          "meta": {"type": "object", "properties": {"current_page": {"type": "integer"}, "per_page": {"type": "integer"}, "total": {"type": "integer"}}}
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Users retrieved successfully"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "example": 1
+              },
+              "per_page": {
+                "type": "integer",
+                "example": 15
+              },
+              "total": {
+                "type": "integer",
+                "example": 100
+              }
+            }
+          }
         }
       },
       "SuccessResponse": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "status": {"type": "integer"}
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Password reset link sent successfully"
+          },
+          "status": {
+            "type": "integer",
+            "example": 200,
+            "description": "HTTP status code"
+          }
         },
         "required": ["success", "message", "status"]
       },
       "User": {
         "type": "object",
         "properties": {
-          "id": {"type": "string", "format": "uuid"},
-          "firstname": {"type": "string"},
-          "lastname": {"type": "string"},
-          "othername": {"type": "string", "nullable": true},
-          "email": {"type": "string", "format": "email"},
-          "phone": {"type": "string", "nullable": true},
-          "dob": {"type": "string", "format": "date", "nullable": true},
-          "status": {"type": "string", "enum": ["banned", "suspended", "active"]},
-          "photo_url": {"type": "string", "nullable": true},
-          "email_verified_at": {"type": "string", "format": "date-time", "nullable": true},
-          "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"},
-          "roles": {"type": "array", "items": {"$ref": "#/components/schemas/Role"}},
-          "permissions": {"type": "array", "items": {"$ref": "#/components/schemas/Permission"}}
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019a979f-f86c-7102-9bbf-83fda33cd34d"
+          },
+          "firstname": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "othername": {
+            "type": "string",
+            "example": "Smith",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-01-01",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": ["banned", "suspended", "active"],
+            "example": "active"
+          },
+          "photo_url": {
+            "type": "string",
+            "example": "https://example.com/photo.jpg",
+            "nullable": true
+          },
+          "email_verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-16T12:45:00Z"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
         }
       },
-      "Role": {"type": "object", "properties": {"id": {"type": "integer"}, "name": {"type": "string"}, "guard_name": {"type": "string"}}},
-      "Permission": {"type": "object", "properties": {"id": {"type": "integer"}, "name": {"type": "string"}, "guard_name": {"type": "string"}}},
-      "Error": {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}, "status": {"type": "integer"}}},
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "user"
+          },
+          "guard_name": {
+            "type": "string",
+            "example": "web"
+          }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "view_profile"
+          },
+          "guard_name": {
+            "type": "string",
+            "example": "web"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid credentials"
+          },
+          "status": {
+            "type": "integer",
+            "example": 401
+          }
+        }
+      },
       "ValidationError": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "errors": {"type": "object"},
-          "status": {"type": "integer"}
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "The given data was invalid."
+          },
+          "errors": {
+            "type": "object",
+            "example": {
+              "email": ["The email field is required."],
+              "password": ["The password must be at least 8 characters."]
+            }
+          },
+          "status": {
+            "type": "integer",
+            "example": 422
+          }
         }
       },
+
       "CompanyCreateRequest": {
         "type": "object",
         "required": ["user_id", "name", "slug"],
         "properties": {
-          "user_id": {"type": "string", "format": "uuid"},
-          "name": {"type": "string"},
-          "slug": {"type": "string"},
-          "description": {"type": "string", "nullable": true},
-          "logo_url": {"type": "string", "format": "uri", "nullable": true},
-          "country_id": {"type": "string", "format": "uuid", "nullable": true},
-          "website_url": {"type": "string", "format": "uri", "nullable": true},
-          "is_verified": {"type": "boolean"},
-          "official_email": {"type": "string", "format": "email", "nullable": true},
-          "status": {"type": "string", "enum": ["active", "inactive", "suspended"]}
+          "user_id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string", "maxLength": 255 },
+          "slug": { "type": "string", "maxLength": 255 },
+          "description": { "type": "string", "nullable": true },
+          "logo_url": { "type": "string", "format": "uri", "nullable": true },
+          "country_id": { "type": "string", "format": "uuid", "nullable": true },
+          "website_url": { "type": "string", "format": "uri", "nullable": true },
+          "is_verified": { "type": "boolean" },
+          "official_email": { "type": "string", "format": "email", "nullable": true },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          }
         }
       },
+
       "CompanyUpdateRequest": {
         "type": "object",
         "properties": {
-          "name": {"type": "string"},
-          "slug": {"type": "string", "nullable": true},
-          "description": {"type": "string", "nullable": true},
-          "logo_url": {"type": "string", "format": "uri", "nullable": true},
-          "country_id": {"type": "string", "format": "uuid", "nullable": true},
-          "website_url": {"type": "string", "format": "uri", "nullable": true},
-          "is_verified": {"type": "boolean"},
-          "official_email": {"type": "string", "format": "email", "nullable": true},
-          "status": {"type": "string", "enum": ["active", "inactive", "suspended"]}
+          "name": { "type": "string", "maxLength": 255 },
+          "slug": { "type": "string", "maxLength": 255, "nullable": true },
+          "description": { "type": "string", "nullable": true },
+          "logo_url": { "type": "string", "format": "uri", "nullable": true },
+          "country_id": { "type": "string", "format": "uuid", "nullable": true },
+          "website_url": { "type": "string", "format": "uri", "nullable": true },
+          "is_verified": { "type": "boolean" },
+          "official_email": { "type": "string", "format": "email", "maxLength": 255 },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          }
         }
       },
+
       "CompanyResponse": {
         "type": "object",
         "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "status": {"type": "integer"},
-          "data": {"$ref": "#/components/schemas/Company"}
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "status": { "type": "integer" },
+          "data": { "$ref": "#/components/schemas/Company" }
         }
       },
+
       "Company": {
         "type": "object",
         "properties": {
-          "id": {"type": "string", "format": "uuid"},
-          "user_id": {"type": "string", "format": "uuid"},
-          "name": {"type": "string"},
-          "slug": {"type": "string"},
-          "description": {"type": "string", "nullable": true},
-          "logo_url": {"type": "string", "nullable": true},
-          "country_id": {"type": "string", "nullable": true},
-          "website_url": {"type": "string", "nullable": true},
-          "is_verified": {"type": "boolean"},
-          "official_email": {"type": "string", "nullable": true},
-          "status": {"type": "string", "enum": ["active", "inactive", "suspended"]},
-          "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"}
+          "id": { "type": "string", "format": "uuid" },
+          "user_id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "logo_url": { "type": "string", "nullable": true },
+          "country_id": { "type": "string", "nullable": true },
+          "website_url": { "type": "string", "nullable": true },
+          "is_verified": { "type": "boolean" },
+          "official_email": { "type": "string", "nullable": true },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
         }
       }
     },
@@ -825,7 +1352,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "Sanctum Token",
-        "description": "Laravel Sanctum token authentication"
+        "description": "Laravel Sanctum token authentication. Format: 'Bearer {token}' where token is returned from login endpoint."
       }
     }
   }
