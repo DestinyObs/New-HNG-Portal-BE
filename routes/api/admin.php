@@ -11,8 +11,20 @@ Route::prefix('api/admin')->group(function () {
     });
 
     // SKILLS ROUTES
-    Route::apiResource('skills', SkillController::class);
+    Route::apiResource('skills', SkillController::class)->names([
+        'index' => 'admin.skills.index',
+        'store' => 'admin.skills.store',
+        'show' => 'admin.skills.show',
+        'update' => 'admin.skills.update',
+        'destroy' => 'admin.skills.destroy',
+    ]);
 
     // JOB TYPES ROUTES
-    Route::apiResource('job-types', JobTypeController::class);
+    Route::apiResource('job-types', JobTypeController::class)->names([
+        'index' => 'admin.job-types.index',
+        'store' => 'admin.job-types.store',
+        'show' => 'admin.job-types.show',
+        'update' => 'admin.job-types.update',
+        'destroy' => 'admin.job-types.destroy',
+    ]);
 });
