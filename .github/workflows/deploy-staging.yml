@@ -13,50 +13,23 @@ jobs:
     runs-on: [self-hosted, hng-13-runner, linux]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up PHP 8.2
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, intl, pdo, mysql, openssl, tokenizer, ctype, fileinfo
-
-      - name: Install Composer dependencies
-        run: /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-        working-directory: /home/hng-portal/staging/backend/HNG-Portal-BE
-
-      - name: Set folder permissions
-        run: |
-          sudo chown -R hng-portal:hng-portal /home/hng-portal/staging/backend/HNG-Portal-BE
-          sudo chmod -R 775 /home/hng-portal/staging/backend/HNG-Portal-BE/storage
-          sudo chmod -R 775 /home/hng-portal/staging/backend/HNG-Portal-BE/bootstrap/cache
-
-      - name: Run Laravel optimizations
-        run: |
-          php artisan config:clear
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          php artisan optimize
-        working-directory: /home/hng-portal/staging/backend/HNG-Portal-BE
-
-      - name: Run fresh database migrations
-        run: php artisan migrate:fresh --force
-        working-directory: /home/hng-portal/staging/backend/HNG-Portal-BE
-
       - name: Prepare SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
 
-      - name: Deploy to remote server via SSH
+      - name: Deploy to remote server via SSH and run deployment commands
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa hng-portal@${{ secrets.DEPLOY_SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 hng-portal@${{ secrets.DEPLOY_SERVER_IP }} << 'EOF'
             cd /home/hng-portal/staging/backend/HNG-Portal-BE
             git pull origin staging
             /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            php artisan config:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
             php artisan migrate:fresh --force
             sudo systemctl restart staging-backend
           EOF
