@@ -98,6 +98,7 @@ jobs:
             fi
 
             # Restart the production service (passwordless sudo required)
+            sudo systemctl daemon-reload
             sudo systemctl restart prod-backend
             sudo systemctl status prod-backend --no-pager
 
