@@ -30,27 +30,30 @@ class JobListingFactory extends Factory
             'title' => fake()->randomElement($jobTitles),
             'description' => fake()->paragraphs(3, true),
             'acceptance_criteria' => fake()->optional(0.8)->text(200),
-            'candidate_location_id' => null, // Will be set by seeder
+            'state_id' => null, // Will be set by seeder if needed
+            'country_id' => null, // Will be set by seeder if needed
             'company_id' => null, // Will be set by seeder
             'price' => fake()->randomFloat(2, 50000, 200000),
             'track_id' => null, // Will be set by seeder
             'category_id' => null, // Will be set by seeder
             'job_type_id' => null, // Will be set by seeder
+            'work_mode_id' => null, // Will be set by seeder
+            'status' => fake()->randomElement(['active', 'in-active', 'draft']),
+            'publication_status' => fake()->randomElement(['published', 'unpublished']),
         ];
     }
 
     public function withHighSalary(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'price' => fake()->randomFloat(2, 150000, 300000),
         ]);
     }
 
     public function withLowSalary(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'price' => fake()->randomFloat(2, 30000, 80000),
         ]);
     }
 }
-

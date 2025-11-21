@@ -20,10 +20,9 @@ class JobTypeSeeder extends Seeder
         ];
 
         foreach ($jobTypes as $jobType => $title) {
-           JobType::factory()->create([
-               'name' => $title['name'],
-           ]);
+            JobType::factory()->create([
+                'name' => $title['name'],
+            ]);
         }
     }
 }
-

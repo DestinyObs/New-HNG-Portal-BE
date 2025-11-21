@@ -1,28 +1,46 @@
 <?php
 
+//? API routes for employer functionalities
+
+use App\Http\Controllers\Employer\CompanyController;
+use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
 
 
 
 // API routes for employer functionalities
-Route::prefix('employer')->group(function () {
+Route::prefix('api/employer')->group(function () {
 
     Route::get('/test', function () {
         dd("Employer route reached");
     });
 
-    // Company Jobs Routes
-    Route::prefix('company/{uuid}/jobs')->group(function () {
-
-        Route::get('/', [\App\Http\Controllers\Employer\JobController::class, 'index']);
-        Route::post('/', [\App\Http\Controllers\Employer\JobController::class, 'store']);
-        Route::get('/{job_id}', [\App\Http\Controllers\Employer\JobController::class, 'show']);
-        Route::put('/{job_id}', [\App\Http\Controllers\Employer\JobController::class, 'update']);
-        Route::delete('/{job_id}', [\App\Http\Controllers\Employer\JobController::class, 'destroy']);
-        Route::post('/{job_id}/restore', [\App\Http\Controllers\Employer\JobController::class, 'restore']);
-        Route::put('/{job_id}/publish', [\App\Http\Controllers\Employer\JobController::class, 'publish']);
-        Route::put('/{job_id}/unpublish', [\App\Http\Controllers\Employer\JobController::class, 'unpublish']);
-
+    //? Employer Company Jobs Routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::prefix('company/{companyId}/jobs')->group(function () {
+            Route::controller(JobController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/store', 'storePublishJob');
+                Route::post('/draft', 'draft');
+                Route::get('/{job_id}', 'show');
+                Route::put('/{job_id}', 'update');
+                Route::delete('/{job_id}', 'destroy');
+                Route::post('/{job_id}/restore', 'restore');
+                Route::put('/{job_id}/publish', 'publish');
+                Route::put('/{job_id}/unpublish', 'unpublish');
+                Route::put('/{job_id}/active', 'updateStatus');
+            });
+        });
     });
 
+
+    //? Employer Company Routes
+    Route::controller(CompanyController::class)->group(function () {
+        Route::prefix('company')->group(function () {
+            Route::post('company', 'store');
+            Route::get('{uuid}', 'show');
+            Route::put('{uuid}', 'update');
+            Route::put('{uuid}/logo', 'updateLogo');
+        });
+    });
 });

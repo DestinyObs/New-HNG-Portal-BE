@@ -7,6 +7,7 @@ namespace App\Enums;
 enum Status: string
 {
      case ACTIVE = 'active';
+     case INACTIVE = 'in-active';
      case ACCEPT = 'accept';
 
      case ACCEPTED = 'accepted';
@@ -33,7 +34,7 @@ enum Status: string
 
      case CANCELLED = 'cancelled';
 
-     case INACTIVE = 'inactive';
+          // case INACTIVE = 'inactive';
 
      case LOCKED = 'locked';
 
@@ -49,10 +50,10 @@ enum Status: string
 
      case SUSPENDED = 'suspended';
 
+     case PUBLISH = 'published';
+     case UNPUBLISH = 'unpublished';
 
+     case DRAFT = 'draft';
 
      case EXPIRED = 'expired';
-     
-
-
 }
