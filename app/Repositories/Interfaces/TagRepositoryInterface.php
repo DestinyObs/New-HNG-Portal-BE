@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Models\Skill;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Collection;
 
-interface SkillRepositoryInterface
+interface TagRepositoryInterface
 {
     public function getAll(): Collection;
-    public function findById(string $id): Skill;
+    public function findById(string $id): Tag;
 }
 

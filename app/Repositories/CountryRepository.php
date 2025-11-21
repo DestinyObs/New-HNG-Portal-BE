@@ -2,13 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Models\Skill;
-use App\Repositories\Interfaces\SkillRepositoryInterface;
+use App\Models\Country;
+use App\Repositories\Interfaces\CountryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class SkillRepository extends BaseRepository implements SkillRepositoryInterface
+class CountryRepository extends BaseRepository implements CountryRepositoryInterface
 {
-    public function __construct(Skill $model)
+    public function __construct(Country $model)
     {
         parent::__construct($model);
     }
@@ -18,7 +18,7 @@ class SkillRepository extends BaseRepository implements SkillRepositoryInterface
         return $this->query()->get();
     }
 
-    public function findById(string $id): Skill
+    public function findById(string $id): Country
     {
         return $this->query()->findOrFail($id);
     }
