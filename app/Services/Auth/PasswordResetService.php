@@ -38,18 +38,18 @@ class PasswordResetService implements PasswordResetInterface
                $user = $this->userRepository->findBy('email', $email);
                $token = Str::random(32);
                $now = now()->copy();
-               
+
                DB::table($this->table)->upsert(
                     ['email' => $user->email, 'token' => Hash::make($token), 'created_at' => $now],
                     ['email'],
                     ['token', 'created_at']
                );
-               
+
                $expiresAt = $now->copy()->addMinutes($this->expiresAfter);
                $url = config('services.base_url') . '/reset-password?hash=' . $token . '&email=' . $user->email;
-               
+
                Mail::to($user->email)->send(
-                   new PasswordResetLink($user, $url, $expiresAt)
+                    new PasswordResetLink($user, $url, $expiresAt)
                );
           });
      }
@@ -68,7 +68,7 @@ class PasswordResetService implements PasswordResetInterface
                $this->deleteToken($email);
 
                Mail::to($user->email)->send(
-                   new PasswordChangedNotification($user)
+                    new PasswordChangedNotification($user)
                );
           });
      }
@@ -76,8 +76,8 @@ class PasswordResetService implements PasswordResetInterface
      private function getToken(string $email)
      {
           $token = DB::table($this->table)
-                         ->where('email', $email)
-                         ->first();
+               ->where('email', $email)
+               ->first();
 
           if (is_null($token)) {
                throw ValidationException::withMessages([

@@ -7,10 +7,8 @@ use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleAuthController;
-
-require __DIR__ . '/api/employer.php';
-
-
+use App\Http\Controllers\OtpTokenController;
+use App\Models\OtpToken;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,3 +27,14 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
+
+
+
+
+// Route::post('verify-otp', [])
+Route::controller(OtpTokenController::class)
+    ->prefix('otp')
+    ->group(function () {
+        Route::post('verify-otp', 'verifyOtp')->middleware('auth:sanctum');
+        Route::post('resend-otp', 'resendOtp')->middleware('auth:sanctum');
+    });
