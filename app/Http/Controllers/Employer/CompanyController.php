@@ -24,14 +24,14 @@ class CompanyController extends Controller
     {
         $company = $this->companyService->getCompany($uuid);
 
-        return $this->successWithData( $company, 'Company retrieved successfully');
+        return $this->successWithData($company, 'Company retrieved successfully');
     }
 
     public function update(UpdateCompanyRequest $request, string $uuid)
     {
         $company = $this->companyService->updateCompany($request->validated(), $uuid);
 
-        return $this->successWithData( $company, 'Company updated successfully');
+        return $this->successWithData($company, 'Company updated successfully');
     }
 
     public function updateLogo(UpdateCompanyLogoRequest $request, string $uuid)

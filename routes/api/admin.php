@@ -12,7 +12,6 @@ Route::prefix('api/admin')->group(function () {
 
     // SKILLS ROUTES
     Route::apiResource('skills', SkillController::class);
-});
 
     // JOB TYPES ROUTES
     Route::apiResource('job-types', JobTypeController::class);
