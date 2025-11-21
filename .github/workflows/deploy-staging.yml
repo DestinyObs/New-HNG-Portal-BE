@@ -1,0 +1,66 @@
+name: Deploy Laravel Backend to Staging
+
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, hng-13-runner, linux]
+
+    steps:
+      - name: Deploy to staging server using password-based SSH
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: hng-portal
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          APP_DIR: /home/hng-portal/staging/backend/HNG-Portal-BE
+        run: |
+          set -e
+
+          # Install sshpass on runner (requires sudo)
+          sudo apt-get update || true
+          sudo apt-get install -y sshpass || true
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          # Add server to known_hosts to avoid SSH prompt
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # Connect to server and run deployment commands
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" 'bash -s' <<EOF
+            set -e
+            echo "Starting STAGING deployment..."
+
+            cd $APP_DIR
+
+            # Ensure the working directory is clean
+            git fetch origin
+            git reset --hard origin/staging
+            git clean -fd
+
+            # Install/update PHP dependencies
+            /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+            # Laravel cache and optimizations
+            php artisan config:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            # Run fresh database migrations
+            php artisan migrate:fresh --force
+
+            # Restart backend service (assumes passwordless sudo)
+            sudo systemctl daemon-reload
+            sudo systemctl restart staging-backend
+            sudo systemctl status staging-backend --no-pager
+
+            echo "STAGING deployment completed successfully!"
+          EOF

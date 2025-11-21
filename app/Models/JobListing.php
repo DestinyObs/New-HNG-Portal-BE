@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,12 +17,18 @@ class JobListing extends Model
         'title',
         'description',
         'acceptance_criteria',
-        'candidate_location_id',
+        // 'candidate_location_id',
+        'state_id',
+        'country_id',
         'company_id',
         'price',
         'track_id',
         'category_id',
+        'work_mode_id',
         'job_type_id',
+        'status',
+        'publication_status',
+
     ];
 
     // Relationships
@@ -40,9 +47,19 @@ class JobListing extends Model
         return $this->belongsTo(JobType::class, 'job_type_id');
     }
 
-    public function candidateLocation()
+    // public function candidateLocation()
+    // {
+    //     return $this->belongsTo(Location::class, 'candidate_location_id');
+    // }
+
+    public function states()
     {
-        return $this->belongsTo(Location::class, 'candidate_location_id');
+        return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function countries()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
     public function company()
@@ -50,4 +67,14 @@ class JobListing extends Model
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            Skill::class,
+            'job_listing_skill',
+            'job_listing_id',
+            'job_skill_id'
+        );
+    }
 }

@@ -29,4 +29,3 @@ class LocationSeeder extends Seeder
         }
     }
 }
-
