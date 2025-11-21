@@ -19,7 +19,6 @@ use App\Http\Controllers\LookUpController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\WorkModeController;
-use App\Http\Controllers\SkillController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -64,7 +63,8 @@ Route::controller(LookUpController::class)->group(function () {
 
 
 // SKILLS ROUTES
-Route::apiResource('skills', SkillController::class)
+Route::apiResource('skills', SkillController::class);
+
 // JOB TYPES ROUTES
 Route::apiResource('job-types', JobTypeController::class)
     ->only(['index', 'show']);
