@@ -1,0 +1,105 @@
+name: Deploy Laravel Backend to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm production deployment'
+        required: true
+        default: ''
+  push:
+    branches:
+      - prod
+
+jobs:
+  pre-deploy-checks:
+    name: Pre-Deployment Checks
+    runs-on: [self-hosted, hng-13-runner, linux]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run PHP static analysis (PHPStan)
+        run: |
+          composer install --no-dev
+          ./vendor/bin/phpstan analyse --level=max app
+
+      - name: Run security checks (e.g. Symfony security checker)
+        run: |
+          composer install --no-dev
+          ./vendor/bin/security-checker security:check
+
+      - name: Run Unit Tests
+        run: |
+          composer install --no-dev
+          ./vendor/bin/phpunit --fail-on-risky --fail-on-warning
+
+  deploy:
+    name: Production Deployment
+    runs-on: [self-hosted, hng-13-runner, linux]
+    needs: pre-deploy-checks
+
+    environment:
+      name: production
+      url: https://api.staging.takeda.emerj.net
+
+    if: github.event.inputs.confirm == 'deploy' || (github.event_name == 'push' && github.ref == 'refs/heads/prod')
+
+    steps:
+      - name: Confirm deployment input
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "deploy" ]; then
+            echo "Deployment cancelled: input confirm != deploy"
+            exit 1
+          fi
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Deploy to production server
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: hng-portal
+          APP_DIR: /home/hng-portal/prod/backend/HNG-Portal-BE
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 $SERVER_USER@$SERVER_HOST << EOF
+            set -e
+            echo "Starting PRODUCTION deployment..."
+
+            cd $APP_DIR
+
+            # Sync code safely: fetch, reset hard, clean untracked files
+            git fetch origin
+            git reset --hard origin/prod
+            git clean -fd
+
+            # Composer install dependencies (no dev packages)
+            /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+            # Laravel optimization caches
+            php artisan config:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            # Run migrations (safe migrate, no fresh)
+            php artisan migrate --force
+
+            # Basic health check: verify app is reachable
+            HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://api.takeda.emerj.net/health)
+            if [ "$HTTP_RESPONSE" -ne 200 ]; then
+              echo "Health check failed with status $HTTP_RESPONSE"
+              exit 1
+            fi
+
+            # Restart the production service (passwordless sudo required)
+            sudo systemctl restart prod-backend
+            sudo systemctl status prod-backend --no-pager
+
+            echo "PRODUCTION deployment completed successfully!"
+          EOF
