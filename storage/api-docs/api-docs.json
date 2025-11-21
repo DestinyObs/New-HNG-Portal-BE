@@ -6,7 +6,7 @@
     "description": "API endpoints for hng portal creation."
   },
   "paths": {
-    "/waitlist": {
+    "/api/waitlist": {
       "post": {
         "summary": "Join the waitlist",
         "description": "Creates a new waitlist entry and sends a confirmation email.",
@@ -62,7 +62,7 @@
         }
       }
     },
-    "/waitlist/{id}": {
+    "/api/waitlist/{id}": {
       "get": {
         "summary": "Get waitlist entry",
         "description": "Returns the details of a single waitlist entry.",
@@ -215,7 +215,7 @@
         }
       }
     },
-    "/auth/register": {
+    "/api/auth/register": {
       "post": {
         "summary": "Register a new user",
         "description": "Create a new user account. For company role, a company record will also be created.",
@@ -294,7 +294,7 @@
         }
       }
     },
-    "/auth/google/redirect": {
+    "/api/auth/google/redirect": {
       "get": {
         "summary": "Redirect to Google OAuth",
         "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
@@ -314,7 +314,7 @@
         }
       }
     },
-    "/auth/google/callback": {
+    "/api/auth/google/callback": {
       "get": {
         "summary": "Handle Google OAuth callback",
         "description": "Processes Google OAuth callback and returns user data with access token.",
@@ -373,7 +373,7 @@
         }
       }
     },
-    "/auth/login": {
+    "/api/auth/login": {
       "post": {
         "summary": "User login",
         "description": "Authenticate user and return access token with user data.",
@@ -435,7 +435,7 @@
         }
       }
     },
-    "/auth/logout": {
+    "/api/auth/logout": {
       "post": {
         "summary": "User logout",
         "description": "Logout user and revoke access token (requires authentication).",
@@ -465,7 +465,7 @@
         }
       }
     },
-    "/auth/forgot-password": {
+    "/api/auth/forgot-password": {
       "post": {
         "summary": "Request password reset",
         "description": "Send password reset link to user's email. The reset link will be valid for 10 minutes and contains a unique token (hash) that must be used with the reset-password endpoint.",
@@ -512,7 +512,7 @@
         }
       }
     },
-    "/auth/reset-password": {
+    "/api/auth/reset-password": {
       "post": {
         "summary": "Reset password",
         "description": "Reset user password using token (hash) from the password reset email link. The token is the 'hash' query parameter from the reset link URL.",
@@ -768,7 +768,227 @@
           }
         }
       }
-    }
+    },
+    "/api/skills": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Get all skills",
+        "description": "Retrieve a list of all available skills in the system",
+        "operationId": "getSkills",
+        "responses": {
+          "200": {
+            "description": "List of skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Skills retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Full-time"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/skills/{id}": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Get a specific skill",
+        "operationId": "getSkillId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill retrieved successfully"
+          },
+          "404": {
+            "description": "Skill not found"
+          }
+        }
+      }
+    },
+    "/api/admin/skills": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Get all skills",
+        "description": "Retrieve a list of all available skills",
+        "operationId": "getSkill",
+        "responses": {
+          "200": {
+            "description": "List of skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/skills/{id}": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Get skill by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully"
+          },
+          "404": {
+            "description": "Skills not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Update skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "new type update"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Skills updated successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Delete skills (Admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Skills deleted successfully"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }    
   },
 
   "components": {
