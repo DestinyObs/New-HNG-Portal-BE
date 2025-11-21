@@ -4,26 +4,10 @@ namespace App\Providers;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Services\Interfaces\{
-    CategoryInterface,
-    CountryInterface,
-    JobTypeInterface,
-    LocationInterface,
-    SkillInterface,
-    StateInterface,
-    TagInterface,
-    TrackInterface,
     UserInterface,
     WaitlistInterface,
 };
 use App\Services\{
-    CategoryService,
-    CountryService,
-    JobTypeService,
-    LocationService,
-    SkillService,
-    StateService,
-    TagService,
-    TrackService,
     UserService,
     WaitlistService,
 };
@@ -46,15 +30,7 @@ class InterfaceServiceProvider extends ServiceProvider
         UserInterface::class => UserService::class,
         LoginInterface::class => \App\Services\Auth\LoginService::class,
         PasswordResetInterface::class => \App\Services\Auth\PasswordResetService::class,
-        GoogleAuthInterface::class => \App\Services\Auth\GoogleAuthService::class,
-        CountryInterface::class => CountryService::class,
-        StateInterface::class => StateService::class,
-        TrackInterface::class => TrackService::class,
-        CategoryInterface::class => CategoryService::class,
-        LocationInterface::class => LocationService::class,
-        JobTypeInterface::class => JobTypeService::class,
-        TagInterface::class => TagService::class,
-        SkillInterface::class => SkillService::class,
+        GoogleAuthInterface::class => \App\Services\Auth\GoogleAuthService::class
     ];
 
     /**

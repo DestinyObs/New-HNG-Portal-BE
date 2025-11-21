@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Models\Skill;
-use Illuminate\Database\Eloquent\Collection;
-
 interface SkillRepositoryInterface
 {
-    public function getAll(): Collection;
-    public function findById(string $id): Skill;
-}
 
+     public function fetchAll();
+     public function findById(string $id);
+     public function create(array $data);
+     public function update(string $id, array $data);
+     public function destroy(string $id);
+}
