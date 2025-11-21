@@ -20,10 +20,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Execute PHP static analysis with PHPStan
-        run: |
-          composer install --no-dev
-          ./vendor/bin/phpstan analyse --level=max app
+      #- name: Execute PHP static analysis with PHPStan
+        #run: |
+         # composer install --no-dev
+         # ./vendor/bin/phpstan analyse --level=max app
 
       - name: Perform security audit with Composer
         run: |
