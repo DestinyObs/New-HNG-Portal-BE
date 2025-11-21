@@ -40,6 +40,16 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception): Response|JsonResponse
     {
+        // 🚨 1. Whitelist Swagger UI (DON'T force JSON here)
+        if (
+            $request->is('api/documentation') ||
+            $request->is('docs') ||
+            $request->is('swagger*')
+        ) {
+            return parent::render($request, $exception);
+        }
+        
+        
         if ($request->is('api/*')) {
 
             // Validation errors
