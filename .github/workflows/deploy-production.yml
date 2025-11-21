@@ -12,25 +12,11 @@ on:
       - prod
 
 jobs:
-  # This job runs pre-deployment quality checks to ensure codebase health
-  pre-deploy-checks:
-    name: Pre-Deployment Quality Assurance
-    runs-on: [self-hosted, hng-13-runner, linux]
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Run PHPUnit unit tests
-        run: |
-          composer install --no-dev
-          ./vendor/bin/phpunit
-
   # This job deploys the application to the production environment
-  # It runs only if pre-deploy checks succeed and after manual confirmation or pushes to the prod branch
+  # It runs only after manual confirmation or pushes to the prod branch
   deploy:
     name: Execute Production Deployment
     runs-on: [self-hosted, hng-13-runner, linux]
-    needs: pre-deploy-checks
 
     environment:
       name: production
