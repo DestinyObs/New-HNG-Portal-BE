@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StateFactory extends Factory
@@ -11,7 +10,6 @@ class StateFactory extends Factory
     {
         return [
             'name' => fake()->state(),
-            'country_id' => Country::factory(),
         ];
     }
 }

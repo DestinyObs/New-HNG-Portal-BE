@@ -51,31 +51,3 @@ class JobTypeService
         return $this->jobTypeRepository->destroy($id);
     }
 }
-<?php
-
-declare(strict_types=1);
-
-namespace App\Services;
-
-use App\Models\JobType;
-use App\Repositories\Interfaces\JobTypeRepositoryInterface;
-use App\Services\Interfaces\JobTypeInterface;
-use Illuminate\Database\Eloquent\Collection;
-
-class JobTypeService implements JobTypeInterface
-{
-    public function __construct(
-        private readonly JobTypeRepositoryInterface $jobTypeRepository,
-    ) {}
-
-    public function getAll(): Collection
-    {
-        return $this->jobTypeRepository->getAll();
-    }
-
-    public function findById(string $id): JobType
-    {
-        return $this->jobTypeRepository->findById($id);
-    }
-}
-
