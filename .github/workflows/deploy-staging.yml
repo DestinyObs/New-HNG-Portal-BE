@@ -45,15 +45,18 @@ jobs:
         run: php artisan migrate:fresh --force
         working-directory: /home/hng-portal/staging/backend/HNG-Portal-BE
 
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Deploy to remote server via SSH
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_SERVER_IP }}
-          username: hng-portal
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa hng-portal@${{ secrets.DEPLOY_SERVER_IP }} << 'EOF'
             cd /home/hng-portal/staging/backend/HNG-Portal-BE
             git pull origin staging
             /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
             php artisan migrate:fresh --force
             sudo systemctl restart staging-backend
+          EOF
