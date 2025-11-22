@@ -54,17 +54,9 @@ Route::controller(LookUpController::class)->group(function () {
         Route::get('job-types', 'jobTypes');
         Route::get('skills', 'skills');
         Route::get('tracks', 'tracks');
-        Route::get('categories', 'getCategories');
+        Route::get('countries', 'countries');
         Route::get('work-modes', 'workModes');
         Route::get('states', 'states');
         Route::get('categories', 'categories');
     });
 });
-
-
-// SKILLS ROUTES
-Route::apiResource('skills', SkillController::class);
-
-// JOB TYPES ROUTES
-Route::apiResource('job-types', JobTypeController::class)
-    ->only(['index', 'show']);

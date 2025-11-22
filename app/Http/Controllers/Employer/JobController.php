@@ -7,7 +7,7 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\StoreDraftJobRequest;
 use App\Http\Requests\Employer\StoreJobRequest;
-use App\Http\Requests\UpdateJobRequest;
+use App\Http\Requests\Employer\UpdateJobRequest;
 use App\Services\JobService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -40,12 +40,12 @@ class JobController extends Controller
      */
     public function storePublishJob(StoreJobRequest $request, string|int $companyId): JsonResponse
     {
-        // dd($request->all()['skills']);
+        //dd($request->all()['skills']);
 
         $response = $this->service->createOrUpdate(
             $companyId,
             $request->validated(),
-            'active',
+            false,
             true
         );
 
@@ -73,7 +73,8 @@ class JobController extends Controller
         $response = $this->service->createOrUpdate(
             $companyId,
             $request->validated(),
-            Status::DRAFT,
+            true,
+            false,
         );
 
         //? case when job is added successfully
@@ -99,11 +100,12 @@ class JobController extends Controller
     {
         $job = $this->service->getForCompany($uuid, $job_id);
 
+        // dd($job);
         if (!$job) {
             return $this->error("Job not found", Http::NOT_FOUND);
         }
 
-        return $this->success("Job retrieved successfully", $job);
+        return $this->successWithData($job, "Job retrieved successfully");
     }
 
 
@@ -111,19 +113,13 @@ class JobController extends Controller
 
     public function update(UpdateJobRequest $request, $uuid, $job_id): JsonResponse
     {
-        dd($request->validated());
-        // $validated = $request->validate([
-        //     'title' => 'sometimes|required|string|max:255',
-        //     'description' => 'sometimes|required|string',
-        //     'acceptance_criteria' => 'nullable|string',
-        //     'candidate_location_id' => 'nullable|uuid|exists:locations,id',
-        //     'price' => 'nullable|numeric',
-        //     'track_id' => 'nullable|uuid|exists:tracks,id',
-        //     'category_id' => 'nullable|uuid|exists:categories,id',
-        //     'job_type_id' => 'nullable|uuid|exists:job_types,id',
-        // ]);
+        // dd($request->validated());
 
-        $updated = $this->service->updateForCompany($uuid, $job_id, $request->validated());
+        $updated = $this->service->updateForCompany(
+            $uuid,
+            $job_id,
+            $request->validated()
+        );
 
         if (!$updated) {
             return $this->error(
@@ -133,8 +129,8 @@ class JobController extends Controller
         }
 
         return $this->successWithData(
-            "Job updated",
             $updated,
+            "Job updated successfully",
             Http::OK
         );
     }
@@ -147,10 +143,14 @@ class JobController extends Controller
         $deleted = $this->service->deleteForCompany($uuid, $job_id);
 
         if (!$deleted) {
-            return response()->json(['message' => 'Job not found or cannot be deleted'], 404);
+
+            return $this->error(
+                'Job not found or cannot be deleted',
+                Http::NOT_FOUND
+            );
         }
 
-        return response()->json(['message' => 'Job soft-deleted']);
+        return $this->success("Job soft deleted successfully");
     }
 
 
@@ -161,10 +161,11 @@ class JobController extends Controller
         $job = $this->service->restore($job_id);
 
         if (!$job) {
-            return response()->json(['message' => 'Job not found or not restorable'], 404);
+
+            return $this->error("Job not found or not restorable", Http::NOT_FOUND);
         }
 
-        return response()->json(['message' => 'Job restored', 'data' => $job]);
+        return $this->successWithData($job, "Job restored");
     }
 
 
@@ -173,7 +174,8 @@ class JobController extends Controller
         $job = $this->service->publish($uuid, $job_id, true);
 
         if ($job) {
-            return $this->success(
+            return $this->successWithData(
+                $job,
                 "Job published successfully",
                 Http::OK,
             );
@@ -190,7 +192,8 @@ class JobController extends Controller
         $job = $this->service->publish($uuid, $job_id, false);
 
         if ($job) {
-            return $this->success(
+            return $this->successWithData(
+                $job,
                 "Job unpublished successfully",
                 Http::OK,
             );
@@ -198,6 +201,43 @@ class JobController extends Controller
 
         return $this->success(
             "Unable to unpublish job",
+            Http::INTERNAL_SERVER_ERROR,
+        );
+    }
+
+    public function updateStatusToActive($company_id, $job_id)
+    {
+        // dd($company_id, $job_id);
+        $job = $this->service->updateStatus($company_id, $job_id, true);
+
+        if ($job) {
+            return $this->successWithData(
+                $job,
+                "Job status updated successfully",
+                Http::OK,
+            );
+        }
+
+        return $this->success(
+            "Unable to update status",
+            Http::INTERNAL_SERVER_ERROR,
+        );
+    }
+
+    public function updateStatusToInActive($uuid, $job_id)
+    {
+        $job = $this->service->updateStatus($uuid, $job_id, false);
+
+        if ($job) {
+            return $this->successWithData(
+                $job,
+                "Job status updated successfully",
+                Http::OK,
+            );
+        }
+
+        return $this->success(
+            "Unable to update status",
             Http::INTERNAL_SERVER_ERROR,
         );
     }
