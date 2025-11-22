@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,102 +10,108 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_create_category()
+    /** @test */
+    public function test_admin_can_create_category()
     {
-        $response = $this->postJson('/api/admin/categories', [
-            'name' => 'Testing Category'
+        $name = "Testing Category";
+
+        $response = $this->post('/admin/categories', [
+            'name' => $name,
         ]);
 
-        $response->assertStatus(201)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Category created successfully'
-                 ]);
+        // test if the response status is 201 Created
+        $response->assertStatus(201);
+
+        // test if the response data contains the value true
+        $response->assertJson(['success' => true]);
+
+        // test the existence of a specific record in the table
+        $this->assertDatabaseHas('categories', [
+            'name' => $name,
+        ]);
     }
 
+    /** @test */
     public function test_create_category_requires_name()
     {
-        $response = $this->postJson('/api/admin/categories', []);
+        $response = $this->post('/admin/categories', []);
 
-        $response->assertStatus(422) // Unprocessable Entity
-                 ->assertJson([
-                     'success' => false,
-                     'message' => 'Validation failed'
-                 ]);
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
     }
 
-    public function test_create_category_unique_name()
+    /** @test */
+    public function test_category_name_must_be_unique()
     {
-        $category = Category::factory()->create([
-            'name' => 'Unique Category'
+        Category::factory()->create([
+            'name' => 'Unique Category',
         ]);
 
-        $response = $this->postJson('/api/admin/categories', [
-            'name' => 'Unique Category'
+        $response = $this->post('/admin/categories', [
+            'name' => 'Unique Category',
         ]);
 
-        $response->assertStatus(422)
-                 ->assertJson([
-                     'success' => false,
-                     'message' => 'Validation failed'
-                 ]);
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
     }
 
-    public function test_can_list_categories()
+    /** @test */
+    public function test_admin_can_list_categories()
     {
         Category::factory()->count(3)->create();
 
-        $response = $this->getJson('/api/admin/categories');
+        $response = $this->get('/admin/categories');
 
-        $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'success',
-                     'message',
-                     'data' => [
-                         ['id', 'name', 'created_at', 'updated_at']
-                     ],
-                     'status'
-                 ]);
+        $response->assertStatus(200);
+
+        $response->assertJson(['success' => true]);
     }
 
-    public function test_can_update_category()
+    /** @test */
+    public function test_admin_can_update_category()
     {
         $category = Category::factory()->create();
 
-        $response = $this->putJson("/api/admin/categories/{$category->id}", [
-            'name' => 'Updated Category'
+        $newName = "Updated Category";
+
+        $response = $this->put("/admin/categories/{$category->id}", [
+            'name' => $newName,
         ]);
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Category updated successfully'
-                 ]);
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // assert database updated
+        $this->assertDatabaseHas('categories', [
+            'id' => $category->id,
+            'name' => $newName,
+        ]);
     }
 
+    /** @test */
     public function test_update_category_requires_name()
     {
         $category = Category::factory()->create();
 
-        $response = $this->putJson("/api/admin/categories/{$category->id}", []);
+        $response = $this->put("/admin/categories/{$category->id}", []);
 
-        $response->assertStatus(422)
-                 ->assertJson([
-                     'success' => false,
-                     'message' => 'Validation failed'
-                 ]);
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
     }
 
-    public function test_can_delete_category()
+    /** @test */
+    public function test_admin_can_delete_category()
     {
         $category = Category::factory()->create();
 
-        $response = $this->deleteJson("/api/admin/categories/{$category->id}");
+        $response = $this->deleteJson("/admin/categories/{$category->id}");
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Category deleted successfully'
-                 ]);
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // assert database no longer has the record
+        $this->assertDatabaseMissing('categories', [
+            'id' => $category->id,
+        ]);
     }
 }

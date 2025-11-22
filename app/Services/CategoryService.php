@@ -36,13 +36,14 @@ class CategoryService
     }
 
     public function deleteCategory(string $id)
-    {
-        $category = $this->repo->find($id);
+{
+    $category = $this->repo->find($id);
 
-        if (!$category) {
-            throw new Exception("Category not found", 404);
-        }
-
-        return $this->repo->delete($category);
+    if (!$category) {
+        throw new Exception("Category not found", 404);
     }
+
+    return $this->repo->delete($id);
+}
+
 }

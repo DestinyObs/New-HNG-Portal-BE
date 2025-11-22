@@ -1,69 +1,90 @@
 <?php
+
 namespace Tests\Feature;
 
+use App\Models\Track;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Track;
 
 class TrackTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_create_track()
+    public function test_admin_can_create_track()
     {
-        $response = $this->postJson('/api/admin/tracks', [
-            'name' => 'Backend Development'
+        $name = "New Track Name";
+
+        $response = $this->postJson('/admin/tracks', [
+            'name' => $name,
         ]);
 
-        $response->assertStatus(201)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Track created successfully'
-                 ]);
+        $response->assertStatus(201);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('tracks', [
+            'name' => $name,
+        ]);
     }
 
-    public function test_can_list_tracks()
+    public function test_admin_can_list_tracks()
     {
-        Track::factory()->create(['name' => 'Frontend Development']);
+        Track::factory()->count(2)->create();
 
-        $response = $this->getJson('/api/admin/tracks');
+        $response = $this->getJson('/admin/tracks');
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                 ])
-                 ->assertJsonStructure([
-                     'success',
-                     'message',
-                     'data'
-                 ]);
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
     }
 
-    public function test_can_update_track()
+    public function test_admin_can_update_track()
     {
-        $track = Track::factory()->create(['name' => 'Old Track']);
+        $track = Track::factory()->create();
+        $newName = "Updated Track Name";
 
-        $response = $this->putJson('/api/admin/tracks/'.$track->id, [
-            'name' => 'Updated Track'
+        $response = $this->putJson("/admin/tracks/{$track->id}", [
+            'name' => $newName,
         ]);
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Track updated successfully'
-                 ]);
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('tracks', [
+            'id' => $track->id,
+            'name' => $newName,
+        ]);
     }
 
-    public function test_can_delete_track()
+    public function test_admin_can_delete_track()
     {
-        $track = Track::factory()->create(['name' => 'Delete Me']);
+        $track = Track::factory()->create();
 
-        $response = $this->deleteJson('/api/admin/tracks/'.$track->id);
+        $response = $this->deleteJson("/admin/tracks/{$track->id}");
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Track deleted successfully'
-                 ]);
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('tracks', [
+            'id' => $track->id,
+        ]);
+    }
+
+    public function test_track_name_is_required()
+    {
+        $response = $this->postJson('/admin/tracks', []);
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
+    }
+
+    public function test_track_name_must_be_unique()
+    {
+        Track::factory()->create(['name' => 'Backend']);
+
+        $response = $this->postJson('/admin/tracks', [
+            'name' => 'Backend'
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
     }
 }

@@ -31,16 +31,4 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
 
-Route::prefix('admin')->group(function () {
-    Route::get('/categories', [CategoryController::class, 'index']);
-    Route::post('/categories', [CategoryController::class, 'store']);
-    Route::put('/categories/{id}', [CategoryController::class, 'update']);
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-
-    Route::get('/tracks', [TrackController::class, 'index']);
-    Route::post('/tracks', [TrackController::class, 'store']);
-    Route::put('/tracks/{id}', [TrackController::class, 'update']);
-    Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
-});
-
 

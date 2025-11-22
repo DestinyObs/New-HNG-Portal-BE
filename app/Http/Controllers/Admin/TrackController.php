@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\StoreTrackRequest;
-use App\Http\Requests\UpdateTrackRequest;
-use App\Services\TrackService;
-use App\Http\Controllers\Concerns\ApiResponse;
 use App\Enums\Http;
+use App\Http\Controllers\Concerns\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreTrackRequest;
+use App\Http\Requests\Admin\UpdateTrackRequest;
+use App\Services\TrackService;
 
 class TrackController extends Controller
 {
@@ -58,10 +59,13 @@ class TrackController extends Controller
     /**
      * Delete a track
      */
-    public function destroy(string $id)
+
+     public function destroy(string $id)
     {
         $this->service->deleteTrack($id);
 
-        return $this->noContent();
+        return $this->success(
+            "Track deleted successfully"
+        );
     }
 }
