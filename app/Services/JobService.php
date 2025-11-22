@@ -114,7 +114,15 @@ class JobService
                 'success' => true,
                 'message' => 'Job added to successfully',
                 'status' => Http::OK,
-                'data' => $updatedDraft->load('skills'),
+                'data' => $updatedDraft->load([
+                    'category',
+                    'states',
+                    'countries',
+                    'category',
+                    'jobType',
+                    'track',
+                    'skills'
+                ]),
             ];
 
             //? return job model
