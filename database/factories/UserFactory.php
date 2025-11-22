@@ -23,6 +23,9 @@ class UserFactory extends Factory
             'address_id' => null,
             'photo_url' => fake()->optional(0.4)->imageUrl(200, 200, 'people'),
             'password' => static::$password ??= Hash::make('password'),
+            'google_id' => $this->faker->uuid(),
+            // 'remember_token' intentionally omitted to match current schema
+              // 'remember_token' and 'email_verified_at' intentionally omitted to match test schema
         ];
     }
 

@@ -1151,9 +1151,7 @@
       "get": {
         "summary": "Handle Google OAuth callback",
         "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "parameters": [
           {
             "name": "token",
@@ -1180,21 +1178,13 @@
             "description": "Invalid Google token or authentication failed",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/GoogleAuthResponse" }
               }
             }
           },
           "422": {
             "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } } }
           }
         }
       }
@@ -3345,23 +3335,13 @@
       "ValidationError": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean",
-            "example": false
-          },
-          "message": {
-            "type": "string",
-            "example": "The given data was invalid."
-          },
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "The given data was invalid." },
           "errors": {
             "type": "object",
             "example": {
-              "email": [
-                "The email field is required."
-              ],
-              "password": [
-                "The password must be at least 8 characters."
-              ]
+              "email": ["The email field is required."],
+              "password": ["The password must be at least 8 characters."]
             }
           },
           "status": {

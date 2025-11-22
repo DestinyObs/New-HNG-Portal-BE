@@ -6,5 +6,5 @@ use Laravel\Socialite\Contracts\User as GoogleUser;
 
 interface GoogleAuthInterface
 {
-    public function handle(GoogleUser $googleUser): array;
+    public function handle(GoogleUser $googleUser, string $role): array;
 }

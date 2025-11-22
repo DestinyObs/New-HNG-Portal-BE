@@ -12,4 +12,9 @@ class UserDevice extends Model
     protected $fillable = [
         'user_id', 'name', 'last_activity_at'
     ];
+
+    protected $casts = [
+        'last_activity_at' => 'datetime',
+    ];
+
 }

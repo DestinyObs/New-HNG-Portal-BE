@@ -25,9 +25,19 @@ class User extends Authenticatable
         'status',
         'photo_url',
         'password',
+        'google_id',
+        'google_access_token',
+        'google_refresh_token',
+        'google_token_expires_at',
+        'role',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'google_access_token',
+        'google_refresh_token'
+    ];
 
     protected $with = [
         'roles', 'permissions'
@@ -35,7 +45,8 @@ class User extends Authenticatable
 
     protected $casts = [
         'dob'         => 'date',
-        'password'  => 'hashed'
+        'password'  => 'hashed',
+        'google_token_expires_at' => 'datetime',
     ];
 
     // Relationships
@@ -69,5 +80,10 @@ class User extends Authenticatable
     public function jobs()
     {
         return $this->hasMany(JobListing::class, 'user_id');
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(UserDevice::class);
     }
 }
