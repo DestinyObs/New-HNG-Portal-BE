@@ -34,6 +34,7 @@ Route::prefix('auth')->group(function () {
 
 });
 Route::post('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+Route::post('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);

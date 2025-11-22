@@ -1125,52 +1125,32 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
-        "tags": [
-          "Authentication"
-        ],
-        "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "URL to Google OAuth page"
+    "/api/auth/google/callback": {
+      "post": {
+        "summary": "Handle Google OAuth callback",
+        "description": "Processes Google OAuth callback for both login and signup. Accepts Google access token and role, returns user data with application access token.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "role"],
+                "properties": {
+                  "token": { "type": "string", "description": "Google access token or ID token from frontend SDK" },
+                  "role": { "type": "string", "enum": ["talent", "employer"], "description": "User role for account creation" }
+                }
               }
             }
           }
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Handle Google OAuth callback",
-        "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": ["Authentication"],
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Authorization code from Google"
-          }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Google OAuth login successful",
+            "description": "Google authentication successful",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/GoogleAuthResponse" }
               }
             }
           },
@@ -1475,28 +1455,15 @@
       },
       "post": {
         "summary": "Create user",
-        "description": "Create a new user (requires authentication).",
-        "tags": [
-          "Users"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "description": "Create a new user account (public registration).",
+        "tags": ["Users"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "firstname",
-                  "lastname",
-                  "email",
-                  "phone",
-                  "password"
-                ],
+                "required": ["firstname", "lastname", "email", "password", "role"],
                 "properties": {
                   "firstname": {
                     "type": "string",
@@ -3339,15 +3306,38 @@
           "message": { "type": "string", "example": "The given data was invalid." },
           "errors": {
             "type": "object",
-            "example": {
-              "email": ["The email field is required."],
-              "password": ["The password must be at least 8 characters."]
+            "example": { "email": ["The email field is required."], "password": ["The password must be at least 8 characters."] }
+          },
+          "status": { "type": "integer", "example": 422 }
+        }
+      },
+      "GoogleAuthUser": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "firstname": { "type": "string", "example": "John" },
+          "lastname": { "type": "string", "example": "Doe" },
+          "email": { "type": "string", "example": "john@example.com" },
+          "role": { "type": "string", "enum": ["talent", "employer"], "example": "talent" },
+          "email_verified_at": { "type": "string", "format": "date-time", "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GoogleAuthResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "Login successful" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": { "$ref": "#/components/schemas/GoogleAuthUser" },
+              "token": { "type": "string", "description": "Application access token" },
+              "is_new_user": { "type": "boolean", "description": "Indicates if this was a new user signup" }
             }
           },
-          "status": {
-            "type": "integer",
-            "example": 422
-          }
+          "status": { "type": "integer", "example": 200 }
         }
       },
       "Job": {
