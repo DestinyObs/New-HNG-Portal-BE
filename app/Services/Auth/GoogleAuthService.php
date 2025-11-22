@@ -10,32 +10,6 @@ use Laravel\Socialite\Contracts\User as GoogleUser;
 
 class GoogleAuthService implements GoogleAuthInterface
 {
-    public function handle(GoogleUser $googleUser): array
-    {
-        [$firstname, $lastname] = $this->splitName($googleUser->getName());
-
-        // Create or find user
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'firstname' => $firstname,
-                'lastname'  => $lastname,
-                'password'  => Str::random(12),
-            ]
-        );
-
-        // Save device
-        $this->saveDevice($user);
-
-        // Generate token
-        $token = $user->createToken('google-token')->plainTextToken;
-
-        return [
-            'user'  => $user->refresh(),
-            'token' => $token,
-        ];
-    }
-
     private function splitName(string $fullName): array
     {
         $parts = explode(' ', trim($fullName), 2);
@@ -57,5 +31,38 @@ class GoogleAuthService implements GoogleAuthInterface
                 'last_activity_at' => now(),
             ]
         );
+    }
+
+    public function handle(GoogleUser $googleUser, string $role): array
+    {
+        $isNewUser = false;
+        $email = $googleUser->getEmail();
+        [$firstname, $lastname] = $this->splitName($googleUser->getName());
+
+        $userCheck = User::where('email', $email)->first();
+
+        if (!$userCheck) {
+            $isNewUser = true;
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'role' => $role,
+                'password' => Str::random(12),
+            ]
+        );
+
+        $this->saveDevice($user);
+
+        $token = $user->createToken('API Token')->plainTextToken;
+        //
+        return [
+            'user' => $user,
+            'token' => $token,
+            'is_new_user' => $isNewUser
+        ];
     }
 }

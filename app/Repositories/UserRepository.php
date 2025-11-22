@@ -22,10 +22,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 
     public function findBy(string $column, mixed $value): User
     {
-        $query = $this->query()
-                    ->where(Str::lower($column), $value)
-                        ->firstOrFail();
-        return $query;
+        return $this->query()->where($column, $value)->firstOrFail();
     }
 
     public function updatePassword(User $user, string $password): User
