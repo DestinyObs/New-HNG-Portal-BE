@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\Admin\JobTypeController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 //? API routes for admin functionalities
@@ -27,4 +28,8 @@ Route::prefix('api/admin')->group(function () {
         'update' => 'admin.job-types.update',
         'destroy' => 'admin.job-types.destroy',
     ]);
+
+    // TAGS ROUTES
+    Route::apiResource('tags', TagController::class);
+
 });

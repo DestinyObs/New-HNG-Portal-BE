@@ -17,6 +17,7 @@ use App\Http\Controllers\JobTypesController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LookUpController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\WorkModeController;
 
@@ -67,4 +68,8 @@ Route::apiResource('skills', SkillController::class);
 
 // JOB TYPES ROUTES
 Route::apiResource('job-types', JobTypeController::class)
+    ->only(['index', 'show']);
+
+// TAGS ROUTES
+Route::apiResource('tags', TagController::class)
     ->only(['index', 'show']);
