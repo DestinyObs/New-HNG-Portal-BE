@@ -27,7 +27,9 @@ class SkillTest extends TestCase
      */
     public function test_the_route_returns_a_successful_response(): void
     {
-        $response = $this->get('/api/skills');
+        Skill::factory(2)->create();
+
+        $response = $this->get('/api/lookups/skills');
 
         $response->assertStatus(200); // $response->assertOk();
     }
