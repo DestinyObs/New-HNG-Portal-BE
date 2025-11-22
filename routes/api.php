@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\JobTypeController;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;

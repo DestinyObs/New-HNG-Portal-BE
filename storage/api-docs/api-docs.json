@@ -5,24 +5,41 @@
     "version": "1.0.0",
     "description": "API endpoints for hng portal creation."
   },
-
   "paths": {
     "/api/waitlist": {
       "post": {
         "summary": "Join the waitlist",
         "description": "Creates a new waitlist entry and sends a confirmation email.",
-        "tags": ["Waitlist"],
+        "tags": [
+          "Waitlist"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["full_name", "email", "role"],
+                "required": [
+                  "full_name",
+                  "email",
+                  "role"
+                ],
                 "properties": {
-                  "full_name": { "type": "string", "example": "John Doe" },
-                  "email": { "type": "string", "format": "email", "example": "johndoe@example.com" },
-                  "role": { "type": "string",                    "enum": ["talent", "company"],
+                  "full_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "johndoe@example.com"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "talent",
+                      "company"
+                    ],
                     "example": "talent"
                   }
                 }
@@ -34,13 +51,21 @@
           "201": {
             "description": "Waitlist entry created successfully.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Waitlist" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Waitlist"
+                }
+              }
             }
           },
           "422": {
             "description": "Validation error",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
             }
           }
         }
@@ -50,26 +75,96 @@
       "get": {
         "summary": "Get waitlist entry",
         "description": "Returns the details of a waitlist entry.",
-        "tags": ["Waitlist"],
+        "tags": [
+          "Waitlist"
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Waitlist entry retrieved successfully.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Waitlist" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Waitlist"
+                }
+              }
+            }
           },
-          "404": { "description": "Waitlist entry not found" }
+          "404": {
+            "description": "Waitlist entry not found"
+          }
         }
       }
     },
-
     "/api/employer/company/{uuid}/jobs": {
       "get": {
         "summary": "List all jobs for a company",
-        "tags": ["Employer - Jobs"],
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 15
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by job title"
+          },
+          {
+            "name": "job_type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by job type"
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by category"
+          }
         ],
         "responses": {
           "200": {
@@ -79,131 +174,887 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Job" } }
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Job"
+                      }
+                    }
                   }
                 }
               }
             }
+          },
+          "404": {
+            "description": "Waitlist entry not found"
           }
         }
       },
-
       "post": {
-        "summary": "Create a new job",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } }
+        "summary": "Create and publish a new job",
+        "description": "Create a new job posting and immediately publish it. All required fields must be provided.",
+        "tags": [
+          "Employer - Jobs"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/JobCreateRequest" } }
+        "security": [
+          {
+            "bearerAuth": []
           }
-        },
-        "responses": {
-          "201": { "description": "Job created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Job" } } } },
-          "422": { "description": "Validation error" }
-        }
-      }
-    },
-
-    "/api/employer/company/{uuid}/jobs/{job_id}": {
-      "get": {
-        "summary": "Get job details",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": {
-          "200": { "description": "Job details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Job" } } } },
-          "404": { "description": "Job not found" }
-        }
-      },
-
-      "put": {
-        "summary": "Update a job posting",
-        "tags": ["Employer - Jobs"],
         "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/JobUpdateRequest" } }
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
           }
-        },
-        "responses": {
-          "200": { "description": "Job updated" },
-          "404": { "description": "Job not found" }
-        }
-      },
-
-      "delete": {
-        "summary": "Soft delete job",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": {
-          "200": { "description": "Job deleted" },
-          "404": { "description": "Job not found" }
-        }
-      }
-    },
-
-    "/api/employer/company/{uuid}/jobs/{job_id}/restore": {
-      "post": {
-        "summary": "Restore a deleted job",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Job restored" },
-          "404": { "description": "Job not found" }
-        }
-      }
-    },
-
-    "/api/employer/company/{uuid}/jobs/{job_id}/publish": {
-      "put": {
-        "summary": "Publish job",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": { "200": { "description": "Job published" }, "404": { "description": "Job not found" } }
-      }
-    },
-
-    "/api/employer/company/{uuid}/jobs/{job_id}/unpublish": {
-      "put": {
-        "summary": "Unpublish job",
-        "tags": ["Employer - Jobs"],
-        "parameters": [
-          { "name": "uuid", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "job_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": { "200": { "description": "Job unpublished" }, "404": { "description": "Job not found" } }
-      }
-    },
-    "/api/auth/register": {
-      "post": {
-        "summary": "Register a new user",
-        "description": "Create a new user account. For company role, a company record will also be created.",
-        "tags": ["Authentication"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["firstname", "lastname", "email", "password", "password_confirmation", "role"],
+                "required": [
+                  "title",
+                  "description",
+                  "acceptance_criteria",
+                  "country_id",
+                  "state_id",
+                  "price",
+                  "track_id",
+                  "category_id",
+                  "job_type_id",
+                  "work_mode_id",
+                  "skills"
+                ],
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "description": "Optional: Job ID if updating existing job"
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Backend Developer"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Write and maintain API logic"
+                  },
+                  "acceptance_criteria": {
+                    "type": "string",
+                    "example": "Must have 3+ years experience"
+                  },
+                  "country_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-country"
+                  },
+                  "state_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-state"
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 50000
+                  },
+                  "track_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-track"
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-category"
+                  },
+                  "job_type_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-jobtype"
+                  },
+                  "work_mode_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "019abcde-1234-5678-9999-workmode"
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "example": [
+                      "019abcde-1234-5678-9999-skill1",
+                      "019abcde-1234-5678-9999-skill2"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job created and published successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company": {
+      "post": {
+        "summary": "Create a company",
+        "description": "Creates a new company for an employer.",
+        "tags": [
+          "Company"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{id}": {
+      "get": {
+        "summary": "Retrieve a company",
+        "description": "Gets a single company by its ID.",
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update company details",
+        "description": "Updates fields for an existing company.",
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{id}/logo": {
+      "post": {
+        "summary": "Update company logo",
+        "description": "Uploads and updates the company's logo.",
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "logo"
+                ],
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "_method": {
+                    "type": "string",
+                    "format": "text"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{uuid}/jobs/{job_id}": {
+      "get": {
+        "summary": "Get job details",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a job posting",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job updated"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Soft delete job",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job deleted"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        }
+      }
+    },
+    "/api/employer/company/{uuid}/jobs/{job_id}/restore": {
+      "post": {
+        "summary": "Restore a deleted job",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job restored"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        }
+      }
+    },
+    "/api/employer/company/{uuid}/jobs/{job_id}/publish": {
+      "put": {
+        "summary": "Publish job",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job published successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{uuid}/jobs/{job_id}/unpublish": {
+      "put": {
+        "summary": "Unpublish job",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company UUID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job unpublished successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{companyId}/jobs/draft": {
+      "post": {
+        "summary": "Create or update job as draft",
+        "description": "Create a new job or update existing job as draft. Most fields are optional for drafts.",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "description"
+                ],
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "description": "Optional: Job ID if updating existing draft"
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Backend Developer"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Write and maintain API logic"
+                  },
+                  "acceptance_criteria": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "country_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "state_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "track_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "job_type_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "work_mode_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "nullable": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "draft"
+                    ],
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job draft saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employer/company/{companyId}/jobs/{job_id}/active": {
+      "put": {
+        "summary": "Update job status (active/inactive)",
+        "description": "Update the active status of a job posting.",
+        "tags": [
+          "Employer - Jobs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Company ID"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Create a new user account. For company role, a company record will also be created.",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstname",
+                  "lastname",
+                  "email",
+                  "password",
+                  "password_confirmation",
+                  "role"
+                ],
                 "properties": {
                   "firstname": {
                     "type": "string",
@@ -239,7 +1090,10 @@
                   },
                   "role": {
                     "type": "string",
-                    "enum": ["talent", "company"],
+                    "enum": [
+                      "talent",
+                      "company"
+                    ],
                     "example": "talent"
                   }
                 }
@@ -275,7 +1129,9 @@
       "get": {
         "summary": "Redirect to Google OAuth",
         "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "responses": {
           "302": {
             "description": "Redirect to Google OAuth",
@@ -295,7 +1151,9 @@
       "get": {
         "summary": "Handle Google OAuth callback",
         "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "parameters": [
           {
             "name": "code",
@@ -354,14 +1212,19 @@
       "post": {
         "summary": "User login",
         "description": "Authenticate user and return access token with user data.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -416,8 +1279,14 @@
       "post": {
         "summary": "User logout",
         "description": "Logout user and revoke access token (requires authentication).",
-        "tags": ["Authentication"],
-        "security": [{"bearerAuth": []}],
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Logged out successfully",
@@ -446,14 +1315,18 @@
       "post": {
         "summary": "Request password reset",
         "description": "Send password reset link to user's email. The reset link will be valid for 10 minutes and contains a unique token (hash) that must be used with the reset-password endpoint.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email"],
+                "required": [
+                  "email"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -493,14 +1366,21 @@
       "post": {
         "summary": "Reset password",
         "description": "Reset user password using token (hash) from the password reset email link. The token is the 'hash' query parameter from the reset link URL.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "token", "password", "password_confirmation"],
+                "required": [
+                  "email",
+                  "token",
+                  "password",
+                  "password_confirmation"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -559,8 +1439,14 @@
       "get": {
         "summary": "Get all users",
         "description": "Retrieve paginated list of users (requires authentication).",
-        "tags": ["Users"],
-        "security": [{"bearerAuth": []}],
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "page",
@@ -609,15 +1495,27 @@
       "post": {
         "summary": "Create user",
         "description": "Create a new user (requires authentication).",
-        "tags": ["Users"],
-        "security": [{"bearerAuth": []}],
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["firstname", "lastname", "email", "phone", "password"],
+                "required": [
+                  "firstname",
+                  "lastname",
+                  "email",
+                  "phone",
+                  "password"
+                ],
                 "properties": {
                   "firstname": {
                     "type": "string",
@@ -698,8 +1596,14 @@
       "get": {
         "summary": "Get user by ID",
         "description": "Retrieve a specific user by UUID (requires authentication).",
-        "tags": ["Users"],
-        "security": [{"bearerAuth": []}],
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -746,15 +1650,16 @@
         }
       }
     },
-
     "/api/otp/verify-otp": {
       "post": {
         "summary": "Verify user OTP",
-        "description": "Verify a 4-digit OTP sent to the user's email. Marks the email as verified if OTP is valid and sends registration email accordingly.",
-        "tags": ["Authentication"],
+        "description": "Verify a 6-digit OTP sent to the user's email. Marks the email as verified if OTP is valid and sends registration email accordingly.",
+        "tags": [
+          "Authentication"
+        ],
         "security": [
           {
-            "sanctum": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
@@ -763,13 +1668,15 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["otp"],
+                "required": [
+                  "otp"
+                ],
                 "properties": {
                   "otp": {
                     "type": "string",
-                    "maxLength": 6,
-                    "example": "1234",
-                    "description": "4-digit OTP sent to user email"
+                    "pattern": "^[0-9]{6}$",
+                    "example": "123456",
+                    "description": "6-digit OTP sent to user email"
                   }
                 }
               }
@@ -810,15 +1717,16 @@
         }
       }
     },
-
     "/api/otp/resend-otp": {
       "post": {
         "summary": "Resend OTP to user email",
-        "description": "Generate a new 4-digit OTP for the authenticated user and send it to their email.",
-        "tags": ["Authentication"],
+        "description": "Generate a new 6-digit OTP for the authenticated user and send it to their email.",
+        "tags": [
+          "Authentication"
+        ],
         "security": [
           {
-            "sanctum": []
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -834,24 +1742,1361 @@
           }
         }
       }
+    },
+    "/api/admin/skills": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "List all skills (Admin)",
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Skill"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skills not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Create a new skill (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "JavaScript"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Skill created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/skills/{skill}": {
+      "get": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Get skill by ID (Admin)",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Update skill by ID (Admin)",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Updated Skill Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Skill updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Skills"
+        ],
+        "summary": "Delete skill by ID (Admin)",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Skill deleted successfully"
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/job-types": {
+      "get": {
+        "tags": [
+          "Admin Job Types"
+        ],
+        "summary": "List all job types (Admin)",
+        "responses": {
+          "200": {
+            "description": "Job types retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JobType"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Job Types"
+        ],
+        "summary": "Create a new job type (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Full-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job type created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobType"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/job-types/{job_type}": {
+      "get": {
+        "tags": [
+          "Admin Job Types"
+        ],
+        "summary": "Get job type by ID (Admin)",
+        "parameters": [
+          {
+            "name": "job_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job Type ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job type retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job type not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin Job Types"
+        ],
+        "summary": "Update job type by ID (Admin)",
+        "parameters": [
+          {
+            "name": "job_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job Type ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Updated Job Type"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job type updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job type not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Job Types"
+        ],
+        "summary": "Delete job type by ID (Admin)",
+        "parameters": [
+          {
+            "name": "job_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job Type ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Job type deleted successfully"
+          },
+          "404": {
+            "description": "Job type not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skills": {
+      "get": {
+        "summary": "List all skills",
+        "tags": [
+          "Skills"
+        ],
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Skills retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Skill"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No skills found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new skill",
+        "tags": [
+          "Skills"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "JavaScript"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Skill created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skills/{skill}": {
+      "get": {
+        "summary": "Get skill by ID",
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update skill by ID",
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Updated Skill Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Skill updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete skill by ID",
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Skill ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Skill deleted successfully"
+          },
+          "404": {
+            "description": "Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/job-types": {
+      "get": {
+        "summary": "List all job types",
+        "tags": [
+          "Job Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "Job types retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Job types retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JobType"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/job-types/{job_type}": {
+      "get": {
+        "summary": "Get job type by ID",
+        "tags": [
+          "Job Types"
+        ],
+        "parameters": [
+          {
+            "name": "job_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job Type ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job type retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job type not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/talent/profile": {
+      "get": {
+        "summary": "Get talent profile",
+        "description": "Retrieve the authenticated talent user's profile information.",
+        "tags": [
+          "Talent"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Talent profile retrieved successfully."
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/talent/profile/change-password": {
+      "put": {
+        "summary": "Change talent password",
+        "description": "Update the authenticated talent user's password.",
+        "tags": [
+          "Talent"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "current_password",
+                  "password",
+                  "password_confirmation"
+                ],
+                "properties": {
+                  "current_password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "OldPassword123!",
+                    "description": "Current password"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "NewPassword123!",
+                    "description": "New password (minimum 8 characters)"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123!",
+                    "description": "Password confirmation (must match password)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Password changed successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or invalid current password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/talent/profile/photo": {
+      "put": {
+        "summary": "Update talent profile photo",
+        "description": "Update the authenticated talent user's profile photo.",
+        "tags": [
+          "Talent"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "photo"
+                ],
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Profile photo image file"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile photo updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Profile photo updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/countries": {
+      "get": {
+        "summary": "Get all countries",
+        "description": "Retrieve a list of all countries for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Countries retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Countries retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Country"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/states": {
+      "get": {
+        "summary": "Get all states",
+        "description": "Retrieve a list of all states for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "States retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "States retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/State"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/skills": {
+      "get": {
+        "summary": "Get all skills",
+        "description": "Retrieve a list of all skills for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Skills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Skills retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Skill"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/tracks": {
+      "get": {
+        "summary": "Get all tracks",
+        "description": "Retrieve a list of all tracks for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tracks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tracks retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Track"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/categories": {
+      "get": {
+        "summary": "Get all categories",
+        "description": "Retrieve a list of all categories for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Categories retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Category"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/work-modes": {
+      "get": {
+        "summary": "Get all work modes",
+        "description": "Retrieve a list of all work modes for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Work modes retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Work modes retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkMode"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookups/job-types": {
+      "get": {
+        "summary": "Get all job types",
+        "description": "Retrieve a list of all job types for use in forms, filters, and dropdowns.",
+        "tags": [
+          "Lookups"
+        ],
+        "responses": {
+          "200": {
+            "description": "Job types retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Job types retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JobType"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user": {
+      "get": {
+        "summary": "Get authenticated user",
+        "description": "Retrieve the currently authenticated user's information.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
-
   },
-
   "components": {
     "schemas": {
       "Waitlist": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "example": 12 },
-          "full_name": { "type": "string", "example": "John Doe" },
-          "email": { "type": "string", "example": "johndoe@example.com" },
-          "role": { "type": "string", "enum": ["talent", "company"], "example": "talent" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "id": {
+            "type": "integer",
+            "example": 12
+          },
+          "full_name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "johndoe@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "talent",
+              "company"
+            ],
+            "example": "talent"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
-
       "LoginResponse": {
         "type": "object",
         "properties": {
@@ -875,14 +3120,22 @@
                 "description": "Laravel Sanctum bearer token for API authentication"
               }
             },
-            "required": ["user", "token"]
+            "required": [
+              "user",
+              "token"
+            ]
           },
           "status": {
             "type": "integer",
             "example": 200
           }
         },
-        "required": ["success", "message", "data", "status"]
+        "required": [
+          "success",
+          "message",
+          "data",
+          "status"
+        ]
       },
       "UserResponse": {
         "type": "object",
@@ -903,7 +3156,12 @@
             "example": 201
           }
         },
-        "required": ["success", "message", "data", "status"]
+        "required": [
+          "success",
+          "message",
+          "data",
+          "status"
+        ]
       },
       "UsersResponse": {
         "type": "object",
@@ -958,7 +3216,11 @@
             "description": "HTTP status code"
           }
         },
-        "required": ["success", "message", "status"]
+        "required": [
+          "success",
+          "message",
+          "status"
+        ]
       },
       "User": {
         "type": "object",
@@ -998,7 +3260,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["banned", "suspended", "active"],
+            "enum": [
+              "banned",
+              "suspended",
+              "active"
+            ],
             "example": "active"
           },
           "photo_url": {
@@ -1101,8 +3367,12 @@
           "errors": {
             "type": "object",
             "example": {
-              "email": ["The email field is required."],
-              "password": ["The password must be at least 8 characters."]
+              "email": [
+                "The email field is required."
+              ],
+              "password": [
+                "The password must be at least 8 characters."
+              ]
             }
           },
           "status": {
@@ -1111,50 +3381,283 @@
           }
         }
       },
-
       "Job": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "example": "019abcde-1234-5678-9999-jobid" },
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "acceptance_criteria": { "type": "string", "nullable": true },
-          "candidate_location_id": { "type": "string", "nullable": true },
-          "company_id": { "type": "string" },
-          "price": { "type": "number", "nullable": true },
-          "track_id": { "type": "string", "nullable": true },
-          "category_id": { "type": "string", "nullable": true },
-          "job_type_id": { "type": "string", "nullable": true },
-          "status": { "type": "string", "example": "draft" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "id": {
+            "type": "string",
+            "example": "019abcde-1234-5678-9999-jobid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "acceptance_criteria": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidate_location_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "company_id": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "nullable": true
+          },
+          "track_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "category_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "job_type_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "example": "draft"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
-
       "JobCreateRequest": {
         "type": "object",
-        "required": ["title", "description"],
+        "required": [
+          "title",
+          "description"
+        ],
         "properties": {
-          "title": { "type": "string", "example": "Backend Developer" },
-          "description": { "type": "string", "example": "Write and maintain API logic" },
-          "acceptance_criteria": { "type": "string", "nullable": true },
-          "price": { "type": "number", "nullable": true },
-          "track_id": { "type": "string", "nullable": true },
-          "category_id": { "type": "string", "nullable": true },
-          "job_type_id": { "type": "string", "nullable": true }
+          "title": {
+            "type": "string",
+            "example": "Backend Developer"
+          },
+          "description": {
+            "type": "string",
+            "example": "Write and maintain API logic"
+          },
+          "acceptance_criteria": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "nullable": true
+          },
+          "track_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "category_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "job_type_id": {
+            "type": "string",
+            "nullable": true
+          }
         }
       },
-
       "JobUpdateRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "acceptance_criteria": { "type": "string" },
-          "price": { "type": "number" },
-          "track_id": { "type": "string" },
-          "category_id": { "type": "string" },
-          "job_type_id": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "acceptance_criteria": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "track_id": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "string"
+          },
+          "job_type_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Skill": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-skill"
+          },
+          "name": {
+            "type": "string",
+            "example": "JavaScript"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JobType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-jobtype"
+          },
+          "name": {
+            "type": "string",
+            "example": "Full-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-country"
+          },
+          "name": {
+            "type": "string",
+            "example": "Nigeria"
+          },
+          "code": {
+            "type": "string",
+            "example": "NG"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "State": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-state"
+          },
+          "name": {
+            "type": "string",
+            "example": "Lagos"
+          },
+          "country_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Track": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-track"
+          },
+          "name": {
+            "type": "string",
+            "example": "Backend Development"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-category"
+          },
+          "name": {
+            "type": "string",
+            "example": "Software Development"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WorkMode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019abcde-1234-5678-9999-workmode"
+          },
+          "name": {
+            "type": "string",
+            "example": "Remote"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       }
     },
@@ -1164,6 +3667,12 @@
         "scheme": "bearer",
         "bearerFormat": "Sanctum Token",
         "description": "Laravel Sanctum token authentication. Format: 'Bearer {token}' where token is returned from login endpoint."
+      },
+      "sanctum": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Sanctum Token",
+        "description": "Laravel Sanctum token authentication (alias for bearerAuth)."
       }
     }
   }

@@ -82,7 +82,7 @@ class JobService
     public function createOrUpdate(
         string $companyUuid,
         array $data,
-        $status,
+        bool $isDraft,
         bool $isPublish = false
     ): array|object {
         //? check if company id exist and user owns a company
@@ -100,7 +100,7 @@ class JobService
             $updatedDraft = $this->repo->createOrUpdateJob(
                 $companyUuid,
                 $data,
-                $status,
+                $isDraft,
                 $isPublish
             );
 
@@ -122,7 +122,7 @@ class JobService
             // return 
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error("Unable to save job to draft: " . $e->getMessage());
+            logger()->error("Unable to save job: " . $e->getMessage());
 
             return (object) [
                 'success' => false,
@@ -155,7 +155,7 @@ class JobService
             // return 
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error("Unable to save job to draft: " . $e->getMessage());
+            logger()->error("Unable to save job to update job: " . $e->getMessage());
 
             return false;
         }
@@ -186,21 +186,21 @@ class JobService
             return null;
         }
 
-        $this->repo->publish($job, $isPublish);
-        return true;
+        return $this->repo->publish($job, $isPublish);
     }
 
 
-    public function updateStatus(string $companyUuid, string $jobId, string $isActive)
+    public function updateStatus(string $companyUuid, string $jobId, bool $isActive)
     {
+        // dd($companyUuid, $jobId);
         $isActive = $isActive ? 'active' : 'in-active';
 
         $job = $this->getForCompany($companyUuid, $jobId);
+        // dd($job);/
         if (!$job) {
             return null;
         }
 
-        $this->repo->updateStatus($job, $isActive);
-        return true;
+        return $this->repo->updateStatus($job, $isActive);
     }
 }
