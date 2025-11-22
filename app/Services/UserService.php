@@ -109,8 +109,8 @@ class UserService implements UserInterface
      */
     private function generateOtp(User $user): string
     {
-        //? Generate a secure 4-digit OTP
-        $otpCode = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        //? Generate a secure 6-digit OTP
+        $otpCode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         //? Store hashed OTP in otp_tokens table
         OtpToken::create([
