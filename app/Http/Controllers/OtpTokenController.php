@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 
 class OtpTokenController extends Controller
 {
+
     public function verifyOtp(OtpTokenRequest $request)
     {
 
