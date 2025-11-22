@@ -23,14 +23,19 @@ class StoreDraftJobRequest extends FormRequest
      */
     public function rules(): array
     {
+        $companyId = $this->route('companyId');
+
         return [
             'title' => 'required|string|max:255',
+            'company' => [
+                Rule::exists('companies', 'id')
+                    ->where('user_id', Auth::id())
+            ],
             'job_id' => [
                 'sometimes',
                 'string',
-                Rule::exists('job_listings', 'id')->where(function ($query) {
-                    $query->where('user_id', Auth::id());
-                })
+                Rule::exists('job_listings', 'id')
+                    ->where('company_id', $companyId),
             ],
             'description' => 'required|string',
             'acceptance_criteria' => 'nullable|string',
