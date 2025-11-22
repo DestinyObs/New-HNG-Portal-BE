@@ -95,15 +95,18 @@ class JobRepository
     // }
 
 
-    public function createOrUpdateJob(string $companyUuid, array $data, string $status, $isPublish = false): JobListing
+    public function createOrUpdateJob(string $companyUuid, array $data, bool $isDraft, $isPublish = false): JobListing
     {
         $jobId = $data['job_id'] ?? null;
         $data['publication_status'] = $isPublish ? 'published' : 'unpublished';
 
         //? Always set the company ID to the logged-in company's UUID
         $data['company_id'] = $companyUuid;
-        $data['status'] = $status; // Ensure it's always a draft
+        $data['status'] = $isDraft ? 'draft' : 'active'; //? Ensure it's always a draft or active job
 
+        //dd($data);
+
+        // dd($data);
         if (is_null($jobId)) {
             //? No job ID provided → create a new draft
             return JobListing::create($data);
@@ -112,11 +115,13 @@ class JobRepository
         //? Job ID provided → try to find the draft belonging to the current user
         $job = JobListing::where('id', $jobId)
             ->where('company_id', $companyUuid)
-            ->where('status', $status)
+            ->where('status', 'draft')
             ->first();
 
         if (!$job) {
-            throw new \Exception('The specified job does not exist or you do not have permission to edit it.');
+            throw new \Exception(
+                'The specified job does not exist or it is not longer a draft or you do not have permission to edit it.'
+            );
         }
 
         // Update the existing draft

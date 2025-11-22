@@ -28,19 +28,19 @@ Route::prefix('api/employer')->group(function () {
                 Route::post('/{job_id}/restore', 'restore');
                 Route::put('/{job_id}/publish', 'publish');
                 Route::put('/{job_id}/unpublish', 'unpublish');
-                Route::put('/{job_id}/active', 'updateStatus');
+                Route::put('/{job_id}/active', 'updateStatusToActive');
+                Route::put('/{job_id}/inactive', 'updateStatusToInActive');
             });
         });
-    });
 
-
-    //? Employer Company Routes
-    Route::controller(CompanyController::class)->group(function () {
-        Route::prefix('company')->group(function () {
-            Route::post('company', 'store');
-            Route::get('{uuid}', 'show');
-            Route::put('{uuid}', 'update');
-            Route::put('{uuid}/logo', 'updateLogo');
+        //? Employer Company Routes
+        Route::controller(CompanyController::class)->group(function () {
+            Route::prefix('company')->group(function () {
+                Route::post('company', 'store');
+                Route::get('{companyId}', 'show');
+                Route::put('{companyId}', 'update');
+                Route::put('{companyId}/logo', 'updateLogo');
+            });
         });
     });
 });

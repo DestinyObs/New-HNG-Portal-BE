@@ -12,6 +12,8 @@ class JobListing extends Model
 {
     use HasUuids, HasFactory, SoftDeletes;
 
+    // protected $table = "job_listings";
+
     protected $fillable = [
         'id',
         'title',
