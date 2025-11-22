@@ -9,4 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Track extends Model
 {
     use HasFactory, HasUuids;
+
+    protected $fillable = ['name'];
+    public $incrementing = false;
+    protected $keyType = 'string';
 }
+

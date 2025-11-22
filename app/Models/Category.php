@@ -10,4 +10,9 @@ class Category extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $fillable = ['name'];
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
 }
