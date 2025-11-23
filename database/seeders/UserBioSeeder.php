@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Media;
+use App\Models\MediaAsset;
 use App\Models\User;
 use App\Models\UserBio;
 use Illuminate\Database\Seeder;
@@ -27,7 +28,7 @@ class UserBioSeeder extends Seeder
             UserBio::factory()->create([
                 'user_id' => $user->id,
                 'track_id' => $tracks->isNotEmpty() ? $tracks->random() : null,
-                'cv_id' => Media::factory(),
+                'cv_id' => MediaAsset::factory(),
             ]);
         }
     }

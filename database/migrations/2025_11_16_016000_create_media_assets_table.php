@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('media', function (Blueprint $table) {
+        Schema::create('media_assets', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('url');
             $table->timestamps();
@@ -16,6 +16,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('media');
+        Schema::dropIfExists('media_assets');
     }
 };
