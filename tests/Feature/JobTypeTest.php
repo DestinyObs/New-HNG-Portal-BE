@@ -17,7 +17,7 @@ class JobTypeTest extends TestCase
      */
     public function test_the_route_returns_a_successful_response(): void
     {
-        $response = $this->get('/api/job-types');
+        $response = $this->get('/api/lookups/job-types');
 
         $response->assertStatus(200); // $response->assertOk();
     }

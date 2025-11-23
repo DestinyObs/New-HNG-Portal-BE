@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Country;
+use App\Models\State;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -20,6 +21,8 @@ class CompanyFactory extends Factory
             'description' => fake()->paragraph(3),
             'logo_url' => fake()->optional(0.6)->imageUrl(200, 200, 'business'),
             'country_id' => Country::factory(),
+            'state_id' => State::factory(),
+            'industry' => $name,
             'website_url' => fake()->optional(0.8)->url(),
             'is_verified' => fake()->boolean(60),
             'official_email' => fake()->companyEmail(),

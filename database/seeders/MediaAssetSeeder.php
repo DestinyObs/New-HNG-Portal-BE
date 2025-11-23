@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Models\Media;
+use App\Models\MediaAsset;
 use Illuminate\Database\Seeder;
 
-class MediaSeeder extends Seeder
+class MediaAssetSeeder extends Seeder
 {
     public function run(): void
     {
         // Create 20 media files using factory
-        Media::factory()->count(20)->create();
+        MediaAsset::factory()->count(20)->create();
     }
 }
 
