@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\OnboardingEnum;
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,7 +23,8 @@ return new class extends Migration {
             $table->string('website_url')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('official_email')->nullable();
-            $table->string('status')->default('active');
+            $table->string('onboarding_status')->default(OnboardingEnum::PENDING->value);
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();
             $table->softDeletes();
         });
