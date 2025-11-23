@@ -3,6 +3,7 @@
 //? API routes for employer functionalities
 
 use App\Http\Controllers\Employer\CompanyController;
+use App\Http\Controllers\Employer\CompanyOnboardingController;
 use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,4 +44,11 @@ Route::prefix('api/employer')->group(function () {
             });
         });
     });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        // Company Onboarding
+        Route::post('onboarding', [CompanyOnboardingController::class, 'store']);
+        Route::get('onboarding', [CompanyOnboardingController::class, 'index']);
+    });
+
 });
