@@ -4,6 +4,7 @@
 //? API routes for talent functionalities
 
 use App\Http\Controllers\Talent\ProfileController;
+use App\Http\Controllers\Talent\TalentOnboardingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/talent')->group(function () {
@@ -20,4 +21,12 @@ Route::prefix('api/talent')->group(function () {
             Route::put('profile/photo', 'updatePhoto');
         });
     });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        // Company Onboarding
+        Route::controller(TalentOnboardingController::class)->group(function () {
+            Route::get('onboarding', 'index');
+            Route::post('onboarding', 'store');
+        });
+    });    
 });
