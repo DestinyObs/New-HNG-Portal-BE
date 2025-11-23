@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\OnboardingEnum;
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,6 +22,12 @@ return new class extends Migration {
             $table->json('links')->nullable();
             $table->uuid('cv_id')->nullable();
             $table->foreign('cv_id')->references('id')->on('media_assets')->onDelete('set null');
+            $table->string('current_role')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('project_name')->nullable();
+            $table->string('project_url')->nullable();
+            $table->string('onboarding_status')->default(OnboardingEnum::PENDING->value);
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();
         });
     }
