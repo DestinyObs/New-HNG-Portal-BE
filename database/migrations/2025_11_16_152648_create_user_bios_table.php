@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->boolean('is_verified')->default(false);
             $table->json('links')->nullable();
             $table->uuid('cv_id')->nullable();
-            $table->foreign('cv_id')->references('id')->on('media')->onDelete('set null');
+            $table->foreign('cv_id')->references('id')->on('media_assets')->onDelete('set null');
             $table->timestamps();
         });
     }
