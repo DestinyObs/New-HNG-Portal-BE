@@ -1,0 +1,29 @@
+name: CI for Staging
+
+on:
+    pull_request:
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+  checks:
+    runs-on: [self-hosted, hng-13-runner, linux]
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        
+      - name: Install Composer dependencies
+        # This installs all dependencies, including larastan/phpstan from composer.json
+        run: composer install --no-interaction --prefer-dist
+
+      # - name: PHPStan static analysis (Larastan)
+      #   # This command runs the analysis, automatically picking up the committed phpstan.neon file.
+      #   run: ./vendor/bin/phpstan analyse --level=max app"
+      
+      - name: Composer security audit
+        run: composer audit --format=json
+
+      - name: Run PHPUnit tests
+        run: ./vendor/bin/phpunit
