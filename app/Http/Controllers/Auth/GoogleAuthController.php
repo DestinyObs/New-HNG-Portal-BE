@@ -17,5 +17,4 @@ class GoogleAuthController extends Controller
 
         return $this->successWithData($result, 'Authentication successful');
     }
-    }
 }
