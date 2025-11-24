@@ -27,8 +27,37 @@ jobs:
       #   # This command runs the analysis, automatically picking up the committed phpstan.neon file.
       #   run: ./vendor/bin/phpstan analyse --level=max app"
       
+      
+      - name: Create .env.testing from secrets
+        run: |
+          echo "APP_KEY=base64:testingkey==" > .env.testing
+          echo "DB_CONNECTION=${{ secrets.CI_DB_CONNECTION }}" >> .env.testing
+          echo "DB_HOST=${{ secrets.CI_DB_HOST }}" >> .env.testing
+          echo "DB_PORT=${{ secrets.CI_DB_PORT }}" >> .env.testing
+          echo "DB_DATABASE=${{ secrets.CI_DB_DATABASE }}" >> .env.testing
+          echo "DB_USERNAME=${{ secrets.CI_DB_USERNAME }}" >> .env.testing
+          echo "DB_PASSWORD=${{ secrets.CI_DB_PASSWORD }}" >> .env.testing
+
+      - name: Run migrations
+        env:
+          DB_CONNECTION: ${{ secrets.CI_DB_CONNECTION }}
+          DB_HOST: ${{ secrets.CI_DB_HOST }}
+          DB_PORT: ${{ secrets.CI_DB_PORT }}
+          DB_DATABASE: ${{ secrets.CI_DB_DATABASE }}
+          DB_USERNAME: ${{ secrets.CI_DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+        run: php artisan migrate --force --env=testing
+
       - name: Composer security audit
         run: composer audit --format=json || true
 
       - name: Run PHPUnit tests
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: ${{ secrets.CI_DB_CONNECTION }}
+          DB_HOST: ${{ secrets.CI_DB_HOST }}
+          DB_PORT: ${{ secrets.CI_DB_PORT }}
+          DB_DATABASE: ${{ secrets.CI_DB_DATABASE }}
+          DB_USERNAME: ${{ secrets.CI_DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
         run: ./vendor/bin/phpunit
