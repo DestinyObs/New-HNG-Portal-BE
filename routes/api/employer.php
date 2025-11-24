@@ -49,6 +49,6 @@ Route::prefix('api/employer')->group(function () {
             Route::get('onboarding', 'index');
             Route::post('onboarding', 'store');
         });
-    });      
+    });
 
 });

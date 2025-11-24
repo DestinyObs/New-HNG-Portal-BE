@@ -68,7 +68,7 @@ class UserService implements UserInterface
                     'bio',
                     'track_id',
                     'project_name',
-                    'project_url'
+                    'project_url',
                 ]);
             }
 
