@@ -13,10 +13,28 @@ class UserBio extends Model implements HasMedia
     use HasFactory, HasUuids, InteractsWithMedia;
 
     protected $fillable = [
+        'user_id',
         'current_role',
         'bio',
         'track_id',
         'project_name',
         'project_url'
     ];
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['user'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function track()
+    {
+        return $this->belongsTo(Track::class);
+    }
 }
