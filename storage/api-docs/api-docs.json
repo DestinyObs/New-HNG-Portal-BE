@@ -1125,58 +1125,62 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
+    "/api/auth/google": {
+      "post": {
+        "summary": "Authenticate / Register via Google token",
+        "description": "Accepts a Google OAuth access token obtained on the frontend and signs the user in or creates an account. For company signups include `company_name` (or it may be inferred from the email domain). Returns the standard login response with access token and user data.",
         "tags": [
           "Authentication"
         ],
-        "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "URL to Google OAuth page"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "access_token",
+                  "role"
+                ],
+                "properties": {
+                  "access_token": {
+                    "type": "string",
+                    "description": "Google OAuth access token obtained by the frontend",
+                    "example": "ya29.a0AfH6SM..."
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "talent",
+                      "company"
+                    ],
+                    "description": "Role to assign for new signups; required on signup",
+                    "example": "talent"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Optional: company name for employer signups. If omitted the server will attempt to infer from the email domain; if inference fails, the field is required.",
+                    "example": "Acme Corporation"
+                  }
+                }
               }
             }
           }
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Handle Google OAuth callback",
-        "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": [
-          "Authentication"
-        ],
-        "parameters": [
-          {
-            "name": "code",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Authorization code from Google"
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "State parameter for CSRF protection"
-          }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Google OAuth login successful",
+            "description": "Authenticated existing user — returns login response with access token and user data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New user created and OTP sent — returns login/registration response",
             "content": {
               "application/json": {
                 "schema": {
@@ -1186,7 +1190,7 @@
             }
           },
           "400": {
-            "description": "Invalid OAuth callback",
+            "description": "Invalid request or token",
             "content": {
               "application/json": {
                 "schema": {
@@ -1196,11 +1200,21 @@
             }
           },
           "401": {
-            "description": "OAuth authentication failed",
+            "description": "Authentication with Google failed",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (e.g., missing required fields or company_name required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
