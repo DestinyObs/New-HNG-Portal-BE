@@ -15,7 +15,7 @@ class GoogleTokenRequest extends FormRequest
     {
         return [
             'access_token' => 'required|string',
-            'role' => 'nullable|string|in:talent,company,admin,employer',
+            'role' => 'nullable|string|in:talent,company,admin',
             'company_name' => 'nullable|string|max:255',
         ];
     }

@@ -39,8 +39,33 @@ class GoogleAuthService implements GoogleAuthInterface
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
-        // Existing user -> login
+        // External -> internal role mapping used both for validation and assignment
+        $roleMap = [
+            'talent' => 'talent',
+            'company' => 'employer',
+            'admin' => 'admin',
+        ];
+
+        // Existing user -> login. But if the caller provided a role, ensure it matches
+        // the user's already-assigned role(s). We do NOT allow changing roles via
+        // this token endpoint (signup vs login separation).
         if ($user) {
+            if ($role) {
+                if (! isset($roleMap[$role])) {
+                    Log::warning('Google auth attempted with invalid role for existing user', ['role' => $role, 'email' => $googleUser->getEmail()]);
+                    throw ValidationException::withMessages([
+                        'role' => ['Invalid role provided.'],
+                    ]);
+                }
+
+                $expectedInternal = $roleMap[$role];
+                if (! $user->hasRole($expectedInternal)) {
+                    throw ValidationException::withMessages([
+                        'role' => ["User already exists with a different role and cannot sign up as '{$role}'."],
+                    ]);
+                }
+            }
+
             $this->saveDevice($user);
 
             $token = $user->createToken('API Token')->plainTextToken;
@@ -61,13 +86,7 @@ class GoogleAuthService implements GoogleAuthInterface
             'password' => $password,
         ]);
 
-        // Map external role (if provided) to internal Spatie role names
-        $roleMap = [
-            'talent' => 'talent',
-            'company' => 'employer',
-        ];
-
-        // For signup: role is required and must be valid. For login (existing user), role is ignored.
+        // For signup: role is required and must be valid.
         if (! $role) {
             throw ValidationException::withMessages([
                 'role' => ['Role is required for Google signup.'],

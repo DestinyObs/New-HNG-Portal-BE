@@ -1139,8 +1139,7 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "access_token",
-                  "role"
+                  "access_token"
                 ],
                 "properties": {
                   "access_token": {
@@ -1152,9 +1151,10 @@
                     "type": "string",
                     "enum": [
                       "talent",
-                      "company"
+                      "company",
+                      "admin"
                     ],
-                    "description": "Role to assign for new signups; required on signup",
+                    "description": "Role to assign for new signups; optional for existing-user logins. If omitted and a new account is created the role is required by the server.",
                     "example": "talent"
                   },
                   "company_name": {
@@ -1164,6 +1164,23 @@
                     "example": "Acme Corporation"
                   }
                 }
+              ,
+              "examples": {
+                "login-only": {
+                  "summary": "Existing user login (no role required)",
+                  "value": {
+                    "access_token": "ya29.a0AfH6SM..."
+                  }
+                },
+                "signup-company": {
+                  "summary": "Signup as company (provide role and company_name)",
+                  "value": {
+                    "access_token": "ya29.a0AfH6SM...",
+                    "role": "company",
+                    "company_name": "Acme Corporation"
+                  }
+                }
+              }
               }
             }
           }

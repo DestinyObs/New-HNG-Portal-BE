@@ -56,6 +56,6 @@ class GoogleAuthController extends Controller
         return $this->successWithData([
             'user' => $response['user'],
             'token' => $response['token'],
-        ], 'Login successful');
+        ], 'Google authentication successful');
     }
 }
