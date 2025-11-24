@@ -13,4 +13,3 @@ class StateFactory extends Factory
         ];
     }
 }
-

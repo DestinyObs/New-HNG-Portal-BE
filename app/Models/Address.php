@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 }

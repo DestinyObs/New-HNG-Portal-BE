@@ -27,14 +27,14 @@ class JobAttributeFactory extends Factory
         // Assign name based on group
         $name = match ($attribute_type) {
             'category' => $this->faker->randomElement($categories),
-            'type'     => $this->faker->randomElement($types),
-            'mode'     => $this->faker->randomElement($modes),
+            'type' => $this->faker->randomElement($types),
+            'mode' => $this->faker->randomElement($modes),
         };
 
         return [
             'user_id' => $admin?->id,          // Only admin creates attributes
             'name' => $name,
-            'slug' => Str::slug($name . '-' . Str::random(5)),
+            'slug' => Str::slug($name.'-'.Str::random(5)),
             'attribute_type' => $attribute_type,
             'status' => true,
         ];

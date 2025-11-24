@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum OnboardingEnum : string
+enum OnboardingEnum: string
 {
     case PENDING = 'pending';
     case SUCCESSFUL = 'successful';

@@ -27,8 +27,8 @@ class JobModuleTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
-                    ['id', 'title', 'description', 'company_id']
-                ]
+                    ['id', 'title', 'description', 'company_id'],
+                ],
             ]);
     }
 
@@ -52,7 +52,6 @@ class JobModuleTest extends TestCase
     //     $response->assertStatus(201)
     //         ->assertJsonFragment($payload);
     // }
-
 
     // public function test_employer_can_update_job()
     // {
@@ -79,12 +78,11 @@ class JobModuleTest extends TestCase
     //         ->assertJsonFragment($updateData);
     // }
 
-
     public function test_employer_can_view_job_details()
     {
         $company = Company::factory()->create();
         $job = JobListing::factory()->create([
-            'company_id' => $company->id
+            'company_id' => $company->id,
         ]);
 
         // Create a new user using a factory
@@ -96,13 +94,11 @@ class JobModuleTest extends TestCase
             ->assertJsonFragment(['id' => $job->id]);
     }
 
-
-
     public function test_employer_can_soft_delete_job()
     {
         $company = Company::factory()->create();
         $job = JobListing::factory()->create([
-            'company_id' => $company->id
+            'company_id' => $company->id,
         ]);
 
         // Create a new user using a factory
@@ -117,13 +113,13 @@ class JobModuleTest extends TestCase
 
     public function test_employer_can_restore_job()
     {
-        
+
         $company = Company::factory()->create();
         $job = JobListing::factory()->create([
             'company_id' => $company->id,
             'deleted_at' => now(),
         ]);
-        
+
         // Create a new user using a factory
         $user = User::factory()->create();
         // Authenticate the user and access the route
@@ -133,23 +129,22 @@ class JobModuleTest extends TestCase
 
         $this->assertDatabaseHas('job_listings', [
             'id' => $job->id,
-            'deleted_at' => null
+            'deleted_at' => null,
         ]);
     }
-
 
     public function test_authenticated_users_can_access_protected_route()
     {
         // Create a new user using a factory
         $user = User::factory()->create();
         $company = Company::factory()->create([
-            'user_id' => $user->id
+            'user_id' => $user->id,
         ]);
 
         // Authenticate the user and access the route
         $response = $this->actingAs($user)->get('/api/user');
 
         // Assert a successful response for authenticated users
-        $response->assertStatus(200); 
+        $response->assertStatus(200);
     }
 }

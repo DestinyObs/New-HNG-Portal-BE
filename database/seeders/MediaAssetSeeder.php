@@ -13,4 +13,3 @@ class MediaAssetSeeder extends Seeder
         MediaAsset::factory()->count(20)->create();
     }
 }
-

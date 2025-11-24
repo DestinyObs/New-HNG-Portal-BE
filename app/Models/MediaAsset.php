@@ -10,5 +10,5 @@ class MediaAsset extends Model
 {
     use HasFactory, HasUuids;
 
-    // protected $table = 'media_assets'; 
+    // protected $table = 'media_assets';
 }

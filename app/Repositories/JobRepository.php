@@ -6,10 +6,8 @@ use App\Enums\Status;
 use App\Models\Company;
 use App\Models\JobListing;
 use App\Models\JobListingSkill;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class JobRepository
 {
@@ -22,7 +20,7 @@ class JobRepository
             'category',
             'jobType',
             'track',
-            'skills'
+            'skills',
         ])
             ->find($id);
     }
@@ -38,7 +36,7 @@ class JobRepository
                 'category',
                 'jobType',
                 'track',
-                'skills'
+                'skills',
             ])
             ->first();
     }
@@ -53,17 +51,17 @@ class JobRepository
                 'category',
                 'jobType',
                 'track',
-                'skills'
+                'skills',
             ]);
 
         // apply simple filters if provided
-        if (!empty($filters['title'])) {
-            $query->where('title', 'like', '%' . $filters['title'] . '%');
+        if (! empty($filters['title'])) {
+            $query->where('title', 'like', '%'.$filters['title'].'%');
         }
-        if (!empty($filters['job_type_id'])) {
+        if (! empty($filters['job_type_id'])) {
             $query->where('job_type_id', $filters['job_type_id']);
         }
-        if (!empty($filters['category_id'])) {
+        if (! empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
@@ -76,7 +74,6 @@ class JobRepository
             ->where('user_id', Auth::id())
             ->exists();
     }
-
 
     // public function createAndPushlishJob(string $companyUuid, array $data): JobListing
     // {
@@ -94,31 +91,30 @@ class JobRepository
     //     return JobListing::create($data);
     // }
 
-
     public function createOrUpdateJob(string $companyUuid, array $data, bool $isDraft, $isPublish = false): JobListing
     {
         $jobId = $data['job_id'] ?? null;
         $data['publication_status'] = $isPublish ? 'published' : 'unpublished';
 
-        //? Always set the company ID to the logged-in company's UUID
+        // ? Always set the company ID to the logged-in company's UUID
         $data['company_id'] = $companyUuid;
-        $data['status'] = $isDraft ? 'draft' : 'active'; //? Ensure it's always a draft or active job
+        $data['status'] = $isDraft ? 'draft' : 'active'; // ? Ensure it's always a draft or active job
 
-        //dd($data);
+        // dd($data);
 
         // dd($data);
         if (is_null($jobId)) {
-            //? No job ID provided → create a new draft
+            // ? No job ID provided → create a new draft
             return JobListing::create($data);
         }
 
-        //? Job ID provided → try to find the draft belonging to the current user
+        // ? Job ID provided → try to find the draft belonging to the current user
         $job = JobListing::where('id', $jobId)
             ->where('company_id', $companyUuid)
             ->where('status', 'draft')
             ->first();
 
-        if (!$job) {
+        if (! $job) {
             throw new \Exception(
                 'The specified job does not exist or it is not longer a draft or you do not have permission to edit it.'
             );
@@ -130,12 +126,10 @@ class JobRepository
         return $job;
     }
 
-
-
     public function addJobSkills(array $skills, int|string $jobId): void
     {
         foreach ($skills as $skillId) {
-            //? Skip if the skill is already attached to the job
+            // ? Skip if the skill is already attached to the job
             $exists = JobListingSkill::where('job_listing_id', $jobId)
                 ->where('job_skill_id', $skillId)
                 ->exists();
@@ -144,7 +138,7 @@ class JobRepository
                 continue;
             }
 
-            //? Attach new skill
+            // ? Attach new skill
             JobListingSkill::create([
                 'job_listing_id' => $jobId,
                 'job_skill_id' => $skillId,
@@ -156,14 +150,15 @@ class JobRepository
     {
         $job->fill($data);
         $job->save();
+
         return $job;
     }
-
 
     public function publish(JobListing $job, string $isPublish)
     {
         $job->publication_status = $isPublish;
         $job->save();
+
         return $job;
     }
 
@@ -171,6 +166,7 @@ class JobRepository
     {
         $job->status = $isActive;
         $job->save();
+
         return $job;
     }
 
@@ -185,6 +181,7 @@ class JobRepository
         if ($job && $job->trashed()) {
             $job->restore();
         }
+
         return $job;
     }
 }
