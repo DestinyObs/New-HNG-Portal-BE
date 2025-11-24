@@ -3,132 +3,115 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Services\Auth\GoogleAuthService;
+use App\Services\Interfaces\UserInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Mail;
-use Laravel\Socialite\Contracts\User as SocialiteUserContract;
+use Illuminate\Support\Str;
 use Mockery;
 use Tests\TestCase;
 
-class GoogleAuthTest extends TestCase
+class GoogleAuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        Mail::fake();
-        // Ensure migrations run (if needed)
-        // Artisan::call('migrate');
     }
 
-    public function test_existing_user_can_login_with_token()
+    public function test_existing_user_can_login()
     {
-        $user = User::factory()->create(['email' => 'existing@example.com']);
-
-        $token = 'fake-token-existing';
-
-        // Mock Socialite provider behaviour
-        $provider = Mockery::mock();
-        $socialiteUser = Mockery::mock(SocialiteUserContract::class);
-        $socialiteUser->shouldReceive('getEmail')->andReturn('existing@example.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Existing User');
-
-        $provider->shouldReceive('stateless')->andReturnSelf();
-        $provider->shouldReceive('userFromToken')->with($token)->andReturn($socialiteUser);
-
-        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token]);
-
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['success', 'message', 'data' => ['user', 'token']]);
-    }
-
-    public function test_new_user_signup_requires_role_and_company_when_company()
-    {
-        $token = 'fake-token-new';
-
-        $provider = Mockery::mock();
-        $socialiteUser = Mockery::mock(SocialiteUserContract::class);
-        $socialiteUser->shouldReceive('getEmail')->andReturn('newcompany@example.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('New Company');
-
-        $provider->shouldReceive('stateless')->andReturnSelf();
-        $provider->shouldReceive('userFromToken')->with($token)->andReturn($socialiteUser);
-
-        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-        // Missing role -> should return 422
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token]);
-        $response->assertStatus(422);
-
-        // Role company but missing company_name -> try inference and succeed for example.com
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token, 'role' => 'company']);
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['success', 'message', 'data' => ['user', 'token']]);
-
-        // Role company with company_name -> explicit success
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token, 'role' => 'company', 'company_name' => 'ACME Ltd']);
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['success', 'message', 'data' => ['user', 'token']]);
-    }
-
-    public function test_new_user_signup_with_talent_role_succeeds()
-    {
-        $token = 'fake-token-talent';
-
-        $provider = Mockery::mock();
-        $socialiteUser = Mockery::mock(SocialiteUserContract::class);
-        $socialiteUser->shouldReceive('getEmail')->andReturn('newtalent@example.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('New Talent');
-
-        $provider->shouldReceive('stateless')->andReturnSelf();
-        $provider->shouldReceive('userFromToken')->with($token)->andReturn($socialiteUser);
-
-        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token, 'role' => 'talent']);
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['success', 'message', 'data' => ['user', 'token']]);
-    }
-
-    public function test_new_user_signup_fails_without_role()
-    {
-        $token = 'fake-token-no-role';
-        
-        $provider = Mockery::mock();
-        $socialiteUser = Mockery::mock(SocialiteUserContract::class);
-        $socialiteUser->shouldReceive('getEmail')->andReturn('newuser@example.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('New User');
-
-        $provider->shouldReceive('stateless')->andReturnSelf();
-        $provider->shouldReceive('userFromToken')->with($token)->andReturn($socialiteUser);
-
-        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-        $response = $this->postJson('/api/auth/google', ['access_token' => $token]);
-        $response->assertStatus(422);
-    }
-
-    public function test_company_signup_fails_when_company_name_cannot_be_inferred()
-    {
-        $token = 'fake-token-gmail';
-        
-        $provider = Mockery::mock();
-        $socialiteUser = Mockery::mock(SocialiteUserContract::class);
-        $socialiteUser->shouldReceive('getEmail')->andReturn('test@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Test User');
-
-        $provider->shouldReceive('stateless')->andReturnSelf();
-        $provider->shouldReceive('userFromToken')->with($token)->andReturn($socialiteUser);
-
-        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-        $response = $this->postJson('/api/auth/google', [
-            'access_token' => $token, 
-            'role' => 'company'
+        $user = User::factory()->create([
+            'email' => 'existing@example.com',
         ]);
-        $response->assertStatus(422);
+
+        $mockUserService = Mockery::mock(UserInterface::class);
+
+        $googleAuthService = new GoogleAuthService($mockUserService);
+
+        $result = $googleAuthService->handle([
+            'email' => 'existing@example.com',
+            'name' => 'Existing User',
+        ]);
+
+        $this->assertEquals('login', $result['mode']);
+        $this->assertEquals($user->id, $result['user']->id);
+        $this->assertArrayHasKey('token', $result);
+    }
+
+    public function test_new_talent_user_can_signup()
+    {
+        $mockUserService = Mockery::mock(UserInterface::class);
+        $mockUserService->shouldReceive('create')->once()->andReturnUsing(function ($data) {
+            return array_merge($data, ['mode' => 'signup']);
+        });
+
+        $googleAuthService = new GoogleAuthService($mockUserService);
+
+        $data = [
+            'email' => 'newtalent@example.com',
+            'name' => 'New Talent',
+            'role' => 'talent',
+        ];
+
+        $result = $googleAuthService->handle($data);
+
+        $this->assertEquals('signup', $result['mode']);
+        $this->assertEquals('New', $result['firstname']);
+        $this->assertEquals('Talent', $result['lastname']);
+        $this->assertEquals('talent', $result['role']);
+        $this->assertEquals('newtalent@example.com', $result['email']);
+        $this->assertArrayHasKey('password', $result);
+    }
+
+    public function test_new_company_user_can_signup_with_company_name_provided()
+    {
+        $mockUserService = Mockery::mock(UserInterface::class);
+        $mockUserService->shouldReceive('create')->once()->andReturnUsing(function ($data) {
+            return array_merge($data, ['mode' => 'signup']);
+        });
+
+        $googleAuthService = new GoogleAuthService($mockUserService);
+
+        $data = [
+            'email' => 'company@example.com',
+            'name' => 'ACME Inc',
+            'role' => 'company',
+            'company_name' => 'ACME Inc',
+        ];
+
+        $result = $googleAuthService->handle($data);
+
+        $this->assertEquals('signup', $result['mode']);
+        $this->assertEquals('ACME Inc', $result['company_name']);
+        $this->assertEquals('company', $result['role']);
+    }
+
+    public function test_signup_fails_without_role()
+    {
+        $mockUserService = Mockery::mock(UserInterface::class);
+        $googleAuthService = new GoogleAuthService($mockUserService);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Role is required for new users.');
+
+        $googleAuthService->handle([
+            'email' => 'newuser@example.com',
+            'name' => 'No Role User',
+        ]);
+    }
+
+    public function test_signup_fails_without_email()
+    {
+        $mockUserService = Mockery::mock(UserInterface::class);
+        $googleAuthService = new GoogleAuthService($mockUserService);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Email is required.');
+
+        $googleAuthService->handle([
+            'name' => 'No Email',
+            'role' => 'talent',
+        ]);
     }
 }
