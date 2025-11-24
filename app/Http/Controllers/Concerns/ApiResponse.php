@@ -139,7 +139,7 @@ trait ApiResponse
      * Return an unauthorized response.
      */
     protected function unauthorized(
-        string $message = 'Unauthorized',
+        string $message = 'This action is Unauthorized, please contact support',
         array $headers = []
     ): JsonResponse {
         return $this->error($message, Http::UNAUTHORIZED, $headers);
@@ -149,7 +149,7 @@ trait ApiResponse
      * Return a forbidden response.
      */
     protected function forbidden(
-        string $message = 'Forbidden',
+        string $message = 'Forbidden Request, please update your permissions',
         array $headers = []
     ): JsonResponse {
         return $this->error($message, Http::FORBIDDEN, $headers);
@@ -159,7 +159,7 @@ trait ApiResponse
      * Return an unprocessable entity response.
      */
     protected function unprocessable(
-        string $message = 'Validation failed',
+        string $message = 'Validation failed, please check your input',
         array $errors = [],
         array $headers = []
     ): JsonResponse {

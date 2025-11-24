@@ -45,19 +45,19 @@ class Handler extends ExceptionHandler
             // Validation errors
             if ($exception instanceof ValidationException) {
                 return $this->unprocessable(
-                    'Validation failed',
+                    'Validation failed, please check your input',
                     $exception->errors()
                 );
             }
 
             // Authentication
             if ($exception instanceof AuthenticationException) {
-                return $this->unauthorized('Unauthenticated');
+                return $this->unauthorized('You are Unauthenticated, please log in');
             }
 
             // Authorization
             if ($exception instanceof AuthorizationException) {
-                return $this->forbidden('You do not have permission');
+                return $this->forbidden('You do not have permission to perform this action');
             }
 
             // Model not found
@@ -68,35 +68,35 @@ class Handler extends ExceptionHandler
 
             // Route not found
             if ($exception instanceof NotFoundHttpException) {
-                return $this->notFound('Route not found');
+                return $this->notFound('Route not found, please check the URL');
             }
 
             // Method not allowed
             if ($exception instanceof MethodNotAllowedHttpException) {
-                return $this->error('Method not allowed', Http::METHOD_NOT_ALLOWED);
+                return $this->error('Method not allowed, please confirm the request method', Http::METHOD_NOT_ALLOWED);
             }
 
             // CSRF token mismatch
             if ($exception instanceof TokenMismatchException) {
-                return $this->error('CSRF token mismatch', Http::UNAUTHORIZED);
+                return $this->error('CSRF token mismatch, please confirm the origin of the request is registered', Http::UNAUTHORIZED);
             }
 
             // Too many requests / throttling
             if ($exception instanceof ThrottleRequestsException) {
-                return $this->error('Too many requests', Http::TOO_MANY_REQUESTS);
+                return $this->error('Too many requests, please try again later', Http::TOO_MANY_REQUESTS);
             }
 
             // 9️Database query errors
             if ($exception instanceof QueryException) {
                 return $this->error(
-                    app()->isLocal() ? $exception->getMessage() : 'Database error',
+                    app()->isLocal() ? $exception->getMessage() : 'Database  error occurred, please check your request',
                     Http::INTERNAL_SERVER_ERROR
                 );
             }
 
             // Fallback for all other exceptions
             return $this->error(
-                app()->isLocal() ? $exception->getMessage() : 'Oops! An error occurred',
+                app()->isLocal() ? $exception->getMessage() : 'Oops! An error occurred, please refresh the page or try again later',
                 Http::INTERNAL_SERVER_ERROR
             );
         }
@@ -111,7 +111,7 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|Response
     {
         if ($request->is('api/*')) {
-            return $this->unauthorized('Unauthenticated');
+            return $this->unauthorized('You are Unauthenticated, please log in');
         }
 
         return parent::unauthenticated($request, $exception);
