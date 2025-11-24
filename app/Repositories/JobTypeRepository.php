@@ -7,8 +7,8 @@ use PHPUnit\Util\PHP\Job;
 
 class JobTypeRepository
 {
-
     protected JobType $jobType;
+
     /**
      * Create a new class instance.
      */
@@ -30,24 +30,26 @@ class JobTypeRepository
         return $this->jobType::findOrFail($id);
     }
 
-
     // create
-    public function create(array $data){
+    public function create(array $data)
+    {
         return $this->jobType->create($data);
-    }    
+    }
 
     // update
-    public function update(string $id, array $data){
+    public function update(string $id, array $data)
+    {
         $jobType = $this->jobType::findOrFail($id);
         $jobType->update($data);
+
         return $jobType;
     }
 
     // delete
-    public function destroy(string $id){
+    public function destroy(string $id)
+    {
         $jobType = $this->jobType::findOrFail($id);
+
         return $jobType->delete();
     }
-
-
 }

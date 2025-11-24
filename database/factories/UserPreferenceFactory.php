@@ -28,4 +28,3 @@ class UserPreferenceFactory extends Factory
         ];
     }
 }
-

@@ -2,25 +2,25 @@
 
 namespace App\Exceptions;
 
+use App\Enums\Http;
 use App\Http\Controllers\Concerns\ApiResponse;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Session\TokenMismatchException;
-use Illuminate\Http\Exceptions\ThrottleRequestsException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use App\Enums\Http;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    use ApiResponse; 
+    use ApiResponse;
 
     protected $dontFlash = [
         'current_password',
@@ -63,6 +63,7 @@ class Handler extends ExceptionHandler
             // Model not found
             if ($exception instanceof ModelNotFoundException) {
                 $model = class_basename($exception->getModel());
+
                 return $this->notFound("{$model} not found");
             }
 

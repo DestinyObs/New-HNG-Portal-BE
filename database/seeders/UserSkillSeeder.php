@@ -15,6 +15,7 @@ class UserSkillSeeder extends Seeder
 
         if ($users->isEmpty() || $skills->isEmpty()) {
             $this->command->warn('Missing required data. Please run UserSeeder and SkillSeeder first.');
+
             return;
         }
 
@@ -37,4 +38,3 @@ class UserSkillSeeder extends Seeder
 
     }
 }
-

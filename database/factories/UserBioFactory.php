@@ -32,4 +32,3 @@ class UserBioFactory extends Factory
         ]);
     }
 }
-

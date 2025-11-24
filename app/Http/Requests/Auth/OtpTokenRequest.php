@@ -22,7 +22,7 @@ class OtpTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'otp' => ['required', 'int', 'digits:6']
+            'otp' => ['required', 'int', 'digits:6'],
         ];
     }
 }

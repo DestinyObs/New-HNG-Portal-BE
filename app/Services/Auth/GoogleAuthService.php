@@ -46,7 +46,7 @@ class GoogleAuthService implements GoogleAuthInterface
         if ($role) {
             $this->validateRoleForExistingUser($user, $role, $googleUser->getEmail());
         }
-        
+
         $this->saveDevice($user);
         $token = $user->createToken('API Token')->plainTextToken;
 
@@ -59,7 +59,7 @@ class GoogleAuthService implements GoogleAuthInterface
     private function registerNewUser(GoogleUser $googleUser, ?string $role, ?string $companyName): array
     {
         $this->validateRoleForNewUser($role, $googleUser->getEmail());
-        
+
         [$firstname, $lastname] = $this->splitName($googleUser->getName());
         $password = Str::random(12);
 
@@ -92,17 +92,17 @@ class GoogleAuthService implements GoogleAuthInterface
     private function validateRoleForExistingUser(User $user, string $role, string $email): void
     {
         $roleMap = ['talent' => 'talent', 'company' => 'employer', 'admin' => 'admin'];
-        
-        if (!isset($roleMap[$role])) {
+
+        if (! isset($roleMap[$role])) {
             Log::warning('Google auth attempted with invalid role for existing user', [
-                'role' => $role, 
-                'email' => $email
+                'role' => $role,
+                'email' => $email,
             ]);
             throw ValidationException::withMessages(['role' => ['Invalid role provided.']]);
         }
 
         $expectedInternal = $roleMap[$role];
-        if (!$user->hasRole($expectedInternal)) {
+        if (! $user->hasRole($expectedInternal)) {
             throw ValidationException::withMessages([
                 'role' => ["User already exists with a different role and cannot sign up as '{$role}'."],
             ]);
@@ -112,17 +112,17 @@ class GoogleAuthService implements GoogleAuthInterface
     private function validateRoleForNewUser(?string $role, string $email): void
     {
         $roleMap = ['talent' => 'talent', 'company' => 'employer', 'admin' => 'admin'];
-        
-        if (!$role) {
+
+        if (! $role) {
             throw ValidationException::withMessages([
                 'role' => ['Role is required for Google signup.'],
             ]);
         }
 
-        if (!isset($roleMap[$role])) {
+        if (! isset($roleMap[$role])) {
             Log::warning('Google signup attempted with invalid role', [
-                'role' => $role, 
-                'email' => $email
+                'role' => $role,
+                'email' => $email,
             ]);
             throw ValidationException::withMessages(['role' => ['Invalid role provided.']]);
         }
@@ -160,7 +160,7 @@ class GoogleAuthService implements GoogleAuthInterface
     private function splitName(string $fullName): array
     {
         $nameParts = explode(' ', $fullName, 2);
-        
+
         return [
             $nameParts[0] ?? '',
             $nameParts[1] ?? '',
@@ -193,7 +193,7 @@ class GoogleAuthService implements GoogleAuthInterface
             $candidate = $sld;
         }
 
-        if (!$candidate) {
+        if (! $candidate) {
             return null;
         }
 

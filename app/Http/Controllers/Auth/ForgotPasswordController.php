@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\Interfaces\Auth\PasswordResetInterface;
 
 class ForgotPasswordController extends Controller
@@ -32,7 +32,7 @@ class ForgotPasswordController extends Controller
     {
         $this->passwordResetService->resetPassword(
             $request->validated('email'),
-            $request->validated('token'), 
+            $request->validated('token'),
             $request->validated('password')
         );
 

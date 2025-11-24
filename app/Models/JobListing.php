@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
 class JobListing extends Model
 {
-    use HasUuids, HasFactory, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
 
     // protected $table = "job_listings";
 
@@ -68,7 +67,6 @@ class JobListing extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
-
 
     public function skills()
     {

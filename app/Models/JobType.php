@@ -11,6 +11,6 @@ class JobType extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 }

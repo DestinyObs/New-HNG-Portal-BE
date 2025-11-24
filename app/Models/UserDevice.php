@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserDevice extends Model
 {
     use HasFactory, HasUuids;
+
     protected $fillable = [
-        'user_id', 'name', 'last_activity_at'
+        'user_id', 'name', 'last_activity_at',
     ];
 }

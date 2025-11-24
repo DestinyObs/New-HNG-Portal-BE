@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\Enums\Http;
-use App\Models\User;
 use App\Repositories\Interfaces\Admin\LocationRepositoryInterface;
 use App\Services\Interfaces\Admin\LocationServiceInterface;
 use App\Traits\UploadFile;
-use Illuminate\Http\Request;
 
 class LocationService implements LocationServiceInterface
 {
@@ -19,20 +17,19 @@ class LocationService implements LocationServiceInterface
         private readonly LocationRepositoryInterface $locationRepository,
     ) {}
 
-
     public function getAll(): object|array
     {
         try {
             $locations = $this->locationRepository->fetchAll();
 
-            return (object)[
+            return (object) [
                 'success' => true,
                 'status' => Http::OK,
                 'data' => $locations,
                 'message' => 'Locations fetched successfully.',
             ];
         } catch (\Exception $e) {
-            return (object)[
+            return (object) [
                 'success' => false,
                 'status' => Http::INTERNAL_SERVER_ERROR,
                 'message' => 'An error occurred while fetching locations.',

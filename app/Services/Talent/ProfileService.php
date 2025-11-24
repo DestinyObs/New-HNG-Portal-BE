@@ -19,13 +19,13 @@ class ProfileService implements ProfileServiceInterface
         private readonly ProfileRepositoryInterface $profileRepository
     ) {}
 
-
     public function changePassword(User $user, string $newPassword): object|array
     {
         try {
             $user = $this->profileRepository->updatePassword($user, $newPassword);
 
             logger()->info("Password updated successfully for user ID {$user->id}");
+
             return (object) [
                 'success' => true,
                 'message' => 'Password updated successfully',
@@ -33,22 +33,21 @@ class ProfileService implements ProfileServiceInterface
                 'status' => Http::OK,
             ];
         } catch (\Exception $e) {
-            logger()->error("Failed to update password for user ID {$user->id}: " . $e->getMessage());
+            logger()->error("Failed to update password for user ID {$user->id}: ".$e->getMessage());
 
             return (object) [
                 'success' => false,
-                'message' => 'Failed to update password: ' . $e->getMessage(),
+                'message' => 'Failed to update password: '.$e->getMessage(),
                 'status' => Http::INTERNAL_SERVER_ERROR,
             ];
         }
     }
 
-
-    public function updateProfilePhoto(User $user, Request $request,): object|array
+    public function updateProfilePhoto(User $user, Request $request): object|array
     {
         try {
-            //? check if photo exist in request file
-            if (!$request->hasFile('photo')) {
+            // ? check if photo exist in request file
+            if (! $request->hasFile('photo')) {
                 return (object) [
                     'success' => false,
                     'message' => 'No photo file provided',
@@ -56,21 +55,20 @@ class ProfileService implements ProfileServiceInterface
                 ];
             }
 
-            //? if exist update 
+            // ? if exist update
             $filePath = $this->uploadFile(
                 $request->file('photo'),
                 'talent/profile_photos',
                 $user->profile_url
             );
 
-            //? update profile photo in database
+            // ? update profile photo in database
             $user = $this->profileRepository->updateProfilePhoto(
                 $user,
                 $filePath,
             );
 
-
-            //? return success response
+            // ? return success response
         } catch (\Exception $e) {
         }
     }

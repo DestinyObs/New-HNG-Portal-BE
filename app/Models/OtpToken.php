@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
 class OtpToken extends Model
 {
@@ -23,6 +23,7 @@ class OtpToken extends Model
 
     // Since primary key is UUID
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     /**

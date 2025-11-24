@@ -96,7 +96,7 @@ class GoogleAuthTest extends TestCase
     public function test_new_user_signup_fails_without_role()
     {
         $token = 'fake-token-no-role';
-        
+
         $provider = Mockery::mock();
         $socialiteUser = Mockery::mock(SocialiteUserContract::class);
         $socialiteUser->shouldReceive('getEmail')->andReturn('newuser@example.com');
@@ -114,7 +114,7 @@ class GoogleAuthTest extends TestCase
     public function test_company_signup_fails_when_company_name_cannot_be_inferred()
     {
         $token = 'fake-token-gmail';
-        
+
         $provider = Mockery::mock();
         $socialiteUser = Mockery::mock(SocialiteUserContract::class);
         $socialiteUser->shouldReceive('getEmail')->andReturn('test@gmail.com');
@@ -126,8 +126,8 @@ class GoogleAuthTest extends TestCase
         \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
 
         $response = $this->postJson('/api/auth/google', [
-            'access_token' => $token, 
-            'role' => 'company'
+            'access_token' => $token,
+            'role' => 'company',
         ]);
         $response->assertStatus(422);
     }

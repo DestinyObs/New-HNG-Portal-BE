@@ -29,4 +29,3 @@ class TrackSeeder extends Seeder
         }
     }
 }
-

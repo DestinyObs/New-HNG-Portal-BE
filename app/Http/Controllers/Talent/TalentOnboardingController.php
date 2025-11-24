@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class TalentOnboardingController extends Controller
 {
-
     // // THIS METHODS NEEDS TO BE MODIFIED INTO SERVICE CLASS
     public function index(Request $request)
     {
