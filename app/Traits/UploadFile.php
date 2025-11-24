@@ -6,16 +6,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 
-
 trait UploadFile
 {
     /**
      * Upload images, PDFs, and documents.
      * Images will be compressed automatically.
      */
-    public function uploadFile(UploadedFile $file, string $folder = 'uploads', string $oldPath = null): string
+    public function uploadFile(UploadedFile $file, string $folder = 'uploads', ?string $oldPath = null): string
     {
-        //? Delete old file if provided
+        // ? Delete old file if provided
         if ($oldPath) {
             $this->deleteFile($oldPath);
         }
@@ -39,7 +38,6 @@ trait UploadFile
         return $this->uploadDocument($file, $folder);
     }
 
-
     /**
      * Compress image before upload.
      */
@@ -53,14 +51,14 @@ trait UploadFile
             $constraint->upsize();        // prevent upsizing
         });
 
-        //? encode image to reduce quality
+        // ? encode image to reduce quality
         $image->encode($file->getClientOriginalExtension(), 75); // 75% quality
 
-        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $folder . '/' . $filename;
+        $filename = uniqid().'.'.$file->getClientOriginalExtension();
+        $path = $folder.'/'.$filename;
 
-        //? check if folder exists and create it if not
-        if (!Storage::disk('public')->exists($folder)) {
+        // ? check if folder exists and create it if not
+        if (! Storage::disk('public')->exists($folder)) {
             Storage::disk('public')->makeDirectory($folder);
         }
 
@@ -69,26 +67,24 @@ trait UploadFile
         return $path;
     }
 
-
     /**
      * Upload PDF or any other document without compression.
      */
     protected function uploadDocument(UploadedFile $file, string $folder): string
     {
-        if (!Storage::disk('public')->exists($folder)) {
+        if (! Storage::disk('public')->exists($folder)) {
             Storage::disk('public')->makeDirectory($folder);
         }
 
         return $file->store($folder, 'public');
     }
 
-
     /**
      * Delete file from storage.
      */
     public function deleteFile(?string $path): bool
     {
-        if (!$path) {
+        if (! $path) {
             return false;
         }
 

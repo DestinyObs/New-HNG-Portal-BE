@@ -45,14 +45,14 @@ class JobListingFactory extends Factory
 
     public function withHighSalary(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'price' => fake()->randomFloat(2, 150000, 300000),
         ]);
     }
 
     public function withLowSalary(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'price' => fake()->randomFloat(2, 30000, 80000),
         ]);
     }

@@ -8,6 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Location extends Model
 {
-    use HasUuids, HasFactory;
-
+    use HasFactory, HasUuids;
 }

@@ -13,4 +13,3 @@ class CountryFactory extends Factory
         ];
     }
 }
-

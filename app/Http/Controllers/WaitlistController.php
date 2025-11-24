@@ -10,7 +10,7 @@ class WaitlistController extends Controller
 {
     public function __construct(
         private readonly WaitlistInterface $waitlistService
-    ){}
+    ) {}
 
     public function show(Waitlist $waitlist)
     {
@@ -20,7 +20,7 @@ class WaitlistController extends Controller
     public function store(WaitlistRequest $request)
     {
         $waitlist = $this->waitlistService->create($request->validated());
-        
+
         return $this->created('Waitlist entry created successfully', $waitlist);
     }
 }

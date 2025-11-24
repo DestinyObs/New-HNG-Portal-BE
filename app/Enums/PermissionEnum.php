@@ -2,15 +2,13 @@
 
 namespace App\Enums;
 
-use App\Enums\RoleEnum;
-
 enum PermissionEnum: string
 {
-    //role
-     case View_Role = 'role.view';
-     case Create_Role = 'role.create';
-     case Update_Role = 'role.update';
-     case Delete_Role = 'role.delete';
+    // role
+    case View_Role = 'role.view';
+    case Create_Role = 'role.create';
+    case Update_Role = 'role.update';
+    case Delete_Role = 'role.delete';
 
     // Admin
     case View_Admin = 'admin.view';
@@ -39,7 +37,6 @@ enum PermissionEnum: string
     // Talent Verification
     case Verify_Talent = 'talent.verify_document';
 
-
     /**
      * Return default permissions for a given role as enum cases.
      */
@@ -59,7 +56,7 @@ enum PermissionEnum: string
             ],
 
             RoleEnum::TALENT => [
-                self::View_Skill
+                self::View_Skill,
             ],
         };
     }

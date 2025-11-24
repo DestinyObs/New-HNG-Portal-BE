@@ -64,3 +64,4 @@ class GoogleAuthService implements GoogleAuthInterface
         return $this->userService->create($data);
     }
 }
+

@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\Enums\Http;
-use App\Models\User;
 use App\Repositories\Interfaces\Admin\StateRepositoryInterface;
 use App\Services\Interfaces\Admin\StateServiceInterface;
 use App\Traits\UploadFile;
-use Illuminate\Http\Request;
 
 class StateService implements StateServiceInterface
 {
@@ -19,20 +17,19 @@ class StateService implements StateServiceInterface
         private readonly StateRepositoryInterface $stateRepository,
     ) {}
 
-
     public function getAll(): object|array
     {
         try {
             $states = $this->stateRepository->fetchAll();
 
-            return (object)[
+            return (object) [
                 'success' => true,
                 'status' => Http::OK,
                 'data' => $states,
                 'message' => 'states fetched successfully.',
             ];
         } catch (\Exception $e) {
-            return (object)[
+            return (object) [
                 'success' => false,
                 'status' => Http::INTERNAL_SERVER_ERROR,
                 'message' => 'An error occurred while fetching states.',

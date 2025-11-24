@@ -22,14 +22,14 @@ class CompanyOnboardingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'logo' =>  'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => ['required'],
-            'description'  => ['nullable', 'max:2000'],
+            'description' => ['nullable', 'max:2000'],
             'industry' => ['nullable'],
-            'company_size'  => ['nullable'],
-            'website_url'  => ['nullable', 'active_url'],
-            'state_id'  => ['nullable', 'exists:states,id'],
-            'country_id'  => ['nullable', 'exists:countries,id'],
+            'company_size' => ['nullable'],
+            'website_url' => ['nullable', 'active_url'],
+            'state_id' => ['nullable', 'exists:states,id'],
+            'country_id' => ['nullable', 'exists:countries,id'],
         ];
     }
 }

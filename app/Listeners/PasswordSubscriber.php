@@ -7,16 +7,14 @@ use App\Events\PasswordEmail;
 use App\Mail\Auth\PasswordChangedNotification;
 use App\Mail\Auth\PasswordResetLink;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
 class PasswordSubscriber
 {
     public function sendPasswordResetLink(PasswordEmail $event): void
     {
-        
-        $url = config('services.base_url') . '/reset-password?hash=' . $event->token . '&email=' . $event->user->email;
+
+        $url = config('services.base_url').'/reset-password?hash='.$event->token.'&email='.$event->user->email;
 
         // Send the password reset email
         Mail::to($event->user->email)->send(
@@ -26,7 +24,7 @@ class PasswordSubscriber
 
     public function sendPasswordChangedNotification(PasswordChanged $event): void
     {
-        Mail::to($event->user->email)->send( new PasswordChangedNotification($event->user) );
+        Mail::to($event->user->email)->send(new PasswordChangedNotification($event->user));
     }
 
     public function subscribe(Dispatcher $event): void

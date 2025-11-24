@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\WorkMode;
+use Illuminate\Database\Seeder;
 
 class WorkModeSeeder extends Seeder
 {

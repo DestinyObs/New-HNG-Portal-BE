@@ -176,7 +176,7 @@ return [
 
     /* Cache-specific settings */
 
-    'cache' => [ 
+    'cache' => [
 
         /*
          * By default all permissions are cached for 24 hours to speed up performance.
