@@ -10,19 +10,11 @@ use Illuminate\Support\Str;
 
 class GoogleAuthService implements GoogleAuthInterface
 {
-    protected UserInterface $userService;
-
-    public function __construct(UserInterface $userService)
-    {
-        $this->userService = $userService;
-    }
+    public function __construct(protected UserInterface $userService) {}
 
     public function handle(array $googleUserData, ?string $role = null): array|\Exception
     {
         $email = $googleUserData['email'] ?? null;
-        if (! $email) {
-            throw new \InvalidArgumentException('Email is required.');
-        }
 
         // Check if user exists
         $user = User::where('email', $email)->first();
@@ -34,7 +26,6 @@ class GoogleAuthService implements GoogleAuthInterface
             return [
                 'user' => $user,
                 'token' => $token,
-                'mode' => 'login',
             ];
         }
 
@@ -49,12 +40,16 @@ class GoogleAuthService implements GoogleAuthInterface
         $generatedPassword = Str::random(12);
 
         $data = [
-            'firstname' => $firstname,
-            'lastname' => $lastname,
             'email' => $email,
             'password' => $generatedPassword,
             'role' => $role,
         ];
+
+        if ($role === 'talent') {
+            $nameParts = explode(' ', $googleUserData['name'], 2);
+            $data['firstname'] = $nameParts[0] ?? null;
+            $data['lastname'] = $nameParts[1] ?? null;
+        }
 
         if ($role === 'company') {
             $data['company_name'] = $googleUserData['company_name'] ?? $googleUserData['name'];
@@ -64,4 +59,3 @@ class GoogleAuthService implements GoogleAuthInterface
         return $this->userService->create($data);
     }
 }
-

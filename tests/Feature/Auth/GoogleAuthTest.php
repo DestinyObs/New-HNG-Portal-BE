@@ -24,10 +24,13 @@ class GoogleAuthTest extends TestCase
 
         // Mock UserService
         $this->userService = Mockery::mock(UserInterface::class);
+
+        // Service under test
         $this->googleAuthService = new GoogleAuthService($this->userService);
     }
 
-    public function test_existing_user_can_login()
+    /** @test */
+    public function existing_user_can_login()
     {
         $user = User::factory()->create([
             'email' => 'existing@example.com',
@@ -38,45 +41,48 @@ class GoogleAuthTest extends TestCase
             'name' => 'Existing User',
         ]);
 
-        $this->assertEquals('login', $result['mode']);
+        $this->assertArrayHasKey('user', $result);
+        $this->assertArrayHasKey('token', $result);
         $this->assertEquals($user->id, $result['user']->id);
         $this->assertNotEmpty($result['token']);
     }
 
-    public function test_new_talent_user_can_signup()
+    /** @test */
+    public function new_talent_user_can_signup()
     {
         $this->userService
             ->shouldReceive('create')
             ->once()
             ->andReturnUsing(function ($data) {
-                $data['id'] = 1;
-                $data['token'] = Str::random(10);
-
-                return $data;
+                // Mimic UserService response
+                return array_merge($data, [
+                    'id' => 1,
+                    'token' => Str::random(10),
+                ]);
             });
 
         $result = $this->googleAuthService->handle([
-            'email' => 'newtalent@example.com',
-            'name' => 'New Talent',
+            'email' => 'talent@example.com',
+            'name' => 'John Doe',
         ], 'talent');
 
-        $this->assertEquals('New', $result['firstname']);
-        $this->assertEquals('Talent', $result['lastname']);
-        $this->assertEquals('newtalent@example.com', $result['email']);
+        $this->assertEquals('John', $result['firstname']);
+        $this->assertEquals('Doe', $result['lastname']);
         $this->assertEquals('talent', $result['role']);
         $this->assertNotEmpty($result['password']);
     }
 
-    public function test_new_company_user_can_signup_with_company_name_provided()
+    /** @test */
+    public function new_company_user_can_signup_with_company_name()
     {
         $this->userService
             ->shouldReceive('create')
             ->once()
             ->andReturnUsing(function ($data) {
-                $data['id'] = 2;
-                $data['token'] = Str::random(10);
-
-                return $data;
+                return array_merge($data, [
+                    'id' => 2,
+                    'token' => Str::random(10),
+                ]);
             });
 
         $result = $this->googleAuthService->handle([
@@ -87,33 +93,33 @@ class GoogleAuthTest extends TestCase
 
         $this->assertEquals('ACME Inc', $result['company_name']);
         $this->assertEquals('company', $result['role']);
-        $this->assertEquals('ACME', $result['firstname']); // first word of name
-        $this->assertEquals('Inc', $result['lastname']);    // second word of name
         $this->assertNotEmpty($result['password']);
     }
 
-    public function test_new_company_user_infers_company_name_if_not_provided()
+    /** @test */
+    public function new_company_user_infers_company_name_when_not_provided()
     {
         $this->userService
             ->shouldReceive('create')
             ->once()
             ->andReturnUsing(function ($data) {
-                $data['id'] = 3;
-                $data['token'] = Str::random(10);
-
-                return $data;
+                return array_merge($data, [
+                    'id' => 3,
+                    'token' => Str::random(10),
+                ]);
             });
 
         $result = $this->googleAuthService->handle([
-            'email' => 'company2@example.com',
-            'name' => 'Inferred Company',
+            'email' => 'infer@example.com',
+            'name' => 'Inferred Corp',
         ], 'company');
 
-        $this->assertEquals('Inferred Company', $result['company_name']);
+        $this->assertEquals('Inferred Corp', $result['company_name']);
         $this->assertEquals('company', $result['role']);
     }
 
-    public function test_signup_fails_without_role()
+    /** @test */
+    public function signup_fails_without_role()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Role is required for new users.');

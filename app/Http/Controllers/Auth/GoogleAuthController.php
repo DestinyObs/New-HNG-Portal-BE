@@ -10,7 +10,7 @@ class GoogleAuthController extends Controller
 {
     public function __construct(private readonly GoogleAuthInterface $googleAuthService) {}
 
-     public function handle(GoogleAuthRequest $request)
+    public function handle(GoogleAuthRequest $request)
     {
         $data = $request->validated();
         $result = $this->googleAuthService->handle($data);

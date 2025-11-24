@@ -1,5 +1,3 @@
-<?php
-
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,42 +12,24 @@ class GoogleAuthRequest extends FormRequest
 
     public function rules(): array
     {
-        $mode = $this->input('mode', 'signup');
-
-        if ($mode === 'login') {
-            return [
-                'email' => 'required|email|exists:users,email',
-            ];
-        }
-
-        // Signup rules
         return [
-            'firstname' => 'required_if:role,talent|string|max:255',
-            'lastname' => 'required_if:role,talent|string|max:255',
-            'company_name' => 'required_if:role,company|string|max:255|unique:companies,name',
-            'email' => 'required|email|unique:users,email',
-            'role' => ['required', Rule::in(['talent', 'company'])],
+            'email' => 'required|email',
+            'role' => ['nullable', Rule::in(['talent', 'company'])],
+            'name' => 'nullable|string|max:255',
+            'company_name' => 'nullable|string|max:255',
         ];
     }
 
     public function messages(): array
     {
-        $mode = $this->input('mode', 'signup');
-
-        if ($mode === 'login') {
-            return [
-                'email.required' => 'Email is required for login.',
-                'email.exists' => 'No account found with this email.',
-            ];
-        }
-
         return [
-            'firstname.required_if' => 'First name is required for talent accounts.',
-            'lastname.required_if' => 'Last name is required for talent accounts.',
-            'company_name.required_if' => 'Company name is required for company accounts.',
-            'company_name.unique' => 'This company already exists.',
-            'email.required' => 'The email field is required.',
-            'email.unique' => 'This email is already registered.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Please provide a valid email.',
+            'role.in' => 'Role must be either talent or company.',
+            'name.string' => 'First name must be a valid string.',
+            'name.max' => 'First name cannot exceed 255 characters.',
+            'company_name.string' => 'Company name must be a valid string.',
+            'company_name.max' => 'Company name cannot exceed 255 characters.',
         ];
     }
 }
