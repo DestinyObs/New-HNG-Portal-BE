@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\RoleEnum;
 use App\Mail\CompanyRegistered;
 use App\Mail\UserRegistered;
 use App\Models\Company;
@@ -45,6 +46,10 @@ class UserService implements UserInterface
                 ]);
             }
 
+            // Assign role string on user record
+            $data['current_role'] = RoleEnum::from($roleMap[$role]);
+
+            // Crate a user on the database
             $user = $this->userRepository->create($data);
 
             $company = null;
@@ -54,6 +59,7 @@ class UserService implements UserInterface
                     throw new Exception('Company already exists');
                 }
 
+                // Create a company for employer
                 $company = Company::create([
                     'user_id' => $user->id,
                     'name' => $data['company_name'],
@@ -63,6 +69,7 @@ class UserService implements UserInterface
                     'is_verified' => 0,
                 ]);
             } else {
+                // Create a user bio for talent
                 $userBio = UserBio::create([
                     'user_id' => $user->id,
                     'current_role',
@@ -73,6 +80,7 @@ class UserService implements UserInterface
                 ]);
             }
 
+            // Assign role object to user
             $user->assignRole($roleMap[$role]);
 
             // if ($role == 'company' && $company) {
