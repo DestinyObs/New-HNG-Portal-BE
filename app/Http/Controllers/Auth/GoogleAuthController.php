@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\GoogleTokenRequest;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
-use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
@@ -12,23 +12,20 @@ class GoogleAuthController extends Controller
         private readonly GoogleAuthInterface $googleService
     ) {}
 
-    public function redirectToGoogle()
+    /**
+     * Handle frontend-provided Google access token (mobile/SPA flow)
+     */
+    public function handleToken(GoogleTokenRequest $request)
     {
-        return Socialite::driver('google')
-            ->stateless()
-            ->redirect(); 
-    }
-
-    // Step 2: Handle Google callback
-    public function handleGoogleCallback()
-    {
-        $googleUser = Socialite::driver('google')->stateless()->user();
-
-        $response = $this->googleService->handle($googleUser);
+        $response = $this->googleService->handleToken(
+            $request->get('access_token'),
+            $request->get('role'),
+            $request->get('company_name')
+        );
 
         return $this->successWithData([
-            'user'  => $response['user'],
+            'user' => $response['user'],
             'token' => $response['token'],
-        ], 'Login successful');
+        ], 'Google authentication successful');
     }
 }
