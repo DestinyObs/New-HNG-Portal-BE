@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,17 +26,20 @@ class User extends Authenticatable
         'status',
         'photo_url',
         'password',
+        'current_role',
     ];
 
     protected $hidden = ['password'];
 
     protected $with = [
-        'roles', 'permissions'
+        'roles',
+        'permissions'
     ];
 
     protected $casts = [
         'dob'         => 'date',
-        'password'  => 'hashed'
+        'password'  => 'hashed',
+        'current_role' => RoleEnum::class
     ];
 
     // Relationships
