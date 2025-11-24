@@ -1127,119 +1127,112 @@
     },
     "/api/auth/google": {
       "post": {
-        "summary": "Authenticate / Register via Google token",
-        "description": "Accepts a Google OAuth access token obtained on the frontend and signs the user in or creates an account. For company signups include `company_name` (or it may be inferred from the email domain). Returns the standard login response with access token and user data.",
-        "tags": [
-          "Authentication"
-        ],
+        "summary": "Authenticate or Register a user via Google-provided data",
+        "description": "Handles Google-based authentication using the email and profile data sent from the frontend. If the email already exists, the user is logged in. If the email does not exist, a new account is created based on the provided `role` and optional `company_name`.",
+        "tags": ["Authentication"],
+
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "access_token"
-                ],
+                "required": ["email", "name"],
                 "properties": {
-                  "access_token": {
+                  "email": {
                     "type": "string",
-                    "description": "Google OAuth access token obtained by the frontend",
-                    "example": "ya29.a0AfH6SM..."
+                    "format": "email",
+                    "description": "User email received from Google profile.",
+                    "example": "johndoe@gmail.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "User full name from Google profile.",
+                    "example": "John Doe"
                   },
                   "role": {
                     "type": "string",
-                    "enum": [
-                      "talent",
-                      "company",
-                      "admin"
-                    ],
+                    "enum": ["talent", "company"],
                     "nullable": true,
-                    "description": "Role to assign for new signups; optional for existing-user logins. If omitted and a new account is created the role is required by the server.",
+                    "description": "Required ONLY for new users. Ignored for existing users.",
                     "example": "talent"
                   },
                   "company_name": {
                     "type": "string",
                     "nullable": true,
-                    "description": "Optional: company name for employer signups. If omitted the server will attempt to infer from the email domain; if inference fails, the field is required.",
-                    "example": "Acme Corporation"
+                    "description": "Required ONLY when signing up as a company. If not provided, backend infers from `name`.",
+                    "example": "Acme Corp"
                   }
                 }
-              ,
+              },
+
               "examples": {
-                "login-only": {
-                  "summary": "Existing user login (no role required)",
+                "existing-user-login": {
+                  "summary": "Existing user login — no role required",
                   "value": {
-                    "access_token": "ya29.a0AfH6SM..."
+                    "email": "existing@example.com",
+                    "name": "Existing User"
                   }
                 },
-                "signup-company": {
-                  "summary": "Signup as company (provide role and company_name)",
+                "new-talent-signup": {
+                  "summary": "New talent user signup",
                   "value": {
-                    "access_token": "ya29.a0AfH6SM...",
+                    "email": "newtalent@example.com",
+                    "name": "Jane Talent",
+                    "role": "talent"
+                  }
+                },
+                "new-company-signup": {
+                  "summary": "New company user signup",
+                  "value": {
+                    "email": "hr@acme.com",
+                    "name": "Acme Corporation",
                     "role": "company",
                     "company_name": "Acme Corporation"
                   }
                 }
               }
-              }
             }
           }
         },
+
         "responses": {
           "200": {
-            "description": "Authenticated existing user — returns login response with access token and user data",
+            "description": "Login success — existing user returned with token.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
           "201": {
-            "description": "New user created and OTP sent — returns login/registration response",
+            "description": "Signup success — new user created and returned with token.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
           "400": {
-            "description": "Invalid request or token",
+            "description": "Bad request — missing fields or invalid payload.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Authentication with Google failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/Error" }
               }
             }
           },
           "422": {
-            "description": "Validation error (e.g., missing required fields or company_name required)",
+            "description": "Validation failed — missing role for new user, invalid company signup data, etc.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
               }
             }
           }
         }
       }
     },
+
     "/api/auth/login": {
       "post": {
         "summary": "User login",
