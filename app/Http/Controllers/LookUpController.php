@@ -10,7 +10,6 @@ use App\Services\Admin\TrackService;
 use App\Services\Admin\WorkModeService;
 use App\Services\JobTypeService;
 use App\Services\SkillService;
-use Illuminate\Http\Request;
 
 class LookUpController extends Controller
 {
@@ -24,7 +23,6 @@ class LookUpController extends Controller
         private readonly CategoryService $categoryService,
         private readonly StateService $stateService,
     ) {}
-
 
     public function countries()
     {
@@ -40,7 +38,6 @@ class LookUpController extends Controller
         );
     }
 
-
     public function tracks()
     {
         $response = $this->trackService->getAll();
@@ -54,7 +51,6 @@ class LookUpController extends Controller
             $response->status,
         );
     }
-
 
     public function states()
     {
@@ -72,7 +68,7 @@ class LookUpController extends Controller
 
     public function skills()
     {
-        $data =  $this->skillService->getAllSkills();
+        $data = $this->skillService->getAllSkills();
 
         // dd($data);
         return $this->successWithData($data, 'Skills retrieved successfully');
@@ -109,6 +105,7 @@ class LookUpController extends Controller
     public function jobTypes()
     {
         $data = $this->jobTypeService->getAllJobTypes();
+
         // dd($data);
         return $this->successWithData($data, 'Job types retrieved successfully');
     }

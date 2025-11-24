@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Enums\Http;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
 trait ApiResponse
 {
@@ -74,7 +74,7 @@ trait ApiResponse
         }
 
         // Ensure we have a LengthAwarePaginator
-        if (!$paginator instanceof LengthAwarePaginator) {
+        if (! $paginator instanceof LengthAwarePaginator) {
             throw new \InvalidArgumentException('Paginator must be an instance of LengthAwarePaginator');
         }
 
@@ -169,7 +169,7 @@ trait ApiResponse
             'status' => Http::UNPROCESSABLE_ENTITY->value,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 

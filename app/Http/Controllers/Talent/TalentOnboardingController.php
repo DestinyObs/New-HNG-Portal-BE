@@ -8,12 +8,13 @@ use Illuminate\Http\Request;
 
 class TalentOnboardingController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         return [];
     }
 
-
-    public function store(TalentOnboardingRequest $request){
+    public function store(TalentOnboardingRequest $request)
+    {
         return [];
     }
 }

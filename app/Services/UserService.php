@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Mail\CompanyRegistered;
+use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
 use App\Models\Company;
-use App\Models\User;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use App\Enums\Status;
-use App\Mail\OtpVerification;
 use App\Models\OtpToken;
+use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\UserInterface;
+use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Mail;
 
 class UserService implements UserInterface
 {
@@ -30,15 +30,15 @@ class UserService implements UserInterface
 
     public function create(array $data, array $meta = []): array|Exception
     {
-        return DB::transaction(function () use ($data, $meta) {
+        return DB::transaction(function () use ($data) {
             $role = $data['role'] ?? null;
 
             $roleMap = [
-                'talent'  => 'talent',
+                'talent' => 'talent',
                 'company' => 'employer',
             ];
 
-            if (!isset($roleMap[$role])) {
+            if (! isset($roleMap[$role])) {
                 throw ValidationException::withMessages([
                     'role' => ['Invalid role provided.'],
                 ]);
@@ -71,19 +71,19 @@ class UserService implements UserInterface
             //     Mail::to($user->email)->send(new UserRegistered($user));
             // }
 
-            //? Generate OTP for user and store in otp_tokens
+            // ? Generate OTP for user and store in otp_tokens
             $otpCode = $this->generateOtp($user);
 
-            //? Send email to user (commented out for now)
+            // ? Send email to user (commented out for now)
             Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
 
-            //? authenticate user after registration
+            // ? authenticate user after registration
             $credentials = [
                 'email' => $data['email'],
-                'password' => $data['password']
+                'password' => $data['password'],
             ];
 
-            if (!Auth::attempt($credentials)) {
+            if (! Auth::attempt($credentials)) {
                 throw new AuthenticationException(__('auth.failed'));
             }
 
@@ -103,16 +103,15 @@ class UserService implements UserInterface
         $user->currentAccessToken()->delete();
     }
 
-
     /**
      * Generate a 4-digit OTP, store hashed in DB with 10-min expiry
      */
     private function generateOtp(User $user): string
     {
-        //? Generate a secure 6-digit OTP
+        // ? Generate a secure 6-digit OTP
         $otpCode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        //? Store hashed OTP in otp_tokens table
+        // ? Store hashed OTP in otp_tokens table
         OtpToken::create([
             'id' => Str::uuid(),
             'user_id' => $user->id,

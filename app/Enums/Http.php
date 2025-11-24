@@ -58,7 +58,7 @@ enum Http: int
     // Optional: Get a human-readable message
     public function message(): string
     {
-        return match($this) {
+        return match ($this) {
             self::OK => 'OK',
             self::CREATED => 'Created',
             self::ACCEPTED => 'Accepted',

@@ -22,7 +22,7 @@ class UpdateJobRequest extends FormRequest
         return [
             'company' => [
                 Rule::exists('companies', 'id')
-                    ->where('user_id', Auth::id())
+                    ->where('user_id', Auth::id()),
             ],
             'job_id' => [
                 'sometimes',
@@ -32,27 +32,27 @@ class UpdateJobRequest extends FormRequest
             ],
 
             // Basic fields
-            'title'                => 'sometimes|string|max:255',
-            'description'          => 'sometimes|string',
-            'acceptance_criteria'  => 'sometimes|string',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'acceptance_criteria' => 'sometimes|string',
 
             // Price
-            'price'                => 'sometimes|numeric',
+            'price' => 'sometimes|numeric',
 
             // Location fields
-            'state_id'             => 'sometimes|uuid|exists:states,id',
-            'country_id'           => 'sometimes|uuid|exists:countries,id',
+            'state_id' => 'sometimes|uuid|exists:states,id',
+            'country_id' => 'sometimes|uuid|exists:countries,id',
 
             // Relation fields
-            'track_id'             => 'sometimes|uuid|exists:tracks,id',
-            'category_id'          => 'sometimes|uuid|exists:categories,id',
-            'job_type_id'          => 'sometimes|uuid|exists:job_types,id',
+            'track_id' => 'sometimes|uuid|exists:tracks,id',
+            'category_id' => 'sometimes|uuid|exists:categories,id',
+            'job_type_id' => 'sometimes|uuid|exists:job_types,id',
 
             // Work mode if you have it on your table
-            'work_mode_id'         => 'sometimes|uuid|exists:work_modes,id',
+            'work_mode_id' => 'sometimes|uuid|exists:work_modes,id',
 
             // Skills
-            'skills'   => 'sometimes|array',
+            'skills' => 'sometimes|array',
             'skills.*' => 'uuid|exists:skills,id',
 
             // For updating a draft job

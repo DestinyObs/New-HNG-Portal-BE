@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //   
+        //
     }
 
     /**
@@ -34,6 +34,7 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $userCredentials = $this->userService->create($request->validated());
+
         // dd($userCredentials);
         return $this->created('User created successfully', $userCredentials);
     }

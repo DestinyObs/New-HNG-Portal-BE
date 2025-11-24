@@ -23,11 +23,11 @@ class TalentOnboardingRequest extends FormRequest
     {
         return [
             'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'current_role'  => ['required'],
+            'current_role' => ['required'],
             'bio' => ['required'],
             'track_id' => ['required', 'exists:tracks,id'],
-            'project_name'  => ['required'],
-            'project_url'  => ['required'],
+            'project_name' => ['required'],
+            'project_url' => ['required'],
             'project_file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|pdf|docx|max:2048',
         ];
     }

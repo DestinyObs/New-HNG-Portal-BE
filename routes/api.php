@@ -1,24 +1,14 @@
 <?php
 
-use App\Http\Controllers\Admin\JobTypeController;
-
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OtpTokenController;
+use App\Http\Controllers\LookUpController;
 use App\Http\Controllers\UserController;
-
 use App\Http\Controllers\WaitlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\GoogleAuthController;
-use App\Http\Controllers\Auth\OtpTokenController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CountryController;
-use App\Http\Controllers\JobTypesController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\LookUpController;
-use App\Http\Controllers\SkillController;
-use App\Http\Controllers\TrackController;
-use App\Http\Controllers\WorkModeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -35,7 +25,6 @@ Route::prefix('auth')->group(function () {
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
 
@@ -45,8 +34,7 @@ Route::controller(OtpTokenController::class)->prefix('otp')->group(function () {
     Route::post('resend-otp', 'resendOtp')->middleware('auth:sanctum');
 });
 
-
-//? LookUp controllers for forms, filters and dropdowns;
+// ? LookUp controllers for forms, filters and dropdowns;
 Route::controller(LookUpController::class)->group(function () {
     Route::prefix('lookups')->group(function () {
         Route::get('countries', 'countries');

@@ -6,5 +6,5 @@ namespace App\Services\Interfaces\Auth;
 
 interface LoginInterface
 {
-     public function attempt(array $credentials);
+    public function attempt(array $credentials);
 }
