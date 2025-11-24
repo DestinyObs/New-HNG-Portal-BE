@@ -20,7 +20,7 @@ class GoogleAuthService implements GoogleAuthInterface
 {
     public function handle(GoogleUser $googleUser): array
     {
-        return $this->processGoogleUser($googleUser, null);
+        return $this->processGoogleUser($googleUser, 'talent');
     }
 
     public function handleToken(string $accessToken, ?string $role = null, ?string $companyName = null): array
@@ -30,53 +30,37 @@ class GoogleAuthService implements GoogleAuthInterface
         return $this->processGoogleUser($googleUser, $role, $companyName);
     }
 
-    /**
-     * Shared processing for a Google user; handles both existing and new users.
-     */
     private function processGoogleUser(GoogleUser $googleUser, ?string $role = null, ?string $companyName = null): array
     {
-        [$firstname, $lastname] = $this->splitName($googleUser->getName());
-
         $user = User::where('email', $googleUser->getEmail())->first();
 
-        // External -> internal role mapping used both for validation and assignment
-        $roleMap = [
-            'talent' => 'talent',
-            'company' => 'employer',
-            'admin' => 'admin',
-        ];
-
-        // Existing user -> login. But if the caller provided a role, ensure it matches
-        // the user's already-assigned role(s). We do NOT allow changing roles via
-        // this token endpoint (signup vs login separation).
         if ($user) {
-            if ($role) {
-                if (! isset($roleMap[$role])) {
-                    Log::warning('Google auth attempted with invalid role for existing user', ['role' => $role, 'email' => $googleUser->getEmail()]);
-                    throw ValidationException::withMessages([
-                        'role' => ['Invalid role provided.'],
-                    ]);
-                }
-
-                $expectedInternal = $roleMap[$role];
-                if (! $user->hasRole($expectedInternal)) {
-                    throw ValidationException::withMessages([
-                        'role' => ["User already exists with a different role and cannot sign up as '{$role}'."],
-                    ]);
-                }
-            }
-
-            $this->saveDevice($user);
-
-            $token = $user->createToken('API Token')->plainTextToken;
-
-            return [
-                'user' => $user,
-                'token' => $token,
-            ];
+            return $this->loginExistingUser($user, $role, $googleUser);
         }
 
-        // New user -> create, assign role, create company for employers, generate OTP, send mail, return token
+        return $this->registerNewUser($googleUser, $role, $companyName);
+    }
+
+    private function loginExistingUser(User $user, ?string $role, GoogleUser $googleUser): array
+    {
+        if ($role) {
+            $this->validateRoleForExistingUser($user, $role, $googleUser->getEmail());
+        }
+        
+        $this->saveDevice($user);
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
+    }
+
+    private function registerNewUser(GoogleUser $googleUser, ?string $role, ?string $companyName): array
+    {
+        $this->validateRoleForNewUser($role, $googleUser->getEmail());
+        
+        [$firstname, $lastname] = $this->splitName($googleUser->getName());
         $password = Str::random(12);
 
         $user = User::create([
@@ -86,54 +70,14 @@ class GoogleAuthService implements GoogleAuthInterface
             'password' => $password,
         ]);
 
-        // For signup: role is required and must be valid.
-        if (! $role) {
-            throw ValidationException::withMessages([
-                'role' => ['Role is required for Google signup.'],
-            ]);
-        }
-
-        if (! isset($roleMap[$role])) {
-            Log::warning('Google signup attempted with invalid role', ['role' => $role, 'email' => $googleUser->getEmail()]);
-            throw ValidationException::withMessages([
-                'role' => ['Invalid role provided.'],
-            ]);
-        }
-
+        $roleMap = ['talent' => 'talent', 'company' => 'employer', 'admin' => 'admin'];
         $user->assignRole($roleMap[$role]);
 
-        // If company role, require companyName and create Company record
         if ($role === 'company') {
-            // If frontend didn't provide company_name, attempt to infer from email domain
-            if (empty($companyName)) {
-                $companyName = $this->inferCompanyNameFromEmail($user->email);
-            }
-
-            if (empty($companyName)) {
-                throw ValidationException::withMessages([
-                    'company_name' => ['Company name is required for employer signup.'],
-                ]);
-            }
-
-            $isAvailable = Company::query()->where('name', $companyName)->exists();
-            if ($isAvailable) {
-                throw new \Exception('Company already exists');
-            }
-
-            Company::create([
-                'user_id' => $user->id,
-                'name' => $companyName,
-                'slug' => Str::slug($companyName),
-                'official_email' => $user->email,
-                'status' => \App\Enums\Status::ACTIVE,
-                'is_verified' => 0,
-            ]);
+            $this->createCompanyForUser($user, $companyName);
         }
 
-        // Save device info
         $this->saveDevice($user);
-
-        // Generate OTP and send email (same pattern as UserService)
         $otpCode = $this->generateOtp($user);
         Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
 
@@ -145,20 +89,84 @@ class GoogleAuthService implements GoogleAuthInterface
         ];
     }
 
+    private function validateRoleForExistingUser(User $user, string $role, string $email): void
+    {
+        $roleMap = ['talent' => 'talent', 'company' => 'employer', 'admin' => 'admin'];
+        
+        if (!isset($roleMap[$role])) {
+            Log::warning('Google auth attempted with invalid role for existing user', [
+                'role' => $role, 
+                'email' => $email
+            ]);
+            throw ValidationException::withMessages(['role' => ['Invalid role provided.']]);
+        }
+
+        $expectedInternal = $roleMap[$role];
+        if (!$user->hasRole($expectedInternal)) {
+            throw ValidationException::withMessages([
+                'role' => ["User already exists with a different role and cannot sign up as '{$role}'."],
+            ]);
+        }
+    }
+
+    private function validateRoleForNewUser(?string $role, string $email): void
+    {
+        $roleMap = ['talent' => 'talent', 'company' => 'employer', 'admin' => 'admin'];
+        
+        if (!$role) {
+            throw ValidationException::withMessages([
+                'role' => ['Role is required for Google signup.'],
+            ]);
+        }
+
+        if (!isset($roleMap[$role])) {
+            Log::warning('Google signup attempted with invalid role', [
+                'role' => $role, 
+                'email' => $email
+            ]);
+            throw ValidationException::withMessages(['role' => ['Invalid role provided.']]);
+        }
+    }
+
+    private function createCompanyForUser(User $user, ?string $companyName): void
+    {
+        if (empty($companyName)) {
+            $companyName = $this->inferCompanyNameFromEmail($user->email);
+        }
+
+        if (empty($companyName)) {
+            throw ValidationException::withMessages([
+                'company_name' => ['Company name is required for employer signup.'],
+            ]);
+        }
+
+        $companyExists = Company::query()->where('name', $companyName)->exists();
+        if ($companyExists) {
+            throw ValidationException::withMessages([
+                'company_name' => ['A company with this name already exists.'],
+            ]);
+        }
+
+        Company::create([
+            'user_id' => $user->id,
+            'name' => $companyName,
+            'slug' => Str::slug($companyName),
+            'official_email' => $user->email,
+            'status' => \App\Enums\Status::ACTIVE,
+            'is_verified' => 0,
+        ]);
+    }
+
     private function splitName(string $fullName): array
     {
-        $parts = explode(' ', trim($fullName), 2);
-
+        $nameParts = explode(' ', $fullName, 2);
+        
         return [
-            $parts[0] ?? '',
-            $parts[1] ?? '',
+            $nameParts[0] ?? '',
+            $nameParts[1] ?? '',
         ];
     }
 
-    /**
-     * Try to infer a company name from an email address domain.
-     * Returns null if inference is not possible or domain is a generic provider.
-     */
     private function inferCompanyNameFromEmail(string $email): ?string
     {
         $pos = strrpos($email, '@');
@@ -169,7 +177,6 @@ class GoogleAuthService implements GoogleAuthInterface
         $host = strtolower(substr($email, $pos + 1));
         $host = preg_replace('/^www\./', '', $host);
 
-        // generic public providers to ignore
         $generic = ['gmail', 'yahoo', 'hotmail', 'outlook', 'live', 'aol', 'icloud', 'protonmail', 'mail'];
 
         $parts = explode('.', $host);
@@ -177,18 +184,16 @@ class GoogleAuthService implements GoogleAuthInterface
             return null;
         }
 
-        // Get candidate SLD
         $tld = array_pop($parts);
         $sld = array_pop($parts);
 
-        // Handle common 2nd-level TLDs like co.uk
         if (strlen($tld) === 2 && in_array($sld, ['co', 'com', 'org', 'net', 'gov', 'edu'], true)) {
             $candidate = array_pop($parts) ?? $sld;
         } else {
             $candidate = $sld;
         }
 
-        if (! $candidate) {
+        if (!$candidate) {
             return null;
         }
 
@@ -196,7 +201,6 @@ class GoogleAuthService implements GoogleAuthInterface
             return null;
         }
 
-        // Normalize candidate to title-case, replace dashes/underscores
         $name = str_replace(['-', '_'], ' ', $candidate);
         $name = preg_replace('/[^a-z0-9 ]+/i', '', $name);
         $name = trim($name);

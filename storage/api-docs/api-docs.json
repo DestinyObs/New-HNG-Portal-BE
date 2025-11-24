@@ -1154,6 +1154,7 @@
                       "company",
                       "admin"
                     ],
+                    "nullable": true,
                     "description": "Role to assign for new signups; optional for existing-user logins. If omitted and a new account is created the role is required by the server.",
                     "example": "talent"
                   },
