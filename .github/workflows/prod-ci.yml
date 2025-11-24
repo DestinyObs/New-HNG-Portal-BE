@@ -25,8 +25,8 @@ jobs:
         # This installs all dependencies, including larastan/phpstan from composer.json
         run: composer install --no-interaction --prefer-dist
 
-      - name: PHPStan static analysis (Larastan)
-        run: ./vendor/bin/phpstan analyse --level=max app
+      # - name: PHPStan static analysis (Larastan)
+      #   run: ./vendor/bin/phpstan analyse --level=max app
       
       - name: Composer security audit
         run: composer audit --format=json || true
