@@ -44,9 +44,11 @@ Route::prefix('api/employer')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
-        // Company Onboarding
-        Route::post('onboarding', [CompanyOnboardingController::class, 'store']);
-        Route::get('onboarding', [CompanyOnboardingController::class, 'index']);
-    });
+        // Talent Onboarding
+        Route::controller(CompanyOnboardingController::class)->group(function () {
+            Route::get('onboarding', 'index');
+            Route::post('onboarding', 'store');
+        });
+    });      
 
 });

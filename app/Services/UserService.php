@@ -10,7 +10,7 @@ use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
 use App\Models\Company;
 use App\Models\OtpToken;
-use App\Models\User;
+use App\Models\UserBio;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\UserInterface;
 use Exception;
@@ -60,6 +60,15 @@ class UserService implements UserInterface
                     'official_email' => $data['email'],
                     'status' => Status::ACTIVE,
                     'is_verified' => 0,
+                ]);
+            } else {
+                $userBio = UserBio::create([
+                    'user_id' => $user->id,
+                    'current_role',
+                    'bio',
+                    'track_id',
+                    'project_name',
+                    'project_url'
                 ]);
             }
 

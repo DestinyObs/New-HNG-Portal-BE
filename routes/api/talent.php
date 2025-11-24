@@ -22,7 +22,7 @@ Route::prefix('api/talent')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
-        // Company Onboarding
+        // Talent Onboarding
         Route::controller(TalentOnboardingController::class)->group(function () {
             Route::get('onboarding', 'index');
             Route::post('onboarding', 'store');
