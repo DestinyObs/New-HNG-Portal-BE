@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->decimal('min_salary', 15, 2)->nullable();
             $table->decimal('max_salary', 15, 2)->nullable();
             $table->uuid('track_id')->nullable();
@@ -26,6 +26,8 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->string('project_name')->nullable();
             $table->string('project_url')->nullable();
+            $table->foreignUuid('state_id')->nullable()->references('id')->on('states')->nullOnDelete();
+            $table->foreignUuid('country_id')->nullable()->references('id')->on('countries')->nullOnDelete();
             $table->string('onboarding_status')->default(OnboardingEnum::PENDING->value);
             $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();
