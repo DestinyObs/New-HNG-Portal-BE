@@ -13,7 +13,12 @@ class GoogleAuthController extends Controller
     public function handle(GoogleAuthRequest $request)
     {
         $data = $request->validated();
-        $result = $this->googleAuthService->handle($data);
+
+        $result = $this->googleAuthService->handle(
+            $data['google_token'],
+            $data['role'] ?? null,
+            $data['company_name'] ?? null,
+        );
 
         return $this->successWithData($result, 'Authentication successful');
     }

@@ -13,9 +13,8 @@ class GoogleAuthRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
+            'google_token' => 'required|string',
             'role' => ['nullable', Rule::in(['talent', 'company'])],
-            'name' => 'nullable|string|max:255',
             'company_name' => 'nullable|string|max:255',
         ];
     }
@@ -23,11 +22,9 @@ class GoogleAuthRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email is required.',
-            'email.email' => 'Please provide a valid email.',
+            'google_token.required' => 'Google token is required.',
+            'google_token.string' => 'Google token must be a valid string.',
             'role.in' => 'Role must be either talent or company.',
-            'name.string' => 'First name must be a valid string.',
-            'name.max' => 'First name cannot exceed 255 characters.',
             'company_name.string' => 'Company name must be a valid string.',
             'company_name.max' => 'Company name cannot exceed 255 characters.',
         ];

@@ -5,15 +5,28 @@ namespace App\Services\Auth;
 use App\Models\User;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\UserInterface;
-use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
 class GoogleAuthService implements GoogleAuthInterface
 {
     public function __construct(protected UserInterface $userService) {}
 
-    public function handle(array $googleUserData, ?string $role = null): array|\Exception
+    public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array|\Exception
     {
+        // Retrieve user info from Google using the token
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid Google token provided.');
+        }
+
+        $googleUserData = [
+            'email' => $googleUser->getEmail(),
+            'name' => $googleUser->getName(),
+            'company_name' => $companyName,
+        ];
+    
         $email = $googleUserData['email'] ?? null;
 
         // Check if user exists
@@ -35,8 +48,6 @@ class GoogleAuthService implements GoogleAuthInterface
         }
 
         $nameParts = explode(' ', $googleUserData['name'], 2);
-        $firstname = $nameParts[0] ?? null;
-        $lastname = $nameParts[1] ?? null;
         $generatedPassword = Str::random(12);
 
         $data = [

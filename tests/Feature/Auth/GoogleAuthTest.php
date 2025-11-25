@@ -3,136 +3,127 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use App\Services\Auth\GoogleAuthService;
-use App\Services\Interfaces\UserInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
-use Mockery;
+use Laravel\Socialite\Facades\Socialite;
 use Tests\TestCase;
 
 class GoogleAuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected UserInterface $userService;
-
-    protected GoogleAuthService $googleAuthService;
-
-    protected function setUp(): void
+    /**
+     * Return a fake Google user object.
+     */
+    protected function fakeGoogleUser($email = 'test@example.com', $name = 'Test User')
     {
-        parent::setUp();
+        return new class($email, $name) {
+            private $email;
+            private $name;
 
-        // Mock UserService
-        $this->userService = Mockery::mock(UserInterface::class);
+            public function __construct($email, $name)
+            {
+                $this->email = $email;
+                $this->name = $name;
+            }
 
-        // Service under test
-        $this->googleAuthService = new GoogleAuthService($this->userService);
+            public function getEmail()  { return $this->email; }
+            public function getName()   { return $this->name; }
+            public function getAvatar() { return 'https://example.com/avatar.png'; }
+            public function getId()     { return 'google-12345'; }
+        };
+    }
+
+    /**
+     * Mock Socialite to return our fake Google user.
+     */
+    private function mockSocialite($googleUser)
+    {
+        $providerMock = \Mockery::mock(\Laravel\Socialite\Contracts\Provider::class);
+        $providerMock->shouldReceive('stateless')->andReturnSelf();
+        $providerMock->shouldReceive('userFromToken')->andReturn($googleUser);
+
+        Socialite::shouldReceive('driver')
+            ->with('google')
+            ->andReturn($providerMock);
     }
 
     /** @test */
     public function existing_user_can_login()
     {
-        $user = User::factory()->create([
-            'email' => 'existing@example.com',
+        $user = User::factory()->create(['email' => 'test@example.com']);
+        $googleUser = $this->fakeGoogleUser('test@example.com', 'Existing User');
+        $this->mockSocialite($googleUser);
+
+        $response = $this->postJson('/api/auth/google/callback', [
+            'role' => 'talent',
+            'google_token' => 'dummy-token',
         ]);
 
-        $result = $this->googleAuthService->handle([
-            'email' => 'existing@example.com',
-            'name' => 'Existing User',
-        ]);
-
-        $this->assertArrayHasKey('user', $result);
-        $this->assertArrayHasKey('token', $result);
-        $this->assertEquals($user->id, $result['user']->id);
-        $this->assertNotEmpty($result['token']);
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
     }
 
     /** @test */
     public function new_talent_user_can_signup()
     {
-        $this->userService
-            ->shouldReceive('create')
-            ->once()
-            ->andReturnUsing(function ($data) {
-                // Mimic UserService response
-                return array_merge($data, [
-                    'id' => 1,
-                    'token' => Str::random(10),
-                ]);
-            });
+        $googleUser = $this->fakeGoogleUser('newtalent@example.com', 'New Talent');
+        $this->mockSocialite($googleUser);
 
-        $result = $this->googleAuthService->handle([
-            'email' => 'talent@example.com',
-            'name' => 'John Doe',
-        ], 'talent');
+        $response = $this->postJson('/api/auth/google/callback', [
+            'role' => 'talent',
+            'google_token' => 'dummy-token',
+        ]);
 
-        $this->assertEquals('John', $result['firstname']);
-        $this->assertEquals('Doe', $result['lastname']);
-        $this->assertEquals('talent', $result['role']);
-        $this->assertNotEmpty($result['password']);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'newtalent@example.com']);
     }
 
     /** @test */
     public function new_company_user_can_signup_with_company_name()
     {
-        $this->userService
-            ->shouldReceive('create')
-            ->once()
-            ->andReturnUsing(function ($data) {
-                return array_merge($data, [
-                    'id' => 2,
-                    'token' => Str::random(10),
-                ]);
-            });
+        $googleUser = $this->fakeGoogleUser('newcompany@example.com', 'New Company');
+        $this->mockSocialite($googleUser);
 
-        $result = $this->googleAuthService->handle([
-            'email' => 'company@example.com',
-            'name' => 'ACME Inc',
-            'company_name' => 'ACME Inc',
-        ], 'company');
-
-        $this->assertEquals('ACME Inc', $result['company_name']);
-        $this->assertEquals('company', $result['role']);
-        $this->assertNotEmpty($result['password']);
-    }
-
-    /** @test */
-    public function new_company_user_infers_company_name_when_not_provided()
-    {
-        $this->userService
-            ->shouldReceive('create')
-            ->once()
-            ->andReturnUsing(function ($data) {
-                return array_merge($data, [
-                    'id' => 3,
-                    'token' => Str::random(10),
-                ]);
-            });
-
-        $result = $this->googleAuthService->handle([
-            'email' => 'infer@example.com',
-            'name' => 'Inferred Corp',
-        ], 'company');
-
-        $this->assertEquals('Inferred Corp', $result['company_name']);
-        $this->assertEquals('company', $result['role']);
-    }
-
-    /** @test */
-    public function signup_fails_without_role()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Role is required for new users.');
-
-        $this->googleAuthService->handle([
-            'email' => 'norole@example.com',
-            'name' => 'No Role User',
+        $response = $this->postJson('/api/auth/google/callback', [
+            'role' => 'company',
+            'company_name' => 'HNG',
+            'google_token' => 'dummy-token',
         ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'newcompany@example.com']);
     }
 
-    protected function tearDown(): void
+    /** @test */
+    public function new_company_user_infers_company_name()
     {
-        Mockery::close();
-        parent::tearDown();
+        $googleUser = $this->fakeGoogleUser('autoinfer@example.com', 'Auto Infer');
+        $this->mockSocialite($googleUser);
+
+        $response = $this->postJson('/api/auth/google/callback', [
+            'role' => 'company',
+            'google_token' => 'dummy-token',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'autoinfer@example.com']);
+    }
+
+    /** @test */
+    public function token_decoding_failure_throws_exception()
+    {
+        // Break Socialite on purpose
+        $providerMock = \Mockery::mock(\Laravel\Socialite\Contracts\Provider::class);
+        $providerMock->shouldReceive('stateless')->andReturnSelf();
+        $providerMock->shouldReceive('userFromToken')->andThrow(new \Exception("Invalid token"));
+
+        Socialite::shouldReceive('driver')->with('google')->andReturn($providerMock);
+
+        $this->expectException(\Exception::class);
+
+        $this->postJson('/api/auth/google/callback', [
+            'role' => 'talent',
+            'google_token' => 'broken-token',
+        ]);
     }
 }
