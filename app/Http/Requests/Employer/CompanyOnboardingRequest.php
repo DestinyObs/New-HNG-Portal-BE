@@ -28,8 +28,8 @@ class CompanyOnboardingRequest extends FormRequest
             'industry' => ['nullable'],
             'company_size'  => ['nullable'],
             'website_url'  => ['nullable', 'active_url'],
-            'state_id'  => ['nullable', 'exists:states,id'],
-            'country_id'  => ['nullable', 'exists:countries,id'],
+            'state'  => ['nullable', 'string'],
+            'country'  => ['nullable', 'string'],
         ];
     }
 }
