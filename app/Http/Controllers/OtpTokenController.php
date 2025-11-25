@@ -11,6 +11,7 @@ use App\Mail\UserRegistered;
 use App\Models\Company;
 use App\Models\OtpToken;
 use App\Models\User;
+use App\Services\Interfaces\Auth\LoginInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -18,10 +19,15 @@ use Illuminate\Support\Str;
 
 class OtpTokenController extends Controller
 {
+    public function __construct(
+        private readonly LoginInterface $loginService
+    ) {}
+
     public function verifyOtp(OtpTokenRequest $request)
     {
 
         $user = $request->user();
+        dd($user);
         if ($user->hasVerifiedEmail()) {
             return $this->success(
                 'Account has already been verified!.',
@@ -58,11 +64,24 @@ class OtpTokenController extends Controller
             // Delete Otp
             $hashedOtp->delete();
 
-            //  Successful response
-            return $this->success(
-                'OTP verified successfully.',
-                Http::OK,
+            $response = $this->loginService->attempt(
+                $user,
             );
+            // dd($response['user']);
+
+            $user = new UserResource($response['user']);
+
+
+            //  Successful response
+            // return $this->success(
+            //     'OTP verified successfully.',
+            //     Http::OK,
+            // );
+
+            return $this->successWithData([
+                'user' => $user,
+                'token' => $response['token'],
+            ], 'OTP verified successfully.');
         } else {
             // OTP is invalid
             return $this->error(

@@ -3,29 +3,32 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\GoogleTokenRequest;
+use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
 
 class GoogleAuthController extends Controller
 {
-    public function __construct(
-        private readonly GoogleAuthInterface $googleService
-    ) {}
+    public function __construct(private readonly GoogleAuthInterface $googleAuthService) {}
 
-    /**
-     * Handle frontend-provided Google access token (mobile/SPA flow)
-     */
-    public function handleToken(GoogleTokenRequest $request)
+    public function handle(GoogleAuthRequest $request)
     {
-        $response = $this->googleService->handleToken(
-            $request->get('access_token'),
-            $request->get('role'),
-            $request->get('company_name')
-        );
+        $data = $request->validated();
 
-        return $this->successWithData([
-            'user' => $response['user'],
-            'token' => $response['token'],
-        ], 'Google authentication successful');
+        try {
+            $result = $this->googleAuthService->handle(
+                $data['google_token'],
+                $data['role'] ?? null,
+                $data['company_name'] ?? null,
+            );
+
+            // Normal success path
+            return $this->successWithData(
+                $result,
+                $result['message'] ?? 'Authentication successful'
+            );
+
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage());
+        }
     }
 }
