@@ -51,6 +51,7 @@ class UserService implements UserInterface
 
             //? Crate a user on the database
             $user = $this->userRepository->create($data);
+            // $user['email_verification'] = $user['email_verifi']
 
             $company = null;
             if ($data['role'] == 'company') {

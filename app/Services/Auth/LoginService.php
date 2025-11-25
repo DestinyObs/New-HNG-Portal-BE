@@ -29,7 +29,7 @@ class LoginService implements LoginInterface
 
         // Block login if email not verified
         if (!$user->hasVerifiedEmail()) {
-            Auth::logout();
+            // Auth::logout();
 
             throw new AuthenticationException('Your email is not verified. Please verify your email to continue.');
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Services\Interfaces\Auth\LoginInterface;
 
 class LoginController extends Controller
@@ -20,9 +21,12 @@ class LoginController extends Controller
         $response = $this->loginService->attempt(
             $request->validated()
         );
+        // dd($response['user']);
+
+        $user = new UserResource($response['user']);
 
         return $this->successWithData([
-            'user' => $response['user'],
+            'user' => $user,
             'token' => $response['token'],
         ], 'Login successful');
     }
