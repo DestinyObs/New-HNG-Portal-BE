@@ -42,7 +42,7 @@ jobs:
           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
 
       - name: Laravel Cache and Optimize
         env:
