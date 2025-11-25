@@ -38,7 +38,7 @@ class CompanyOnboardingController extends Controller
         }
 
         // $company->update($data);
-        $company = $this->companyService->updateCompany($data, $company->id);
+        return $company = $this->companyService->updateCompany($data, $company->id);
 
         return $this->successWithData($company, 'Company updated successfully');
     }
