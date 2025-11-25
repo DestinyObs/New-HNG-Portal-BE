@@ -40,7 +40,6 @@ class User extends Authenticatable
         'dob'         => 'date',
         'password'  => 'hashed',
         'current_role' => RoleEnum::class
-        'roles', 'permissions',
     ];
 
 
