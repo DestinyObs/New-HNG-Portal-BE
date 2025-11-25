@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('logo_url')->nullable();
             $table->string('industry')->nullable();
             $table->text('company_size')->nullable();
-            $table->foreignUuid('state_id')->nullable()->references('id')->on('states')->nullOnDelete();
-            $table->foreignUuid('country_id')->nullable()->references('id')->on('countries')->nullOnDelete();
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
             $table->string('website_url')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('official_email')->nullable();

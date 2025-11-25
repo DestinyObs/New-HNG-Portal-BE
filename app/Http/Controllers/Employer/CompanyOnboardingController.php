@@ -36,8 +36,21 @@ class CompanyOnboardingController extends Controller
         }
 
         // $company->update($data);
-        $company = $this->companyService->updateCompany($data, $company->id);
+        return $company = $this->companyService->updateCompany($data, $company->id);
 
         return $this->successWithData($company, 'Company updated successfully');
+    }
+
+
+    // implement onboarding status
+    public function onBoardingStatus(array $data){
+        $status = false;
+        foreach($data as $record){
+            if($record == null){
+                $status = false;
+            }else{
+                $status = true;
+            }
+        }
     }
 }
