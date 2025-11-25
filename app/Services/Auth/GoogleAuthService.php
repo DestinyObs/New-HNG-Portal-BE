@@ -15,27 +15,41 @@ class GoogleAuthService implements GoogleAuthInterface
     public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array|\Exception
     {
         // Retrieve user info from Google using the token
+
+        dump('entering service');
+
         try {
             $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
+            info('GOOGLE USER', ['user' => $googleUser]);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Invalid Google token provided.');
+        } catch (\Throwable $e) {
+            info('GOOGLE ERROR', ['error' => $e->getMessage()]);
+            throw new \Exception('An error occurred while authenticating with Google. Please try again later.');
         }
+
+        dump($googleUser);
 
         $googleUserData = [
             'email' => $googleUser->getEmail(),
             'name' => $googleUser->getName(),
             'company_name' => $companyName,
         ];
-    
+
         $email = $googleUserData['email'] ?? null;
+
+        dump($googleUserData);
+
 
         // Check if user exists
         $user = User::where('email', $email)->first();
 
+
+
         if ($user) {
             // LOGIN FLOW
             $token = $user->createToken('auth_token')->plainTextToken;
-
+            dump($googleUserData);
             return [
                 'user' => $user,
                 'token' => $token,
@@ -43,8 +57,9 @@ class GoogleAuthService implements GoogleAuthInterface
         }
 
         // SIGNUP FLOW
-        if (! $role) {
-            throw new \InvalidArgumentException('Role is required for new users.');
+
+        if (!$role) {
+            throw new \InvalidArgumentException('Role is required for new user signup.');
         }
 
         $nameParts = explode(' ', $googleUserData['name'], 2);

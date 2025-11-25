@@ -14,12 +14,24 @@ class GoogleAuthController extends Controller
     {
         $data = $request->validated();
 
-        $result = $this->googleAuthService->handle(
-            $data['google_token'],
-            $data['role'] ?? null,
-            $data['company_name'] ?? null,
-        );
+        try {
+            $result = $this->googleAuthService->handle(
+                $data['google_token'],
+                $data['role'] ?? null,
+                $data['company_name'] ?? null,
+            );
+            dump('after service call');
 
-        return $this->successWithData($result, 'Authentication successful');
+            dump($result);
+
+            // Normal success path
+            return $this->successWithData(
+                $result,
+                $result['message'] ?? 'Authentication successful'
+            );
+
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage());
+        }
     }
 }
