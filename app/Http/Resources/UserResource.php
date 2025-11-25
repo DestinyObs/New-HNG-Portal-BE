@@ -21,9 +21,18 @@ class UserResource extends JsonResource
             'othername' => $this->othername,
             "email" => $this->email,
             "current_role" => $this->current_role,
-            "email_verification" => is_null($this->email_verified_at) ? false : true,
+            "photo_url" => $this->photo_url,
+            "email_verification" => !is_null($this->email_verified_at),
             "updated_at" => $this->updated_at,
             "created_at" => $this->created_at,
+
+            "company" => $this->whenLoaded('company'),
+            "skills" => $this->whenLoaded('skills'),
+            "experiences" => $this->whenLoaded('experiences'),
+            "verification" => $this->whenLoaded('verification'),
+            "preferences" => $this->whenLoaded('preferences'),
+            "jobs" => $this->whenLoaded('jobs'),
+            "bio" => $this->whenLoaded('bio'),
         ];
     }
 }
