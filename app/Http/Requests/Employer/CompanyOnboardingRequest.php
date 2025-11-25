@@ -22,6 +22,7 @@ class CompanyOnboardingRequest extends FormRequest
     public function rules(): array
     {
         return [
+          
             'logo' =>  'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'name' => ['nullable'],
             'description'  => ['nullable', 'max:2000'],
@@ -30,6 +31,7 @@ class CompanyOnboardingRequest extends FormRequest
             'website_url'  => ['nullable', 'active_url'],
             'state'  => ['nullable', 'string'],
             'country'  => ['nullable', 'string'],
+
         ];
     }
 }

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Faq;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class FaqSeeder extends Seeder
 {
@@ -80,4 +79,3 @@ class FaqSeeder extends Seeder
         }
     }
 }
-

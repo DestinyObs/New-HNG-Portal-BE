@@ -7,12 +7,10 @@ use App\Http\Requests\Employer\CompanyOnboardingRequest;
 use App\Models\Company;
 use App\Services\Employer\CompanyService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CompanyOnboardingController extends Controller
 {
     public function __construct(private CompanyService $companyService) {}
-
 
     // THIS METHODS NEEDS TO BE MODIFIED INTO SERVICE CLASS
     public function index(Request $request)

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Tag;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class TagSeeder extends Seeder
 {
@@ -28,4 +27,3 @@ class TagSeeder extends Seeder
         }
     }
 }
-

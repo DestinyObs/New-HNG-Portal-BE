@@ -10,5 +10,6 @@ use Illuminate\Http\Request;
 interface ProfileServiceInterface
 {
     public function changePassword(User $user, string $currentPassword): object|array;
+
     public function updateProfilePhoto(User $user, Request $request): object|array;
 }

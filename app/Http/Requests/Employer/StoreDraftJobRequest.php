@@ -29,7 +29,7 @@ class StoreDraftJobRequest extends FormRequest
             'title' => 'required|string|max:255',
             'company' => [
                 Rule::exists('companies', 'id')
-                    ->where('user_id', Auth::id())
+                    ->where('user_id', Auth::id()),
             ],
             'job_id' => [
                 'sometimes',
@@ -52,7 +52,6 @@ class StoreDraftJobRequest extends FormRequest
             // 'publication_status' => 'nullable|in:published,unpublished',
         ];
     }
-
 
     public function messages(): array
     {

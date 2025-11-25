@@ -10,5 +10,4 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Application extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
-
 }

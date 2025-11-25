@@ -4,7 +4,7 @@ namespace App\Http\Requests\Talent;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class   TalentOnboardingRequest extends FormRequest
+class TalentOnboardingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

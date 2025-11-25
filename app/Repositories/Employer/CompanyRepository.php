@@ -4,7 +4,6 @@ namespace App\Repositories\Employer;
 
 use App\Models\Company;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
-use App\Services\Interfaces\UploaderInterface;
 use App\Services\UploadDrivers\LocalUploader;
 use App\Services\UploadDrivers\S3Uplodaer;
 use Illuminate\Support\Str;
@@ -13,13 +12,14 @@ class CompanyRepository implements CompanyRepositoryInterface
 {
     protected $uploadDisk;
 
-    public function __construct(private Company $company) {
+    public function __construct(private Company $company)
+    {
         $disk = config('company.logo_disk');
 
-         $this->uploadDisk = match ($disk) {
-            'local'      => new LocalUploader(),
-            's3'         => new S3Uplodaer(),
-            default      => new LocalUploader(),
+        $this->uploadDisk = match ($disk) {
+            'local' => new LocalUploader,
+            's3' => new S3Uplodaer,
+            default => new LocalUploader,
         };
     }
 
@@ -51,7 +51,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         $company = $this->findById($uuid);
 
         $company->update([
-            'logo_url' => $logoUrl
+            'logo_url' => $logoUrl,
         ]);
 
         return $company;

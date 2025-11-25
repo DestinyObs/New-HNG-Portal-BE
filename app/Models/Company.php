@@ -11,7 +11,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Company extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, HasUuids, InteractsWithMedia;
+    use HasFactory, HasUuids, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'user_id',
