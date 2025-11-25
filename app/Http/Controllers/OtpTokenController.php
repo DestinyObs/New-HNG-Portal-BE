@@ -42,7 +42,7 @@ class OtpTokenController extends Controller
         // OTP is valid
         if (Hash::check($plainOtp, $hashedOtp->hashed_token)) {
             // And mark the OTP as used or delete it
-            if (! $user->hasVerifiedEmail()) {
+            if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
             }
 
@@ -74,7 +74,7 @@ class OtpTokenController extends Controller
     public function resendOtp(Request $request)
     {
         $user = $request->user();
-        if ($user->hasVerifiedEmail()) {
+        if ($user->email_verification) {
             return $this->success(
                 'Account has already been verified!.',
                 Http::OK,
