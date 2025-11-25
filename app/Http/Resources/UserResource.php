@@ -31,7 +31,7 @@ class UserResource extends JsonResource
             "experiences" => $this->whenLoaded('experiences'),
             "verification" => $this->whenLoaded('verification'),
             "preferences" => $this->whenLoaded('preferences'),
-            "jobs" => $this->whenLoaded('jobs'),
+            // "jobs" => $this->whenLoaded('jobs'),
             "bio" => $this->whenLoaded('bio'),
         ];
     }

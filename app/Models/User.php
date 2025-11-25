@@ -69,10 +69,10 @@ class User extends Authenticatable
         return $this->hasOne(Company::class, 'user_id');
     }
 
-    public function jobs()
-    {
-        return $this->hasMany(JobListing::class, 'user_id');
-    }
+    // public function jobs()
+    // {
+    //     return $this->hasMany(JobListing::class, 'user_id');
+    // }
 
     public function bio()
     {
