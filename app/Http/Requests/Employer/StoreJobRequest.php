@@ -46,6 +46,7 @@ class StoreJobRequest extends FormRequest
             'category_id' => 'required|uuid|exists:categories,id',
             'job_type_id' => 'required|uuid|exists:job_types,id',
             'work_mode_id' => 'required|uuid|exists:work_modes,id',
+            'job_level_id' => 'required|uuid|exists:job_levels,id',
             'skills' => 'required|array',
             'skills.*' => 'uuid|exists:skills,id',
             // 'status' => 'required|in:active,in-active',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\Admin\CategoryService;
 use App\Services\Admin\CountryService;
+use App\Services\Admin\JobLevelService;
 use App\Services\Admin\LocationService;
 use App\Services\Admin\StateService;
 use App\Services\Admin\TrackService;
@@ -22,6 +23,7 @@ class LookUpController extends Controller
         private readonly WorkModeService $workModeService,
         private readonly CategoryService $categoryService,
         private readonly StateService $stateService,
+        private readonly JobLevelService $joblevelService,
     ) {}
 
     public function countries()
@@ -108,5 +110,12 @@ class LookUpController extends Controller
 
         // dd($data);
         return $this->successWithData($data, 'Job types retrieved successfully');
+    }
+
+
+    public function jobLevels()
+    {
+        $data = $this->joblevelService->getAllJobLevels();
+        return $this->successWithData($data, 'Job levels retrieved successfully');
     }
 }

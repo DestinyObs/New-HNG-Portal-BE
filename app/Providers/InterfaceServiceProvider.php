@@ -6,6 +6,7 @@ use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Services\Employer\CompanyService;
 use App\Services\Interfaces\Admin\CategoryServiceInterface;
 use App\Services\Interfaces\Admin\CountryServiceInterface;
+use App\Services\Interfaces\Admin\JobLevelServiceInterface;
 use App\Services\Interfaces\Admin\StateServiceInterface;
 use App\Services\Interfaces\Admin\TrackServiceInterface;
 use App\Services\Interfaces\Admin\WorkModeServiceInterface;
@@ -40,6 +41,7 @@ class InterfaceServiceProvider extends ServiceProvider
         WorkModeServiceInterface::class => \App\Services\Admin\WorkModeService::class,
         CountryServiceInterface::class => \App\Services\Admin\CountryService::class,
         StateServiceInterface::class => \App\Services\Admin\StateService::class,
+        JobLevelServiceInterface::class => \App\Services\Admin\JobLevelService::class,
     ];
 
     /**

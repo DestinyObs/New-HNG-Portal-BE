@@ -27,7 +27,6 @@ class JobTypeService
     {
         // Logic to create a new job type
         return $this->jobTypeRepository->create($data);
-
     }
 
     public function getJobTypeById(string $id)
@@ -47,4 +46,7 @@ class JobTypeService
         // Logic to delete a job type
         return $this->jobTypeRepository->destroy($id);
     }
+
+
+    public function getAllJobLevels() {}
 }
