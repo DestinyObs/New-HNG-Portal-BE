@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\Http;
 use App\Http\Requests\OtpTokenRequest;
+use App\Http\Resources\UserResource;
 use App\Mail\CompanyRegistered;
 use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
@@ -31,7 +32,7 @@ class OtpTokenController extends Controller
         $plainOtp = $request->input('otp');
         $hashedOtp = OtpToken::where('user_id', $user->id)->first();
 
-        if (! $hashedOtp || $hashedOtp->expired_at < now()) {
+        if (!$hashedOtp || $hashedOtp->expired_at < now()) {
             // Error invalid otp or Expired token
             return $this->error(
                 'OTP is invalid or has expired.',
@@ -88,7 +89,7 @@ class OtpTokenController extends Controller
         // ? Send email to user (commented out for now)
         Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
 
-        return $user;
+        return new UserResource($user);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Talent;
 
 use App\Enums\Http;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Repositories\Interfaces\Talent\ProfileRepositoryInterface;
 use App\Services\Interfaces\Talent\ProfileServiceInterface;
@@ -17,7 +18,8 @@ class ProfileService implements ProfileServiceInterface
 
     public function __construct(
         private readonly ProfileRepositoryInterface $profileRepository
-    ) {}
+    ) {
+    }
 
     public function changePassword(User $user, string $newPassword): object|array
     {
@@ -26,18 +28,28 @@ class ProfileService implements ProfileServiceInterface
 
             logger()->info("Password updated successfully for user ID {$user->id}");
 
+            $user->load([
+                'company',
+                'bio',
+                'skills',
+                'experiences',
+                'verification',
+                'preferences',
+                'jobs',
+            ]);
+
             return (object) [
                 'success' => true,
                 'message' => 'Password updated successfully',
-                'user' => $user,
+                'user' => new UserResource($user),
                 'status' => Http::OK,
             ];
         } catch (\Exception $e) {
-            logger()->error("Failed to update password for user ID {$user->id}: ".$e->getMessage());
+            logger()->error("Failed to update password for user ID {$user->id}: " . $e->getMessage());
 
             return (object) [
                 'success' => false,
-                'message' => 'Failed to update password: '.$e->getMessage(),
+                'message' => 'Failed to update password: ' . $e->getMessage(),
                 'status' => Http::INTERNAL_SERVER_ERROR,
             ];
         }
@@ -47,7 +59,7 @@ class ProfileService implements ProfileServiceInterface
     {
         try {
             // ? check if photo exist in request file
-            if (! $request->hasFile('photo')) {
+            if (!$request->hasFile('photo')) {
                 return (object) [
                     'success' => false,
                     'message' => 'No photo file provided',
@@ -59,7 +71,7 @@ class ProfileService implements ProfileServiceInterface
             $filePath = $this->uploadFile(
                 $request->file('photo'),
                 'talent/profile_photos',
-                $user->profile_url
+                $user->photo_url
             );
 
             // ? update profile photo in database
