@@ -20,9 +20,6 @@ class GoogleAuthController extends Controller
                 $data['role'] ?? null,
                 $data['company_name'] ?? null,
             );
-            dump('after service call');
-
-            dump($result);
 
             // Normal success path
             return $this->successWithData(
