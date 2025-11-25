@@ -18,7 +18,6 @@ class SkillService implements SkillServiceInterface
         $this->skillRepository = $skillRepository;
     }
 
-
     // Add service methods for job type management here
     public function getAllSkills()
     {
@@ -30,6 +29,7 @@ class SkillService implements SkillServiceInterface
     {
         // Logic to create a new job type
         $data['slug'] = Str::slug($data['name']);
+
         return $this->skillRepository->create($data);
 
     }
@@ -40,11 +40,11 @@ class SkillService implements SkillServiceInterface
         return $this->skillRepository->findById($id);
     }
 
-
     public function updateSkill(string $id, array $data)
     {
         // Logic to update a job type
         $data['slug'] = Str::slug($data['name']);
+
         return $this->skillRepository->update($id, $data);
     }
 

@@ -6,54 +6,54 @@ namespace App\Enums;
 
 enum Status: string
 {
-     case ACTIVE = 'active';
-     case INACTIVE = 'in-active';
-     case ACCEPT = 'accept';
+    case ACTIVE = 'active';
+    case INACTIVE = 'in-active';
+    case ACCEPT = 'accept';
 
-     case ACCEPTED = 'accepted';
+    case ACCEPTED = 'accepted';
 
-     case DISABLED = 'disabled';
+    case DISABLED = 'disabled';
 
-     case INITIATED = 'initiated';
+    case INITIATED = 'initiated';
 
-     case BLOCKED = 'blocked';
+    case BLOCKED = 'blocked';
 
-     case DELETED = 'deleted';
+    case DELETED = 'deleted';
 
-     case SUCCESSFUL = 'successful';
+    case SUCCESSFUL = 'successful';
 
-     case FAILED = 'failed';
+    case FAILED = 'failed';
 
-     case UNREAD = 'unread';
+    case UNREAD = 'unread';
 
-     case READ = 'read';
+    case READ = 'read';
 
-     case PENDING = 'pending';
+    case PENDING = 'pending';
 
-     case UNKNOWN = 'unknown';
+    case UNKNOWN = 'unknown';
 
-     case CANCELLED = 'cancelled';
+    case CANCELLED = 'cancelled';
 
-          // case INACTIVE = 'inactive';
+    // case INACTIVE = 'inactive';
 
-     case LOCKED = 'locked';
+    case LOCKED = 'locked';
 
-     case BANNED = 'banned';
+    case BANNED = 'banned';
 
-     case BLOCK = 'block';
+    case BLOCK = 'block';
 
-     case UNBLOCK = 'unblock';
+    case UNBLOCK = 'unblock';
 
-     case OPEN = 'open';
+    case OPEN = 'open';
 
-     case DECLINED = 'declined';
+    case DECLINED = 'declined';
 
-     case SUSPENDED = 'suspended';
+    case SUSPENDED = 'suspended';
 
-     case PUBLISH = 'published';
-     case UNPUBLISH = 'unpublished';
+    case PUBLISH = 'published';
+    case UNPUBLISH = 'unpublished';
 
-     case DRAFT = 'draft';
+    case DRAFT = 'draft';
 
-     case EXPIRED = 'expired';
+    case EXPIRED = 'expired';
 }

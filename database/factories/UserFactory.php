@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserFactory extends Factory
 {
@@ -17,7 +16,7 @@ class UserFactory extends Factory
             'lastname' => fake()->lastName(),
             'othername' => fake()->optional(0.3)->firstName(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => '+234' . fake()->numerify('##########'),
+            'phone' => '+234'.fake()->numerify('##########'),
             'dob' => fake()->date('Y-m-d', '-18 years'),
             'status' => fake()->randomElement(['active', 'active', 'active', 'suspended', 'banned']),
             'address_id' => null,

@@ -17,6 +17,7 @@ class AddressSeeder extends Seeder
 
         if ($users->isEmpty() || $states->isEmpty() || $countries->isEmpty()) {
             $this->command->warn('Missing required data. Please run UserSeeder, StateSeeder, and CountrySeeder first.');
+
             return;
         }
 
@@ -33,4 +34,3 @@ class AddressSeeder extends Seeder
         }
     }
 }
-

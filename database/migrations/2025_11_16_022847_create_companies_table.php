@@ -6,8 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void {
+return new class extends Migration
+{
+    public function up(): void
+    {
         Schema::create('companies', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('user_id');
@@ -18,8 +20,8 @@ return new class extends Migration {
             $table->string('logo_url')->nullable();
             $table->string('industry')->nullable();
             $table->text('company_size')->nullable();
-            $table->foreignUuid('state_id')->nullable()->references('id')->on('states')->nullOnDelete();
-            $table->foreignUuid('country_id')->nullable()->references('id')->on('countries')->nullOnDelete();
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
             $table->string('website_url')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('official_email')->nullable();
@@ -30,7 +32,8 @@ return new class extends Migration {
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('companies');
     }
 };

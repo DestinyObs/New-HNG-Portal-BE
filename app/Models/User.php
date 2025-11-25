@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasUuids, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, HasUuids, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'firstname',
@@ -25,26 +26,28 @@ class User extends Authenticatable
         'status',
         'photo_url',
         'password',
+        'current_role',
     ];
 
     protected $hidden = ['password'];
 
     protected $with = [
-        'roles', 'permissions'
+        'roles',
+        'permissions'
     ];
 
     protected $casts = [
         'dob'         => 'date',
-        'password'  => 'hashed'
+        'password'  => 'hashed',
+        'current_role' => RoleEnum::class
     ];
+
 
     // Relationships
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'user_skills', 'user_id', 'skill_id');
     }
-
-
 
     public function experiences()
     {

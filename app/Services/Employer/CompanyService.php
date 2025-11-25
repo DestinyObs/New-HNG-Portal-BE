@@ -3,7 +3,6 @@
 namespace App\Services\Employer;
 
 use App\Repositories\Employer\CompanyRepository;
-use App\Repositories\Interfaces\CompanyRepositoryInterface;
 
 class CompanyService
 {

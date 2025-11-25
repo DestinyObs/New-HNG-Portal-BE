@@ -7,12 +7,10 @@ use App\Http\Requests\Employer\CompanyOnboardingRequest;
 use App\Models\Company;
 use App\Services\Employer\CompanyService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CompanyOnboardingController extends Controller
 {
     public function __construct(private CompanyService $companyService) {}
-
 
     // THIS METHODS NEEDS TO BE MODIFIED INTO SERVICE CLASS
     public function index(Request $request)
@@ -41,5 +39,18 @@ class CompanyOnboardingController extends Controller
         $company = $this->companyService->updateCompany($data, $company->id);
 
         return $this->successWithData($company, 'Company updated successfully');
+    }
+
+
+    // implement onboarding status
+    public function onBoardingStatus(array $data){
+        $status = false;
+        foreach($data as $record){
+            if($record == null){
+                $status = false;
+            }else{
+                $status = true;
+            }
+        }
     }
 }

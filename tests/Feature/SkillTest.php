@@ -4,12 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Skill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class SkillTest extends TestCase
 {
-
     use RefreshDatabase; // Preventing test interference with database record.
 
     /**
@@ -39,7 +37,7 @@ class SkillTest extends TestCase
      */
     public function test_admin_can_create_skill()
     {
-        $name = "new job name";
+        $name = 'new job name';
         $response = $this->post('/api/admin/skills', [
             'name' => $name,
         ]);
@@ -60,29 +58,28 @@ class SkillTest extends TestCase
     {
         $skill = Skill::factory()->create();
 
-        $response = $this->get('/api/admin/skills/' . $skill->id);
+        $response = $this->get('/api/admin/skills/'.$skill->id);
 
         $response->assertStatus(200); // 200 OK
         $response->assertSee($skill->name);
     }
-
 
     /**
      * A basic update route example.
      */
     public function test_a_skill_can_be_updated()
     {
-        $skill =  Skill::factory()->create([
-               'name' => 'first name',
-           ]);
+        $skill = Skill::factory()->create([
+            'name' => 'first name',
+        ]);
         $newData = [
-            'name' => 'updated name'
+            'name' => 'updated name',
         ];
 
-        $response = $this->put('/api/admin/skills/' . $skill->id, $newData);
+        $response = $this->put('/api/admin/skills/'.$skill->id, $newData);
 
         // Return data after successful update 200 OK
-        $response->assertStatus(200); 
+        $response->assertStatus(200);
         $this->assertDatabaseHas('skills', $newData);
     }
 
@@ -93,10 +90,10 @@ class SkillTest extends TestCase
     {
         $skill = Skill::factory()->create();
 
-        $response = $this->delete('/api/admin/skills/' . $skill->id);
+        $response = $this->delete('/api/admin/skills/'.$skill->id);
 
         // No content after successful deletion 204 No Content
-        $response->assertStatus(204); 
+        $response->assertStatus(204);
         $this->assertDatabaseMissing('skills', ['id' => $skill->id]);
     }
 
@@ -114,8 +111,8 @@ class SkillTest extends TestCase
      * A basic validation failed example.
      */
     public function test_a_failed_validation_of_create_skill_can_return_error()
-    {   
-        $name = "";
+    {
+        $name = '';
         $response = $this->post('/api/admin/skills', [
             'name' => $name,
         ]);
@@ -123,10 +120,10 @@ class SkillTest extends TestCase
         // THIS STILL NEED MODIFICATION AFTER API EXCEPTION CONFIGURATION SETUP
         $this->assertTrue(true);
         // Unprocessable Entity to be changed from 302 on view to 422 api
-         $response->assertStatus(422) 
-                 ->assertJsonValidationErrors(['name']);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
 
         // test if the response data contains the value false
         $response->assertJson(['success' => false]);
-    }       
+    }
 }

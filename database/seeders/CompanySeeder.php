@@ -14,6 +14,7 @@ class CompanySeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->warn('No users found. Please run UserSeeder first.');
+
             return;
         }
 
@@ -21,8 +22,7 @@ class CompanySeeder extends Seeder
         Company::factory()
             ->count(10)
             ->create([
-                'user_id' => fn() => $users->random()->id,
+                'user_id' => fn () => $users->random()->id,
             ]);
     }
 }
-

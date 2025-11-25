@@ -18,7 +18,9 @@ class UserBio extends Model implements HasMedia
         'bio',
         'track_id',
         'project_name',
-        'project_url'
+        'project_url',
+        'state',
+        'country'
     ];
 
     /**
@@ -32,7 +34,7 @@ class UserBio extends Model implements HasMedia
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function track()
     {
         return $this->belongsTo(Track::class);

@@ -1,22 +1,20 @@
 <?php
 
-//? API routes for employer functionalities
+// ? API routes for employer functionalities
 
 use App\Http\Controllers\Employer\CompanyController;
 use App\Http\Controllers\Employer\CompanyOnboardingController;
 use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
 
-
-
 // API routes for employer functionalities
 Route::prefix('api/employer')->group(function () {
 
     Route::get('/test', function () {
-        dd("Employer route reached");
+        dd('Employer route reached');
     });
 
-    //? Employer Company Jobs Routes
+    // ? Employer Company Jobs Routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('company/{companyId}/jobs')->group(function () {
             Route::controller(JobController::class)->group(function () {
@@ -34,7 +32,7 @@ Route::prefix('api/employer')->group(function () {
             });
         });
 
-        //? Employer Company Routes
+        // ? Employer Company Routes
         Route::controller(CompanyController::class)->group(function () {
             Route::prefix('company')->group(function () {
                 Route::post('company', 'store');
@@ -51,6 +49,6 @@ Route::prefix('api/employer')->group(function () {
             Route::get('onboarding', 'index');
             Route::post('onboarding', 'store');
         });
-    });      
+    });
 
 });

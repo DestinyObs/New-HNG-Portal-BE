@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RoleEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->date('dob')->nullable();
+            $table->string('current_role')->default(RoleEnum::TALENT->value);
             $table->enum('status', ['banned', 'suspended', 'active'])->default('active');
             $table->uuid('address_id')->nullable();
             $table->string('photo_url')->nullable();

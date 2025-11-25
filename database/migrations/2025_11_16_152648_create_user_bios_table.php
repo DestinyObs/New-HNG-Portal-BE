@@ -6,7 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('user_bios', function (Blueprint $table) {
@@ -26,8 +27,8 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->string('project_name')->nullable();
             $table->string('project_url')->nullable();
-            $table->foreignUuid('state_id')->nullable()->references('id')->on('states')->nullOnDelete();
-            $table->foreignUuid('country_id')->nullable()->references('id')->on('countries')->nullOnDelete();
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
             $table->string('onboarding_status')->default(OnboardingEnum::PENDING->value);
             $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();

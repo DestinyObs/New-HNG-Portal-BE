@@ -17,7 +17,7 @@ class UserPreference extends Model
     ];
 
     protected $casts = [
-        'value' => 'array'
+        'value' => 'array',
     ];
 
     public function user()

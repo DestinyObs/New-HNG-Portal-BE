@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
-
     public function getAll(): Collection
     {
         return $this->query()->get();
@@ -25,13 +24,14 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         $query = $this->query()
             ->where(Str::lower($column), $value)
             ->firstOrFail();
+
         return $query;
     }
 
     public function updatePassword(User $user, string $password): User
     {
         $user->update([
-            'password' => $password
+            'password' => $password,
         ]);
 
         return $user->refresh();
@@ -40,6 +40,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function update(User $user, array $data): User
     {
         $user->update($data);
+
         return $user->refresh();
     }
 

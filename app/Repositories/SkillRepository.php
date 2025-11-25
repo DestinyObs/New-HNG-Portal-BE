@@ -8,6 +8,7 @@ use App\Repositories\Interfaces\SkillRepositoryInterface;
 class SkillRepository implements SkillRepositoryInterface
 {
     protected Skill $skill;
+
     /**
      * Create a new class instance.
      */
@@ -29,22 +30,26 @@ class SkillRepository implements SkillRepositoryInterface
         return $this->skill::findOrFail($id);
     }
 
-
     // create
-    public function create(array $data){
+    public function create(array $data)
+    {
         return $this->skill->create($data);
-    }    
+    }
 
     // update
-    public function update(string $id, array $data){
+    public function update(string $id, array $data)
+    {
         $skill = $this->skill::findOrFail($id);
         $skill->update($data);
+
         return $skill;
     }
 
     // delete
-    public function destroy(string $id){
+    public function destroy(string $id)
+    {
         $skill = $this->skill::findOrFail($id);
+
         return $skill->delete();
     }
 }

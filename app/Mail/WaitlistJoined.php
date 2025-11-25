@@ -38,7 +38,7 @@ class WaitlistJoined extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.waitlist', 
+            view: 'emails.waitlist',
         );
     }
 

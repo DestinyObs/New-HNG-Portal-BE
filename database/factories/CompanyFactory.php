@@ -17,11 +17,11 @@ class CompanyFactory extends Factory
         return [
             'user_id' => User::factory(), // Will be set by seeder
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->numberBetween(1000, 999999),
+            'slug' => Str::slug($name).'-'.fake()->numberBetween(1000, 999999),
             'description' => fake()->paragraph(3),
             'logo_url' => fake()->optional(0.6)->imageUrl(200, 200, 'business'),
-            'country_id' => Country::factory(),
-            'state_id' => State::factory(),
+            'country' => fake()->company(),
+            'state' => fake()->company(),
             'industry' => $name,
             'website_url' => fake()->optional(0.8)->url(),
             'is_verified' => fake()->boolean(60),
@@ -32,16 +32,15 @@ class CompanyFactory extends Factory
 
     public function verified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_verified' => true,
         ]);
     }
 
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_verified' => false,
         ]);
     }
 }
-
