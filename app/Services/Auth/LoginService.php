@@ -36,11 +36,11 @@ class LoginService implements LoginInterface
         $user->load([
             'company',
             'bio',
-            'skills',
-            'experiences',
-            'verification',
-            'preferences',
-            'jobs',
+            // 'skills',
+            // 'experiences',
+            // 'verification',
+            // 'preferences',
+            // 'jobs',
         ]);
 
         return collect([
