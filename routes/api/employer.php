@@ -21,6 +21,7 @@ Route::prefix('api/employer')->group(function () {
                 Route::get('/', 'index');
                 Route::post('/store', 'storePublishJob');
                 Route::post('/draft', 'draft');
+                Route::get('/draft', 'listDraftedJobs');
                 Route::get('/{job_id}', 'show');
                 Route::put('/{job_id}', 'update');
                 Route::delete('/{job_id}', 'destroy');
@@ -50,5 +51,4 @@ Route::prefix('api/employer')->group(function () {
             Route::post('onboarding', 'store');
         });
     });
-
 });

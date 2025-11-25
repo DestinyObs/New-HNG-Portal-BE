@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             SkillSeeder::class,
             WorkModeSeeder::class,
             MediaAssetSeeder::class,
+            JobLevelSeeder::class,
 
             // Users (depends on nothing initially)
             UserSeeder::class,

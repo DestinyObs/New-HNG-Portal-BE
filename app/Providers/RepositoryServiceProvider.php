@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use App\Repositories\Admin\CategoryRepository;
 use App\Repositories\Admin\CountryRepository;
+use App\Repositories\Admin\JobLevelRepository;
 // Repositories
 use App\Repositories\Admin\LocationRepository;
 use App\Repositories\Admin\StateRepository;
@@ -14,12 +15,14 @@ use App\Repositories\Admin\WorkModeRepository;
 // ? Respositories for admin role
 use App\Repositories\Interfaces\Admin\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\Admin\CountryRepositoryInterface;
+use App\Repositories\Interfaces\Admin\JobLevelRepositoryInterface;
 use App\Repositories\Interfaces\Admin\LocationRepositoryInterface;
 use App\Repositories\Interfaces\Admin\StateRepositoryInterface;
 use App\Repositories\Interfaces\Admin\TrackRepositoryInterface;
 use App\Repositories\Interfaces\Admin\WorkModeRepositoryInterface;
 use App\Repositories\Interfaces\Talent\ProfileRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\JobRepository;
 use App\Repositories\Talent\ProfileRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Model;
@@ -49,6 +52,7 @@ class RepositoryServiceProvider extends ServiceProvider
         WorkModeRepositoryInterface::class => WorkModeRepository::class,
         CountryRepositoryInterface::class => CountryRepository::class,
         StateRepositoryInterface::class => StateRepository::class,
+        JobLevelRepositoryInterface::class => JobLevelRepository::class,
 
     ];
 

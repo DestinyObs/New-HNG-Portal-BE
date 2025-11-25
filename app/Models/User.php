@@ -37,8 +37,8 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'dob'         => 'date',
-        'password'  => 'hashed',
+        'dob' => 'date',
+        'password' => 'hashed',
         'current_role' => RoleEnum::class
     ];
 
@@ -69,8 +69,13 @@ class User extends Authenticatable
         return $this->hasOne(Company::class, 'user_id');
     }
 
-    public function jobs()
+    // public function jobs()
+    // {
+    //     return $this->hasMany(JobListing::class, 'user_id');
+    // }
+
+    public function bio()
     {
-        return $this->hasMany(JobListing::class, 'user_id');
+        return $this->hasOne(UserBio::class, 'user_id');
     }
 }
