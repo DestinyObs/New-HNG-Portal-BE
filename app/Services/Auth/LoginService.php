@@ -21,7 +21,7 @@ class LoginService implements LoginInterface
      */
     public function attempt(array $credentials)
     {
-        if (! Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             throw new AuthenticationException(__('auth.failed'));
         }
 

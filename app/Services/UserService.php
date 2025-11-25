@@ -11,6 +11,7 @@ use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
 use App\Models\Company;
 use App\Models\OtpToken;
+use App\Models\User;
 use App\Models\UserBio;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\UserInterface;
@@ -45,10 +46,10 @@ class UserService implements UserInterface
                 ]);
             }
 
-            // Assign role string on user record
+            //? Assign role string on user record
             $data['current_role'] = RoleEnum::from($roleMap[$role]);
 
-            // Crate a user on the database
+            //? Crate a user on the database
             $user = $this->userRepository->create($data);
 
             $company = null;
