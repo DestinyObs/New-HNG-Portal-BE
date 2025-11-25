@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('othername')->nullable();
             $table->string('email')->unique();
             $table->string('phone')->nullable();
+            // $table->boolen('email_verification')->default(false);
             $table->date('dob')->nullable();
             $table->string('current_role')->default(RoleEnum::TALENT->value);
             $table->enum('status', ['banned', 'suspended', 'active'])->default('active');

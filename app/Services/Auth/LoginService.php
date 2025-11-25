@@ -27,12 +27,20 @@ class LoginService implements LoginInterface
 
         $user = Auth::user();
 
-        if ($user->has('company')) {
+        // Block login if email not verified
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout();
+
+            throw new AuthenticationException('Your email is not verified. Please verify your email to continue.');
+        }
+
+        // Load company if the user owns one
+        if ($user->relationLoaded('company') === false) {
             $user->load('company');
         }
 
         return collect([
-            'user' => $user,
+            'user'  => $user,
             'token' => $user->createToken('auth_token')->plainTextToken,
         ]);
     }
