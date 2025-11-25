@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Models\Company;
 use App\Models\JobListing;
 use App\Models\JobListingSkill;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,6 +38,7 @@ class JobRepository
                 'jobType',
                 'track',
                 'skills',
+                'jobLevels'
             ])
             ->first();
     }
@@ -52,21 +54,52 @@ class JobRepository
                 'jobType',
                 'track',
                 'skills',
+                'jobLevels'
             ]);
 
+        return $this->filterDatas($query, $filters, $perPage);
+    }
+
+
+    public function listDraftedJobs(string $companyUuid, int $perPage = 15, array $filters = [])
+    {
+        $query = JobListing::where('company_id', $companyUuid)
+            ->where('status', 'draft')
+            ->with([
+                'category',
+                'states',
+                'countries',
+                'category',
+                'jobType',
+                'track',
+                'skills',
+                'jobLevels'
+            ]);
+
+        return $this->filterDatas($query, $filters, $perPage);
+    }
+
+
+    private function filterDatas(Builder $query, array $filters, int $perPage): LengthAwarePaginator
+    {
         // apply simple filters if provided
-        if (! empty($filters['title'])) {
-            $query->where('title', 'like', '%'.$filters['title'].'%');
+        if (!empty($filters['title'])) {
+            $query->where('title', 'like', '%' . $filters['title'] . '%');
         }
-        if (! empty($filters['job_type_id'])) {
+        if (!empty($filters['job_type_id'])) {
             $query->where('job_type_id', $filters['job_type_id']);
         }
-        if (! empty($filters['category_id'])) {
+        if (!empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
+        }
+
+        if (!empty($filters['track_id'])) {
+            $query->where('track_id', $filters['track_id']);
         }
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
+
 
     public function checkIfCompanyIdExist(int|string $companyID): bool
     {
@@ -120,31 +153,49 @@ class JobRepository
             );
         }
 
+        // dd($data);
         // Update the existing draft
         $job->update($data);
 
         return $job;
     }
 
-    public function addJobSkills(array $skills, int|string $jobId): void
+    // public function addJobSkills(array $skills, int|string $jobId): void
+    // {
+    //     foreach ($skills as $skillId) {
+    //         // ? Skip if the skill is already attached to the job
+    //         $exists = JobListingSkill::where('job_listing_id', $jobId)
+    //             ->where('job_skill_id', $skillId)
+    //             ->exists();
+
+    //         if ($exists) {
+    //             continue;
+    //         }
+
+    //         // ? Attach new skill
+    //         JobListingSkill::create([
+    //             'job_listing_id' => $jobId,
+    //             'job_skill_id' => $skillId,
+    //         ]);
+    //     }
+    // }
+
+    public function addJobSkills(array $skills, string $jobId): void
     {
-        foreach ($skills as $skillId) {
-            // ? Skip if the skill is already attached to the job
-            $exists = JobListingSkill::where('job_listing_id', $jobId)
-                ->where('job_skill_id', $skillId)
-                ->exists();
+        $job = JobListing::findOrFail($jobId);
 
-            if ($exists) {
-                continue;
-            }
-
-            // ? Attach new skill
-            JobListingSkill::create([
-                'job_listing_id' => $jobId,
-                'job_skill_id' => $skillId,
-            ]);
-        }
+        // Sync the skills (job_skill_id column)
+        $job->skills()->sync($skills);
     }
+
+    public function addJobLevels(array $jobLevels, string $jobId)
+    {
+        $job = JobListing::findOrFail($jobId);
+
+        // Sync the job levels (job_level_id column)
+        $job->jobLevels()->sync($jobLevels);
+    }
+
 
     public function update(JobListing $job, array $data): JobListing
     {

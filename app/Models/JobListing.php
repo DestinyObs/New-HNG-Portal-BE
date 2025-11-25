@@ -24,6 +24,7 @@ class JobListing extends Model
         'company_id',
         'price',
         'track_id',
+        'job_level_id',
         'category_id',
         'work_mode_id',
         'job_type_id',
@@ -77,4 +78,21 @@ class JobListing extends Model
             'job_skill_id'
         );
     }
+
+
+    public function jobLevels()
+    {
+        return $this->belongsTo(JobLevel::class, 'job_level_id');
+    }
+
+
+    // public function jobLevels()
+    // {
+    //     return $this->belongsToMany(
+    //         JobLevel::class,
+    //         'job_listing_job_level',
+    //         'job_listing_id',
+    //         'job_level_id',
+    //     );
+    // }
 }

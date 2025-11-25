@@ -46,5 +46,6 @@ Route::controller(LookUpController::class)->group(function () {
         Route::get('work-modes', 'workModes');
         Route::get('states', 'states');
         Route::get('categories', 'categories');
+        Route::get('job-levels', 'jobLevels');
     });
 });

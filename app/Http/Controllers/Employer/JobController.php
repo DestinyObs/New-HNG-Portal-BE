@@ -26,9 +26,43 @@ class JobController extends Controller
     public function index(Request $request, $uuid): JsonResponse
     {
         $perPage = (int) $request->query('per_page', 15);
-        $result = $this->service->listForCompany($uuid, $request->only(['title', 'job_type_id', 'category_id']), $perPage);
+        $result = $this->service->listForCompany($uuid, $request->only(
+            ['title', 'job_type_id', 'category_id', 'track_id']
+        ), $perPage);
 
-        return response()->json($result);
+        return $this->successWithData(
+            $result,
+            "Jobs retrieved successfully.",
+            Http::OK,
+        );
+    }
+
+
+    /**
+     * GET /emplyer/company/{uuid}/jobs/draft
+     */
+
+    public function listDraftedJobs(Request $request, string $companyUuid)
+    {
+        // dd($request->all());
+        $perPage = (int) $request->query('per_page', 15);
+        $response = $this->service->listDraftedJobs($companyUuid, $request->only(
+            ['title', 'job_type_id', 'category_id', 'track_id']
+        ), $perPage);
+
+        // return response when passed
+        if ($response->status) {
+            return $this->successWithData(
+                $response->data,
+                $response->message,
+                $response->status
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
+        );
     }
 
     /**
