@@ -16,8 +16,6 @@ class GoogleAuthService implements GoogleAuthInterface
     {
         // Retrieve user info from Google using the token
 
-        dump('entering service');
-
         try {
             $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
             info('GOOGLE USER', ['user' => $googleUser]);
@@ -28,8 +26,6 @@ class GoogleAuthService implements GoogleAuthInterface
             throw new \Exception('An error occurred while authenticating with Google. Please try again later.');
         }
 
-        dump($googleUser);
-
         $googleUserData = [
             'email' => $googleUser->getEmail(),
             'name' => $googleUser->getName(),
@@ -38,13 +34,8 @@ class GoogleAuthService implements GoogleAuthInterface
 
         $email = $googleUserData['email'] ?? null;
 
-        dump($googleUserData);
-
-
         // Check if user exists
         $user = User::where('email', $email)->first();
-
-
 
         if ($user) {
             // LOGIN FLOW
