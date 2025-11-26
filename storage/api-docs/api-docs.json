@@ -286,6 +286,174 @@
                 }
             }
         },
+        "/talent/settings/work-experiences": {
+            "get": {
+                "operationId": "work-experiences.index",
+                "summary": "Display a listing of the resource",
+                "tags": [
+                    "ExperienceSetting"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "work-experiences.store",
+                "summary": "Store a newly created resource in storage",
+                "tags": [
+                    "ExperienceSetting"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WorkExperienceProfileSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/talent/settings/work-experiences/{id}": {
+            "get": {
+                "operationId": "work-experiences.show",
+                "summary": "Display the specified resource",
+                "tags": [
+                    "ExperienceSetting"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "work-experiences.update",
+                "summary": "Update the specified resource in storage",
+                "tags": [
+                    "ExperienceSetting"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WorkExperienceProfileSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "work-experiences.destroy",
+                "summary": "Remove the specified resource from storage",
+                "tags": [
+                    "ExperienceSetting"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/auth/forgot-password": {
             "post": {
                 "operationId": "forgotPassword.store",
@@ -389,7 +557,7 @@
         },
         "/employer/company/{uuid}/jobs": {
             "get": {
-                "operationId": "job.index",
+                "operationId": "employer.job.index",
                 "summary": "GET /employer/company/{uuid}/jobs",
                 "tags": [
                     "Job"
@@ -564,7 +732,7 @@
         },
         "/employer/company/{uuid}/jobs/{job_id}": {
             "get": {
-                "operationId": "job.show",
+                "operationId": "employer.job.show",
                 "tags": [
                     "Job"
                 ],
@@ -898,6 +1066,118 @@
                 }
             }
         },
+        "/talent/jobs": {
+            "get": {
+                "operationId": "talent.job.index",
+                "tags": [
+                    "Job"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/jobs/bookmark": {
+            "get": {
+                "operationId": "job.getSaveJobs",
+                "tags": [
+                    "Job"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/jobs/{jobId}": {
+            "get": {
+                "operationId": "talent.job.show",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "jobId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/jobs/{jobUuid}/bookmark": {
+            "put": {
+                "operationId": "job.saveJob",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "jobUuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/admin/job-types": {
             "get": {
                 "operationId": "admin.job-types.index",
@@ -1115,7 +1395,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "dd($data);",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1135,7 +1415,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "dd($data);",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1483,7 +1763,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "$user->userSkills()->sync($skill_ids['skill_ids']);",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3424,6 +3704,44 @@
                     "role"
                 ],
                 "title": "WaitlistRequest"
+            },
+            "WorkExperienceProfileSettingRequest": {
+                "type": "object",
+                "properties": {
+                    "job_title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "company_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "start_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "end_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "title": "WorkExperienceProfileSettingRequest"
             }
         },
         "responses": {
