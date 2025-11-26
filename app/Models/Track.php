@@ -9,4 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Track extends Model
 {
     use HasFactory, HasUuids;
+
+    public function jobListings()
+    {
+        return $this->hasMany(JobListing::class, 'track_id', 'id');
+    }
 }

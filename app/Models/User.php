@@ -27,6 +27,7 @@ class User extends Authenticatable
         'photo_url',
         'password',
         'current_role',
+        'email_verified_at',
     ];
 
     protected $hidden = ['password'];
@@ -82,5 +83,12 @@ class User extends Authenticatable
     public function bio()
     {
         return $this->hasOne(UserBio::class, 'user_id');
+    }
+
+
+    public function bookmarks()
+    {
+        return $this->belongsToMany(JobListing::class, 'bookmarked_jobs', 'user_id', 'job_listing_id')
+            ->withTimestamps();
     }
 }

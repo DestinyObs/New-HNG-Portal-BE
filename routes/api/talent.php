@@ -2,6 +2,8 @@
 
 // ? API routes for talent functionalities
 
+use App\Http\Controllers\Talent\JobController;
+use App\Http\Controllers\Talent\ExperienceSettingController;
 use App\Http\Controllers\Talent\ProfileController;
 use App\Http\Controllers\Talent\ProfileSettingController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
@@ -28,16 +30,29 @@ Route::prefix('api/talent')->group(function () {
             Route::get('onboarding', 'index');
             Route::post('onboarding', 'store');
         });
+
+
+        // Talent JobController
+        Route::controller(JobController::class)->group(function () {
+            Route::prefix('jobs')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/bookmark', 'getSaveJobs');
+                Route::get('/{jobId}', 'show');
+                Route::put('/{jobId}/bookmark', 'saveJob');
+            });
+        });
     });
 
 
     Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
-        // Talent Onboarding
+        // TALENT Profile Settings
         Route::controller(ProfileSettingController::class)->group(function () {
             Route::get('profile', 'index');
             Route::post('profile', 'store');
             Route::post('skills', 'skill');
             Route::post('profile', 'store');
         });
-    });    
+        // TALENT Experiences
+        Route::apiResource('work-experiences', ExperienceSettingController::class);
+    });
 });

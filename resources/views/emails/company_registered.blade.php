@@ -1,16 +1,16 @@
 <x-mail::message>
-# Welcome to HNG Portal, {{ $company->name }}!
+# Welcome to {{ config('app.name')  }}, {{ $company->name }}!
 
 Your company account has been successfully created on {{ $user->created_at->format('jS \o\f F, Y') }}.
 
 ## Company Details
 
-**Company Name:** {{ $company->name }}  
+**Company Name:** {{ $company->name }}
 **Official Email:** {{ $company->official_email }}
 
 ## Account Information
 
-**Account Holder:** {{ $user->firstname }} {{ $user->lastname }}  
+**Account Holder:** {{ $user->firstname }} {{ $user->lastname }}
 **Email:** {{ $user->email }}
 
 We are glad to have your company on our platform and we will give you all the support you need.
