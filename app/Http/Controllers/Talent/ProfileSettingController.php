@@ -15,7 +15,7 @@ class ProfileSettingController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $user_bio = UserBio::where('user_id', $user->id)->first();
+        $user_bio = UserBio::where('user_id', $user->id)->firstOrFail();
         $user_bio->load('user', 'user.skills');
         $user_bio->getMedia();
 
@@ -33,7 +33,10 @@ class ProfileSettingController extends Controller
 
     public function experience(WorkExperienceProfileSettingRequest $request)
     {
-        return $request;
+        $data = $request->validated();
+        $user = $request->user();
+        return $experience = $user->experiences()->create();
+
     }
 
     public function store(ProfileSettingRequest $request)
@@ -53,6 +56,4 @@ class ProfileSettingController extends Controller
 
         return $this->successWithData($user_bio, 'User profile updated successfully');
     }
-
-
 }
