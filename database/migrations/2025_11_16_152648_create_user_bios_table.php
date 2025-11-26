@@ -25,6 +25,11 @@ return new class extends Migration
             $table->foreign('cv_id')->references('id')->on('media_assets')->onDelete('set null');
             $table->string('current_role')->nullable();
             $table->text('bio')->nullable();
+
+            $table->string('experience')->nullable();
+            $table->string('available_status')->nullable();
+            $table->string('job_type_preference')->nullable();
+
             $table->string('project_name')->nullable();
             $table->string('project_url')->nullable();
             $table->string('state')->nullable();
