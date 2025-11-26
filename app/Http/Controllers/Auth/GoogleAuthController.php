@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
+use App\Http\Resources\UserResource;
 
 class GoogleAuthController extends Controller
 {
@@ -21,11 +22,36 @@ class GoogleAuthController extends Controller
                 $data['company_name'] ?? null,
             );
 
-            // Normal success path
-            return $this->successWithData(
-                $result,
-                $result['message'] ?? 'Authentication successful'
-            );
+
+            if (!is_array($result)) {
+                // Wrap user
+                $user = new UserResource($result);
+
+                // Eager load relationships
+                $user->load([
+                    'company',
+                    'bio',
+                    'skills',
+                    'experiences',
+                    'verification',
+                    'preferences',
+                ]);
+
+                // Build response
+                $response = [
+                    'user'  => $user,
+                    'token' => $user->createToken('auth_token')->plainTextToken,
+                ];
+            } else {
+                return $this->successWithData([
+                    'user' => $result,
+                ], 'Authentication successful!');
+            }
+
+            return $this->successWithData([
+                'user' => $response['user'],
+                'token' => $response['token'],
+            ], 'Authentication successful!');
 
         } catch (\InvalidArgumentException $e) {
             return $this->error($e->getMessage());

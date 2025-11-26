@@ -12,7 +12,7 @@ class GoogleAuthService implements GoogleAuthInterface
 {
     public function __construct(protected UserInterface $userService) {}
 
-    public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array|\Exception
+    public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array | User | \Exception
     {
         // Retrieve user info from Google using the token
 
@@ -39,12 +39,8 @@ class GoogleAuthService implements GoogleAuthInterface
 
         if ($user) {
             // LOGIN FLOW
-            $token = $user->createToken('auth_token')->plainTextToken;
-            dump($googleUserData);
-            return [
-                'user' => $user,
-                'token' => $token,
-            ];
+
+            return $user;
         }
 
         // SIGNUP FLOW
@@ -60,6 +56,7 @@ class GoogleAuthService implements GoogleAuthInterface
             'email' => $email,
             'password' => $generatedPassword,
             'role' => $role,
+            'email_verified_at' => now(),
         ];
 
         if ($role === 'talent') {
