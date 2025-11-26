@@ -1,18 +1,18 @@
 <x-mail::message>
 # Hi {{ $user->first_name }},
 
-We received a request to reset your password. Click the button below to reset your password.
+We received a request to reset your password for your {{ config('app.name') }} account. Click the button below to create a new password.
 
 <x-mail::button :url="$url">
-Reset your password
+Reset Password
 </x-mail::button>
 
-If you did not request a password reset, please ignore this email. Your password will remain unchanged.
+If you didn't request a password reset, please ignore this email. Your current password will remain unchanged.
 
-For security purposes, this link will expire in {{ now()->diffInMinutes($duration) }} minutes.
+For security reasons, this reset link will expire in {{ now()->diffInMinutes($duration) }} minutes.
 
-If you have any questions or need further assistance, please contact our support team.
+If you have any questions or need assistance, please contact our support team.
 
-Warm Regards,<br>
-{{ config('app.name') }} Team.
+Best regards,<br>
+The {{ config('app.name') }} Team
 </x-mail::message>
