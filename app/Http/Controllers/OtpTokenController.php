@@ -27,7 +27,7 @@ class OtpTokenController extends Controller
     {
 
         $user = $request->user();
-        dd($user);
+        // dd($user);
         if ($user->hasVerifiedEmail()) {
             return $this->success(
                 'Account has already been verified!.',

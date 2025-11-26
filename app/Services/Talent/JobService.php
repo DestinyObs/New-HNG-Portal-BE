@@ -51,8 +51,18 @@ class JobService implements JobServiceInterface
     {
         try {
             $job = $this->jobRepository->getJob($jobUuid);
-            // dd($job);
-            logger()->info("Job retrievd successfully");
+
+            if (!$job) {
+                logger()->warning("Job not found: {$jobUuid}");
+
+                return (object) [
+                    'success' => false,
+                    'message' => 'Job not found',
+                    'status' => Http::NOT_FOUND,
+                ];
+            }
+
+            logger()->info("Job retrieved successfully");
 
             return (object) [
                 'success' => true,
