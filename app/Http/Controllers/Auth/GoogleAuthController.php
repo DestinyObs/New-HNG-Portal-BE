@@ -16,45 +16,34 @@ class GoogleAuthController extends Controller
         $data = $request->validated();
 
         try {
+            // Always returns: ['user' => model, 'token' => token]
             $result = $this->googleAuthService->handle(
                 $data['google_token'],
                 $data['role'] ?? null,
-                $data['company_name'] ?? null,
+                $data['company_name'] ?? null
             );
 
+            // Wrap user in resource
+            $user = new UserResource($result['user']);
 
-            if (!is_array($result)) {
-                // Wrap user
-                $user = new UserResource($result);
-
-                // Eager load relationships
-                $user->load([
-                    'company',
-                    'bio',
-                    'skills',
-                    'experiences',
-                    'verification',
-                    'preferences',
-                ]);
-
-                // Build response
-                $response = [
-                    'user'  => $user,
-                    'token' => $user->createToken('auth_token')->plainTextToken,
-                ];
-            } else {
-                return $this->successWithData([
-                    'user' => $result,
-                ], 'Authentication successful!');
-            }
+            // Eager load relationships
+            $result['user']->load([
+                'company',
+                'bio',
+                'skills',
+                'experiences',
+                'verification',
+                'preferences',
+            ]);
 
             return $this->successWithData([
-                'user' => $response['user'],
-                'token' => $response['token'],
+                'user'  => $user,
+                'token' => $result['token'],
             ], 'Authentication successful!');
 
         } catch (\InvalidArgumentException $e) {
             return $this->error($e->getMessage());
         }
     }
+
 }
