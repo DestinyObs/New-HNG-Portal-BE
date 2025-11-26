@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,18 +26,22 @@ class User extends Authenticatable
         'status',
         'photo_url',
         'password',
+        'current_role',
     ];
 
     protected $hidden = ['password'];
 
     protected $with = [
-        'roles', 'permissions',
+        'roles',
+        'permissions'
     ];
 
     protected $casts = [
         'dob' => 'date',
         'password' => 'hashed',
+        'current_role' => RoleEnum::class
     ];
+
 
     // Relationships
     public function skills()
@@ -64,8 +69,13 @@ class User extends Authenticatable
         return $this->hasOne(Company::class, 'user_id');
     }
 
-    public function jobs()
+    // public function jobs()
+    // {
+    //     return $this->hasMany(JobListing::class, 'user_id');
+    // }
+
+    public function bio()
     {
-        return $this->hasMany(JobListing::class, 'user_id');
+        return $this->hasOne(UserBio::class, 'user_id');
     }
 }

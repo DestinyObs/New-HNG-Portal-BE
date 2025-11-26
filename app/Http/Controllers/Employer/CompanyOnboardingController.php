@@ -40,4 +40,17 @@ class CompanyOnboardingController extends Controller
 
         return $this->successWithData($company, 'Company updated successfully');
     }
+
+
+    // implement onboarding status
+    public function onBoardingStatus(array $data){
+        $status = false;
+        foreach($data as $record){
+            if($record == null){
+                $status = false;
+            }else{
+                $status = true;
+            }
+        }
+    }
 }

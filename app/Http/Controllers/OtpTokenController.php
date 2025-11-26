@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enums\Http;
 use App\Http\Requests\OtpTokenRequest;
+use App\Http\Resources\UserResource;
 use App\Mail\CompanyRegistered;
 use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
 use App\Models\Company;
 use App\Models\OtpToken;
 use App\Models\User;
+use App\Services\Interfaces\Auth\LoginInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -17,10 +19,15 @@ use Illuminate\Support\Str;
 
 class OtpTokenController extends Controller
 {
+    public function __construct(
+        private readonly LoginInterface $loginService
+    ) {}
+
     public function verifyOtp(OtpTokenRequest $request)
     {
 
         $user = $request->user();
+        dd($user);
         if ($user->hasVerifiedEmail()) {
             return $this->success(
                 'Account has already been verified!.',
@@ -31,7 +38,7 @@ class OtpTokenController extends Controller
         $plainOtp = $request->input('otp');
         $hashedOtp = OtpToken::where('user_id', $user->id)->first();
 
-        if (! $hashedOtp || $hashedOtp->expired_at < now()) {
+        if (!$hashedOtp || $hashedOtp->expired_at < now()) {
             // Error invalid otp or Expired token
             return $this->error(
                 'OTP is invalid or has expired.',
@@ -42,7 +49,7 @@ class OtpTokenController extends Controller
         // OTP is valid
         if (Hash::check($plainOtp, $hashedOtp->hashed_token)) {
             // And mark the OTP as used or delete it
-            if (! $user->hasVerifiedEmail()) {
+            if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
             }
 
@@ -57,11 +64,24 @@ class OtpTokenController extends Controller
             // Delete Otp
             $hashedOtp->delete();
 
-            //  Successful response
-            return $this->success(
-                'OTP verified successfully.',
-                Http::OK,
+            $response = $this->loginService->attempt(
+                $user,
             );
+            // dd($response['user']);
+
+            $user = new UserResource($response['user']);
+
+
+            //  Successful response
+            // return $this->success(
+            //     'OTP verified successfully.',
+            //     Http::OK,
+            // );
+
+            return $this->successWithData([
+                'user' => $user,
+                'token' => $response['token'],
+            ], 'OTP verified successfully.');
         } else {
             // OTP is invalid
             return $this->error(
@@ -74,7 +94,7 @@ class OtpTokenController extends Controller
     public function resendOtp(Request $request)
     {
         $user = $request->user();
-        if ($user->hasVerifiedEmail()) {
+        if ($user->email_verification) {
             return $this->success(
                 'Account has already been verified!.',
                 Http::OK,
@@ -88,7 +108,7 @@ class OtpTokenController extends Controller
         // ? Send email to user (commented out for now)
         Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
 
-        return $user;
+        return new UserResource($user);
     }
 
     /**

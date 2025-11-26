@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Auth;
 
+use App\Http\Resources\UserResource;
 use App\Services\Interfaces\Auth\LoginInterface;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Collection;
@@ -21,18 +22,28 @@ class LoginService implements LoginInterface
      */
     public function attempt(array $credentials)
     {
-        if (! Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             throw new AuthenticationException(__('auth.failed'));
         }
 
         $user = Auth::user();
 
-        if ($user->has('company')) {
-            $user->load('company');
+        // Block login if email not verified
+        if (!$user->hasVerifiedEmail()) {
+            throw new AuthenticationException('Your email is not verified. Please verify your email to continue.');
         }
 
+        $user->load([
+            'company',
+            'bio',
+            'skills',
+            'experiences',
+            'verification',
+            'preferences',
+        ]);
+
         return collect([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $user->createToken('auth_token')->plainTextToken,
         ]);
     }

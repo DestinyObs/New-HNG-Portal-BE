@@ -1,0 +1,75 @@
+name: Deploy Laravel Backend to Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-deploy:
+    runs-on: [self-hosted, hng-13-runner, linux]
+    steps:
+      - name: Install sshpass
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y sshpass || true
+
+      - name: Prepare SSH and Known Hosts
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Git Operations on Remote
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git fetch origin && git reset --hard origin/staging && git clean -fd"
+
+      - name: Install Composer Dependencies
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
+
+      - name: Laravel Cache and Optimize
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize"
+
+      - name: Run Migrations
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate:fresh --force && php artisan db:seed --force"
+
+      - name: Restart Backend Service
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "sudo systemctl daemon-reload && sudo systemctl restart staging-backend && sudo systemctl status staging-backend --no-pager"
+
+      - name: Notify Deployment Status
+        if: always()
+        run: echo "Staging deployment finished."

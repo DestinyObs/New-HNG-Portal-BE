@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\RoleEnum;
 use App\Enums\Status;
+use App\Http\Resources\UserResource;
 use App\Mail\CompanyRegistered;
 use App\Mail\OtpVerification;
 use App\Mail\UserRegistered;
 use App\Models\Company;
 use App\Models\OtpToken;
+use App\Models\User;
 use App\Models\UserBio;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\UserInterface;
@@ -26,7 +29,8 @@ class UserService implements UserInterface
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function create(array $data, array $meta = []): array|Exception
     {
@@ -38,11 +42,13 @@ class UserService implements UserInterface
                 'company' => 'employer',
             ];
 
-            if (! isset($roleMap[$role])) {
+            if (!isset($roleMap[$role])) {
                 throw ValidationException::withMessages([
                     'role' => ['Invalid role provided.'],
                 ]);
             }
+
+            $data['current_role'] = RoleEnum::from($roleMap[$role]);
 
             $user = $this->userRepository->create($data);
 
@@ -53,6 +59,7 @@ class UserService implements UserInterface
                     throw new Exception('Company already exists');
                 }
 
+                // Create a company for employer
                 $company = Company::create([
                     'user_id' => $user->id,
                     'name' => $data['company_name'],
@@ -62,25 +69,20 @@ class UserService implements UserInterface
                     'is_verified' => 0,
                 ]);
             } else {
+                // Create a user bio for talent
                 $userBio = UserBio::create([
                     'user_id' => $user->id,
-                    'current_role',
-                    'bio',
-                    'track_id',
-                    'project_name',
-                    'project_url',
+                    'current_role' => $data['current_role'] ?? null,
+                    'bio' => $data['bio'] ?? null,
+                    'track_id' => $data['track_id'] ?? null,
+                    'project_name' => $data['project_name'] ?? null,
+                    'project_url' => $data['project_url'] ?? null,
                 ]);
             }
 
+            // Assign role object to user
             $user->assignRole($roleMap[$role]);
 
-            // if ($role == 'company' && $company) {
-            //     Mail::to($company->official_email)->send(new CompanyRegistered($user, $company));
-            // } else {
-            //     Mail::to($user->email)->send(new UserRegistered($user));
-            // }
-
-            // ? Generate OTP for user and store in otp_tokens
             $otpCode = $this->generateOtp($user);
 
             // ? Send email to user (commented out for now)
@@ -92,12 +94,17 @@ class UserService implements UserInterface
                 'password' => $data['password'],
             ];
 
-            if (! Auth::attempt($credentials)) {
+            if (!Auth::attempt($credentials)) {
                 throw new AuthenticationException(__('auth.failed'));
             }
 
+            $user->load([
+                'company',
+                'bio',
+            ]);
+
             $userCredentials = [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'token' => $user->createToken('auth_token')->plainTextToken,
             ];
 

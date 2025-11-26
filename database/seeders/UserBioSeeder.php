@@ -29,6 +29,8 @@ class UserBioSeeder extends Seeder
                 'user_id' => $user->id,
                 'track_id' => $tracks->isNotEmpty() ? $tracks->random() : null,
                 'cv_id' => MediaAsset::factory(),
+                'state' => 'lagos',
+                'country' => 'nigeria'
             ]);
         }
     }

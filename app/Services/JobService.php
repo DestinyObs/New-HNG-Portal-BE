@@ -23,9 +23,47 @@ class JobService
             'title' => $params['title'] ?? null,
             'job_type_id' => $params['job_type_id'] ?? null,
             'category_id' => $params['category_id'] ?? null,
+            'track_id' => $params['track_id'] ?? null,
         ];
 
         return $this->repo->listForCompany($companyUuid, $perPage, $filters);
+    }
+
+
+    public function listDraftedJobs(
+        string $companyUuid,
+        array $params = [],
+        int $perPage = 15
+    ): object|array {
+        $filters = [
+            'title' => $params['title'] ?? null,
+            'job_type_id' => $params['job_type_id'] ?? null,
+            'category_id' => $params['category_id'] ?? null,
+            'track_id' => $params['track_id'] ?? null,
+        ];
+
+        try {
+            $listedDrafts = $this->repo->listDraftedJobs(
+                $companyUuid,
+                $perPage,
+                $filters
+            );
+
+            return (object) [
+                'success' => true,
+                'data' => $listedDrafts,
+                'message' => 'Drafted jobs retrive successfully',
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            logger()->error('Failed to retrieve drafted jobs: ' . $e->getMessage());
+
+            return (object) [
+                'success' => false,
+                'message' => 'Unabled to retrieve drafted jobs',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
     }
 
     public function getForCompany(string $companyUuid, string $jobId): ?JobListing
@@ -67,7 +105,7 @@ class JobService
             // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error('Unable to add job: '.$e->getMessage());
+            logger()->error('Unable to add job: ' . $e->getMessage());
 
             return (object) [
                 'success' => false,
@@ -120,6 +158,7 @@ class JobService
                     'jobType',
                     'track',
                     'skills',
+                    'jobLevels'
                 ]),
             ];
 
@@ -128,7 +167,7 @@ class JobService
             // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error('Unable to save job: '.$e->getMessage());
+            logger()->error('Unable to save job: ' . $e->getMessage());
 
             return (object) [
                 'success' => false,
@@ -161,7 +200,7 @@ class JobService
             // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error('Unable to save job to update job: '.$e->getMessage());
+            logger()->error('Unable to save job to update job: ' . $e->getMessage());
 
             return false;
         }

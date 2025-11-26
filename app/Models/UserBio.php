@@ -19,6 +19,8 @@ class UserBio extends Model implements HasMedia
         'track_id',
         'project_name',
         'project_url',
+        'state',
+        'country'
     ];
 
     /**
