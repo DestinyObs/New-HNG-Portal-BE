@@ -3,6 +3,7 @@
 // ? API routes for talent functionalities
 
 use App\Http\Controllers\Talent\ProfileController;
+use App\Http\Controllers\Talent\ProfileSettingController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,15 @@ Route::prefix('api/talent')->group(function () {
             Route::post('onboarding', 'store');
         });
     });
+
+
+    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
+        // Talent Onboarding
+        Route::controller(ProfileSettingController::class)->group(function () {
+            Route::get('profile', 'index');
+            Route::post('profile', 'store');
+            Route::post('skills', 'skill');
+            Route::post('profile', 'store');
+        });
+    });    
 });
