@@ -310,7 +310,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Normal success path",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {

@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": ["${APP_URL}", "http://localhost:8000", "https://api.staging.takeda.emerj.net", "https://api.takeda.emerj.net"]
+            "url": "http://localhost/api"
         }
     ],
     "paths": {
@@ -310,7 +310,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Normal success path",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
