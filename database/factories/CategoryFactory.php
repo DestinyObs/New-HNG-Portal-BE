@@ -8,8 +8,11 @@ class CategoryFactory extends Factory
 {
     public function definition(): array
     {
+        $name = fake()->word() . ' ' . fake()->randomNumber(3);
+
         return [
-            'name' => fake()->word().' '.fake()->randomNumber(3),
+            'name' => $name,
+            'slug' => \Illuminate\Support\Str::slug($name),
         ];
     }
 }

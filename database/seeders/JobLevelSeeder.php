@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\JobLevel;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class JobLevelSeeder extends Seeder
 {
+
     public function run(): void
     {
         $levels = [
@@ -25,14 +27,14 @@ class JobLevelSeeder extends Seeder
         ];
 
         foreach ($levels as $level) {
-            DB::table('job_levels')->insert([
-                'id'          => Str::uuid(),
-                'name'        => $level,
-                'slug'        => Str::slug($level),
-                'description' => $level . " job position",
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ]);
+            JobLevel::firstOrCreate(
+                ['name' => $level],  // unique column
+                [
+                    'id' => Str::uuid(),
+                    'slug' => Str::slug($level),
+                    'description' => $level . " job position",
+                ]
+            );
         }
     }
 }

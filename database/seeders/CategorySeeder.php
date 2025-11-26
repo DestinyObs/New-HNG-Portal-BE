@@ -25,11 +25,10 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::factory()->create(
-                [
-                    'name' => $category['name'],
-                ]
-            );
+            Category::factory()->create([
+                'name' => $category['name'],
+                'slug' => \Illuminate\Support\Str::slug($category['name']),
+            ]);
         }
     }
 }

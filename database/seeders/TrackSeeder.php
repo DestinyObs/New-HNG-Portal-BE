@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Track;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class TrackSeeder extends Seeder
 {
@@ -25,6 +26,7 @@ class TrackSeeder extends Seeder
         ];
 
         foreach ($tracks as $track) {
+            $track['slug'] = Str::slug($track['name']);
             Track::factory()->create($track);
         }
     }

@@ -2,6 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\CountryResource;
+use App\Http\Resources\JobLevelResource;
+use App\Http\Resources\JobTypeResource;
+use App\Http\Resources\SkillResource;
+use App\Http\Resources\StateResource;
+use App\Http\Resources\TrackResource;
+use App\Http\Resources\WorkModeResource;
 use App\Services\Admin\CategoryService;
 use App\Services\Admin\CountryService;
 use App\Services\Admin\JobLevelService;
@@ -33,8 +41,9 @@ class LookUpController extends Controller
             return $this->error($response->message, $response->status);
         }
 
+        $countries = CountryResource::collection($response->data);
         return $this->successWithData(
-            $response->data,
+            $countries,
             $response->message,
             $response->status,
         );
@@ -47,8 +56,9 @@ class LookUpController extends Controller
             return $this->error($response->message, $response->code);
         }
 
+        $tracks = TrackResource::collection($response->data);
         return $this->successWithData(
-            $response->data,
+            $tracks,
             $response->message,
             $response->status,
         );
@@ -61,8 +71,9 @@ class LookUpController extends Controller
             return $this->error($response->message, $response->status);
         }
 
+        $states = StateResource::collection($response->data);
         return $this->successWithData(
-            $response->data,
+            $states,
             $response->message,
             $response->status,
         );
@@ -73,7 +84,8 @@ class LookUpController extends Controller
         $data = $this->skillService->getAllSkills();
 
         // dd($data);
-        return $this->successWithData($data, 'Skills retrieved successfully');
+        $skils = SkillResource::collection($data);
+        return $this->successWithData($skils, 'Skills retrieved successfully');
     }
 
     public function workModes()
@@ -83,8 +95,9 @@ class LookUpController extends Controller
             return $this->error($response->message, $response->status);
         }
 
+        $workmodes = WorkModeResource::collection($response->data);
         return $this->successWithData(
-            $response->data,
+            $workmodes,
             $response->message,
             $response->status,
         );
@@ -97,8 +110,9 @@ class LookUpController extends Controller
             return $this->error($response->message, $response->status);
         }
 
+        $categories = CategoryResource::collection($response->data);
         return $this->successWithData(
-            $response->data,
+            $categories,
             $response->message,
             $response->status,
         );
@@ -109,13 +123,23 @@ class LookUpController extends Controller
         $data = $this->jobTypeService->getAllJobTypes();
 
         // dd($data);
-        return $this->successWithData($data, 'Job types retrieved successfully');
+        $categories = JobTypeResource::collection($data);
+        return $this->successWithData($categories, 'Job types retrieved successfully');
     }
 
 
     public function jobLevels()
     {
-        $data = $this->joblevelService->getAllJobLevels();
-        return $this->successWithData($data, 'Job levels retrieved successfully');
+        $response = $this->joblevelService->getAllJobLevels();
+        if ($response->success === false) {
+            return $this->error($response->message, $response->status);
+        }
+
+        $jobLevels = JobLevelResource::collection($response->data);
+        return $this->successWithData(
+            $jobLevels,
+            $response->message,
+            $response->status,
+        );
     }
 }

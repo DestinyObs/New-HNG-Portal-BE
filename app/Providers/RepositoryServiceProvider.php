@@ -20,9 +20,11 @@ use App\Repositories\Interfaces\Admin\LocationRepositoryInterface;
 use App\Repositories\Interfaces\Admin\StateRepositoryInterface;
 use App\Repositories\Interfaces\Admin\TrackRepositoryInterface;
 use App\Repositories\Interfaces\Admin\WorkModeRepositoryInterface;
+use App\Repositories\Interfaces\Talent\JobRepositoryInterface;
 use App\Repositories\Interfaces\Talent\ProfileRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\JobRepository;
+use App\Repositories\Talent\JobRepository as TalentJobRepository;
 use App\Repositories\Talent\ProfileRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Model;
@@ -53,6 +55,7 @@ class RepositoryServiceProvider extends ServiceProvider
         CountryRepositoryInterface::class => CountryRepository::class,
         StateRepositoryInterface::class => StateRepository::class,
         JobLevelRepositoryInterface::class => JobLevelRepository::class,
+        JobRepositoryInterface::class => TalentJobRepository::class,
 
     ];
 
