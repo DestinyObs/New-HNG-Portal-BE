@@ -7,8 +7,6 @@ use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\UserInterface;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-
 
 class GoogleAuthService implements GoogleAuthInterface
 {
@@ -62,9 +60,13 @@ class GoogleAuthService implements GoogleAuthInterface
         if ($role === 'company') {
             $data['company_name'] = $companyName ?? $googleUser->getName();
         }
-        
 
-        return $this->userService->create($data);
+
+        $result = $this->userService->create($data);
+
+        $result['user'] = $result['user']->resource;
+
+        return $result;
     }
 
 }

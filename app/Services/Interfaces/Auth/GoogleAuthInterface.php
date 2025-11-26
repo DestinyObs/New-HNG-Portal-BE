@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services\Interfaces\Auth;
-use App\Models\User;
 
 interface GoogleAuthInterface
 {
