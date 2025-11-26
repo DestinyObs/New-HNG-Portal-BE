@@ -11,7 +11,7 @@ If you didn't request a password reset, please ignore this email. Your current p
 
 For security reasons, this reset link will expire in {{ now()->diffInMinutes($duration) }} minutes.
 
-If you have any questions or need assistance, please contact our support team.
+If you have any questions or need assistance, please contact our support team at {{ config('mail.from.address') }}.
 
 Best regards,<br>
 The {{ config('app.name') }} Team

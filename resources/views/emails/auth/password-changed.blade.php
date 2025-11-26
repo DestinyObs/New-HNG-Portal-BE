@@ -1,10 +1,22 @@
 <x-mail::message>
-# Hi {{ $user->firstname ?? $user->company->name }},
+# Password Update Confirmation
 
-We wanted to let you know that your password was successfully changed.
+This is a confirmation that your password has been successfully updated.
 
-If you did not make this change or if you believe an unauthorized person has accessed your account, please reset your password immediately and contact our support team.
+**Account:** {{ $user->email }}
+**Date:** {{ now()->format('F j, Y \a\t g:i A T') }}
 
-Warm regards,<br>
-{{ config('app.name') }} Team.
+If you did not make this change, please contact our support team immediately to secure your account.
+
+<x-mail::button :url="config('app.url')">
+Access Your Account
+</x-mail::button>
+
+For security reasons, if you suspect any unauthorized activity, please reset your password immediately and notify our support team.
+
+Best regards,<br>
+The {{ config('app.name') }} Team
+
+---
+**Contact Support:** {{ config('mail.from.address') }}
 </x-mail::message>
