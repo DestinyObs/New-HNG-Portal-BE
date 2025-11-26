@@ -39,7 +39,7 @@ jobs:
           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
           APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
 
       - name: Laravel Cache and Optimize
         env:
@@ -56,7 +56,6 @@ jobs:
           APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate --force"
-
 
       - name: Restart Backend Service
         env:
@@ -86,7 +85,7 @@ jobs:
           APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
         run: |
           echo "Deployment failed. Rolling back to previous release..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git checkout HEAD@{1} && /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize && php artisan migrate --force && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git checkout HEAD@{1} && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize && php artisan migrate --force && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
           echo "Rollback completed. Please investigate deployment failure."
 
       - name: Notify Deployment Status
