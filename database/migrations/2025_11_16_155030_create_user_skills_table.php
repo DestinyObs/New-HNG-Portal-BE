@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('user_skills', function (Blueprint $table) {
             $table->uuid('id')->primary(); // causing error during sync
-            // $table->primary(['user_id', 'skill_id']);  
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->uuid('skill_id');
