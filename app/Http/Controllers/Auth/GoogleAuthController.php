@@ -3,32 +3,32 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
-use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
-    public function __construct(
-        private readonly GoogleAuthInterface $googleService
-    ) {}
+    public function __construct(private readonly GoogleAuthInterface $googleAuthService) {}
 
-    public function redirectToGoogle()
+    public function handle(GoogleAuthRequest $request)
     {
-        return Socialite::driver('google')
-            ->stateless()
-            ->redirect(); 
-    }
+        $data = $request->validated();
 
-    // Step 2: Handle Google callback
-    public function handleGoogleCallback()
-    {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        try {
+            $result = $this->googleAuthService->handle(
+                $data['google_token'],
+                $data['role'] ?? null,
+                $data['company_name'] ?? null,
+            );
 
-        $response = $this->googleService->handle($googleUser);
+            // Normal success path
+            return $this->successWithData(
+                $result,
+                $result['message'] ?? 'Authentication successful'
+            );
 
-        return $this->successWithData([
-            'user'  => $response['user'],
-            'token' => $response['token'],
-        ], 'Login successful');
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage());
+        }
     }
 }

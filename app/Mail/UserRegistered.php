@@ -1,9 +1,9 @@
 <?php
+
 namespace App\Mail;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -14,14 +14,12 @@ class UserRegistered extends Mailable
 {
     use Queueable, SerializesModels;
 
-  
-
     /**
      * Create a new message instance.
      *
-     * @param string $user  the user.
+     * @param  string  $user  the user.
      */
-     public function __construct( 
+    public function __construct(
         public readonly User $user
     ) {}
 
@@ -31,11 +29,11 @@ class UserRegistered extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-        subject: 'Registration Information',
-        from: new Address(
-            address: 'security@hng.tech',
-        )
-    );
+            subject: 'Registration Information',
+            from: new Address(
+                address: 'security@hng.tech',
+            )
+        );
     }
 
     /**

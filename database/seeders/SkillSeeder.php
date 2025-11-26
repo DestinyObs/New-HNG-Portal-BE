@@ -44,4 +44,3 @@ class SkillSeeder extends Seeder
         }
     }
 }
-

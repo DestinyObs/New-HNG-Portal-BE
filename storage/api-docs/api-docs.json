@@ -1125,89 +1125,114 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
-      "get": {
-        "summary": "Redirect to Google OAuth",
-        "description": "Initiates Google OAuth flow and redirects to Google's authentication page.",
-        "tags": [
-          "Authentication"
-        ],
-        "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
+    "/api/auth/google": {
+      "post": {
+        "summary": "Authenticate or Register a user via Google-provided data",
+        "description": "Handles Google-based authentication using the email and profile data sent from the frontend. If the email already exists, the user is logged in. If the email does not exist, a new account is created based on the provided `role` and optional `company_name`.",
+        "tags": ["Authentication"],
+
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "name"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User email received from Google profile.",
+                    "example": "johndoe@gmail.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "User full name from Google profile.",
+                    "example": "John Doe"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "nullable": true,
+                    "description": "Required ONLY for new users. Ignored for existing users.",
+                    "example": "talent"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Required ONLY when signing up as a company. If not provided, backend infers from `name`.",
+                    "example": "Acme Corp"
+                  }
+                }
+              },
+
+              "examples": {
+                "existing-user-login": {
+                  "summary": "Existing user login — no role required",
+                  "value": {
+                    "email": "existing@example.com",
+                    "name": "Existing User"
+                  }
                 },
-                "description": "URL to Google OAuth page"
+                "new-talent-signup": {
+                  "summary": "New talent user signup",
+                  "value": {
+                    "email": "newtalent@example.com",
+                    "name": "Jane Talent",
+                    "role": "talent"
+                  }
+                },
+                "new-company-signup": {
+                  "summary": "New company user signup",
+                  "value": {
+                    "email": "hr@acme.com",
+                    "name": "Acme Corporation",
+                    "role": "company",
+                    "company_name": "Acme Corporation"
+                  }
+                }
               }
             }
           }
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Handle Google OAuth callback",
-        "description": "Processes Google OAuth callback and returns user data with access token.",
-        "tags": [
-          "Authentication"
-        ],
-        "parameters": [
-          {
-            "name": "code",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Authorization code from Google"
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "State parameter for CSRF protection"
-          }
-        ],
+        },
+
         "responses": {
           "200": {
-            "description": "Google OAuth login successful",
+            "description": "Login success — existing user returned with token.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "201": {
+            "description": "Signup success — new user created and returned with token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
           "400": {
-            "description": "Invalid OAuth callback",
+            "description": "Bad request — missing fields or invalid payload.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/Error" }
               }
             }
           },
-          "401": {
-            "description": "OAuth authentication failed",
+          "422": {
+            "description": "Validation failed — missing role for new user, invalid company signup data, etc.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
               }
             }
           }
         }
       }
     },
+
     "/api/auth/login": {
       "post": {
         "summary": "User login",

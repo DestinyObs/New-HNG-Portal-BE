@@ -2,17 +2,17 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository
 {
-     public function __construct(
-          protected readonly Model $model
-     ) {}
+    public function __construct(
+        protected readonly Model $model
+    ) {}
 
-     protected function query(): Builder
-     {
-          return $this->model->query();
-     }
+    protected function query(): Builder
+    {
+        return $this->model->query();
+    }
 }

@@ -22,14 +22,15 @@ class UserBioFactory extends Factory
                 'twitter' => fake()->optional(0.5)->url(),
             ]),
             'cv_id' => null, // Will be set by seeder
+            'state' => null,
+            'country' => null
         ];
     }
 
     public function verified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_verified' => true,
         ]);
     }
 }
-

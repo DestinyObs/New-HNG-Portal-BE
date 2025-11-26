@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Requests\Talent;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class TalentOnboardingRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'current_role'  => ['nullable'],
+            'bio' => ['nullable'],
+            'track_id' => ['nullable', 'exists:tracks,id'],
+            'project_name'  => ['nullable'],
+            'project_url'  => ['nullable'],
+            'project_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,docx|max:2048',
+        ];
+    }
+}

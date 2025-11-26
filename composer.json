@@ -10,10 +10,12 @@
         "darkaonline/l5-swagger": "^9.0",
         "intervention/image": "^3.11",
         "intervention/image-laravel": "^1.5",
+        "larastan/larastan": "^3.7",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
-        "laravel/socialite": "^5.23",
+        "laravel/socialite": "^5.21",
         "laravel/tinker": "^2.9",
+        "spatie/laravel-medialibrary": "^11.17",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {

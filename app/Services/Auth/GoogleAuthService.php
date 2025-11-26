@@ -1,60 +1,78 @@
-<?php 
+<?php
 
 namespace App\Services\Auth;
 
 use App\Models\User;
-use App\Models\UserDevice;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
+use App\Services\Interfaces\UserInterface;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Contracts\User as GoogleUser;
 
 class GoogleAuthService implements GoogleAuthInterface
 {
-    public function handle(GoogleUser $googleUser): array
+    public function __construct(protected UserInterface $userService) {}
+
+    public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array|\Exception
     {
-        // Split name into firstname + lastname
-        [$firstname, $lastname] = $this->splitName($googleUser->getName());
+        // Retrieve user info from Google using the token
 
-        // Create or find user
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'firstname'         => $firstname,
-                'lastname'          => $lastname,
-                'password'  => Str::random(12), 
-            ]
-        );
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
+            info('GOOGLE USER', ['user' => $googleUser]);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid Google token provided.');
+        } catch (\Throwable $e) {
+            info('GOOGLE ERROR', ['error' => $e->getMessage()]);
+            throw new \Exception('An error occurred while authenticating with Google. Please try again later.');
+        }
 
-        $this->saveDevice($user);
-
-        $token = $user->createToken('API Token')->plainTextToken;
-
-        return [
-            'user'  => $user,
-            'token' => $token,
+        $googleUserData = [
+            'email' => $googleUser->getEmail(),
+            'name' => $googleUser->getName(),
+            'company_name' => $companyName,
         ];
-    }
 
-    private function splitName(string $fullName): array
-    {
-        $parts = explode(' ', trim($fullName), 2);
+        $email = $googleUserData['email'] ?? null;
 
-        return [
-            $parts[0] ?? '',
-            $parts[1] ?? '',
+        // Check if user exists
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            // LOGIN FLOW
+            $token = $user->createToken('auth_token')->plainTextToken;
+            dump($googleUserData);
+            return [
+                'user' => $user,
+                'token' => $token,
+            ];
+        }
+
+        // SIGNUP FLOW
+
+        if (!$role) {
+            throw new \InvalidArgumentException('Role is required for new user signup.');
+        }
+
+        $nameParts = explode(' ', $googleUserData['name'], 2);
+        $generatedPassword = Str::random(12);
+
+        $data = [
+            'email' => $email,
+            'password' => $generatedPassword,
+            'role' => $role,
         ];
-    }
 
-    private function saveDevice($user)
-    {
-        UserDevice::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'name'    => request()->userAgent(),
-            ],
-            [
-                'last_activity_at' => now(),
-            ]
-        );
+        if ($role === 'talent') {
+            $nameParts = explode(' ', $googleUserData['name'], 2);
+            $data['firstname'] = $nameParts[0] ?? null;
+            $data['lastname'] = $nameParts[1] ?? null;
+        }
+
+        if ($role === 'company') {
+            $data['company_name'] = $googleUserData['company_name'] ?? $googleUserData['name'];
+        }
+
+        // Delegate to UserService to handle full signup (OTP, role, company/userbio, auth)
+        return $this->userService->create($data);
     }
 }

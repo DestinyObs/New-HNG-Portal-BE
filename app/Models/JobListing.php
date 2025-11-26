@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
 class JobListing extends Model
 {
-    use HasUuids, HasFactory, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
+
+    // protected $table = "job_listings";
 
     protected $fillable = [
         'id',
@@ -23,6 +24,7 @@ class JobListing extends Model
         'company_id',
         'price',
         'track_id',
+        'job_level_id',
         'category_id',
         'work_mode_id',
         'job_type_id',
@@ -67,7 +69,6 @@ class JobListing extends Model
         return $this->belongsTo(Company::class, 'company_id');
     }
 
-
     public function skills()
     {
         return $this->belongsToMany(
@@ -77,4 +78,21 @@ class JobListing extends Model
             'job_skill_id'
         );
     }
+
+
+    public function jobLevels()
+    {
+        return $this->belongsTo(JobLevel::class, 'job_level_id');
+    }
+
+
+    // public function jobLevels()
+    // {
+    //     return $this->belongsToMany(
+    //         JobLevel::class,
+    //         'job_listing_job_level',
+    //         'job_listing_id',
+    //         'job_level_id',
+    //     );
+    // }
 }

@@ -3,18 +3,10 @@
 namespace App\Providers;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
-use App\Services\Interfaces\{
-    UserInterface,
-    WaitlistInterface,
-};
-use App\Services\{
-    UserService,
-    WaitlistService,
-};
-use App\Services\Admin\CategoryService;
 use App\Services\Employer\CompanyService;
 use App\Services\Interfaces\Admin\CategoryServiceInterface;
 use App\Services\Interfaces\Admin\CountryServiceInterface;
+use App\Services\Interfaces\Admin\JobLevelServiceInterface;
 use App\Services\Interfaces\Admin\StateServiceInterface;
 use App\Services\Interfaces\Admin\TrackServiceInterface;
 use App\Services\Interfaces\Admin\WorkModeServiceInterface;
@@ -22,14 +14,18 @@ use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\Auth\LoginInterface;
 use App\Services\Interfaces\Auth\PasswordResetInterface;
 use App\Services\Interfaces\Talent\ProfileServiceInterface;
+use App\Services\Interfaces\UserInterface;
+use App\Services\Interfaces\WaitlistInterface;
 use App\Services\Talent\ProfileService;
+use App\Services\UserService;
+use App\Services\WaitlistService;
 use Illuminate\Support\ServiceProvider;
 
 class InterfaceServiceProvider extends ServiceProvider
 {
-
     /**
      * Binds interfaces to their implementations.
+     *
      * @var array<string, string>
      */
     public $bindings = [
@@ -45,6 +41,7 @@ class InterfaceServiceProvider extends ServiceProvider
         WorkModeServiceInterface::class => \App\Services\Admin\WorkModeService::class,
         CountryServiceInterface::class => \App\Services\Admin\CountryService::class,
         StateServiceInterface::class => \App\Services\Admin\StateService::class,
+        JobLevelServiceInterface::class => \App\Services\Admin\JobLevelService::class,
     ];
 
     /**
