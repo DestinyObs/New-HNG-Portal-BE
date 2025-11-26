@@ -20,10 +20,8 @@ Route::prefix('auth')->group(function () {
     Route::post('reset-password', [ForgotPasswordController::class, 'update']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
     Route::post('/register', action: [UserController::class, 'store']);
+    Route::post('google-auth', [GoogleAuthController::class, 'handle']);
 });
-
-Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 Route::post('/waitlist', [WaitlistController::class, 'store']);
 Route::get('/waitlist/{waitlist}', [WaitlistController::class, 'show']);
