@@ -65,7 +65,7 @@
             <p>This code will expire in 10 minutes. Please do not share it with anyone.</p>
         </div>
         <div class="footer">
-            &copy; {{ date('Y') }} Your Company. All rights reserved.
+            &copy; {{ date('Y') }} {{ config('app.url') }}. All rights reserved.
         </div>
     </div>
 </body>
