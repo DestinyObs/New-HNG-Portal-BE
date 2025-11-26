@@ -9,4 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 class UserSkill extends Model
 {
     use HasFactory, HasUuids;
+
+    protected $fillable = ['user_id', 'skill_id'];
 }

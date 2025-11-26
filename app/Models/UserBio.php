@@ -20,7 +20,10 @@ class UserBio extends Model implements HasMedia
         'project_name',
         'project_url',
         'state',
-        'country'
+        'country',
+        'experience',
+        'available_status',
+        'job_type_preference'
     ];
 
     /**
