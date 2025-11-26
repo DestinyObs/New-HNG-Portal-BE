@@ -87,7 +87,8 @@ jobs:
           echo "Deployment failed. Rolling back to previous release..."
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git checkout HEAD@{1} && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize && php artisan migrate --force && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
           echo "Rollback completed. Please investigate deployment failure."
-
+      
+      
       - name: Notify Deployment Status
         if: always()
         env:
@@ -101,6 +102,13 @@ jobs:
           if [ "$GITHUB_JOB" = "build-deploy" ] && [ "$GITHUB_RUN_ATTEMPT" -eq 1 ] && [ "$GITHUB_RUN_STATUS" != "success" ]; then
             STATUS="FAILED"
           fi
+
+          # Health Check (now uses HTTPS and follows redirects if any)
+          echo "Running health check on $HEALTHCHECK_URL..."
+          if ! curl -Ls --fail "$HEALTHCHECK_URL"; then
+            STATUS="FAILED"
+          fi
+
           MESSAGE="Production deployment status: $STATUS\nRepo: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\nHealthcheck: $HEALTHCHECK_URL"
           if [ -n "$NOTIFY_WEBHOOK_URL" ]; then
             curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"$MESSAGE\"}" "$NOTIFY_WEBHOOK_URL"
