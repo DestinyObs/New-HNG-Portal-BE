@@ -11,7 +11,7 @@ class WorkExperienceProfileSettingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class WorkExperienceProfileSettingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'job_title' => ['nullable', 'string'],
+            'company_name' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
+            'start_date' => ['nullable', 'date', 'before:end_date'],
+            'end_date' => ['nullable', 'date', 'after:start_date']
         ];
     }
 }
