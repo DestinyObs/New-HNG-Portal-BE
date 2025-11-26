@@ -9,4 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class State extends Model
 {
     use HasFactory, HasUuids;
+
+    public function jobListings()
+    {
+        return $this->hasMany(JobListing::class, 'state_id', 'id');
+    }
 }

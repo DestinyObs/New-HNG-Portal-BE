@@ -2,6 +2,7 @@
 
 // ? API routes for talent functionalities
 
+use App\Http\Controllers\Talent\JobController;
 use App\Http\Controllers\Talent\ProfileController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,17 @@ Route::prefix('api/talent')->group(function () {
         Route::controller(TalentOnboardingController::class)->group(function () {
             Route::get('onboarding', 'index');
             Route::post('onboarding', 'store');
+        });
+
+
+        // Talent JobController
+        Route::controller(JobController::class)->group(function () {
+            Route::prefix('jobs')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/bookmark', 'getSaveJobs');
+                Route::get('/{jobId}', 'show');
+                Route::put('/{jobId}/bookmark', 'saveJob');
+            });
         });
     });
 });

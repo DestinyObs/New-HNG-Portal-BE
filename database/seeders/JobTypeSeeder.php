@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\JobType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JobTypeSeeder extends Seeder
 {
@@ -18,9 +19,10 @@ class JobTypeSeeder extends Seeder
             ['name' => 'Temporary'],
         ];
 
-        foreach ($jobTypes as $jobType => $title) {
+        foreach ($jobTypes as $jobType) {
             JobType::factory()->create([
-                'name' => $title['name'],
+                'name' => $jobType['name'],
+                'slug' => Str::slug($jobType['name']),
             ]);
         }
     }
