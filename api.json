@@ -1,15 +1,77 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "HNG-Portal",
+        "title": "HNG-Connect",
         "version": "0.0.1"
     },
     "servers": [
         {
-            "url": "http://localhost/api"
+            "url": "http://localhost:8000/api"
         }
     ],
     "paths": {
+        "/user": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "`User`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/employer/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/talent/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/employer/company/company": {
             "post": {
                 "operationId": "company.store",
@@ -1348,6 +1410,97 @@
                 }
             }
         },
+        "/talent/settings/profile": {
+            "get": {
+                "operationId": "profileSetting.index",
+                "tags": [
+                    "ProfileSetting"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "profileSetting.store",
+                "tags": [
+                    "ProfileSetting"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProfileSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/talent/settings/skills": {
+            "post": {
+                "operationId": "profileSetting.skill",
+                "tags": [
+                    "ProfileSetting"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SkillProfileSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/admin/skills": {
             "get": {
                 "operationId": "admin.skills.index",
@@ -2026,6 +2179,71 @@
                 ],
                 "title": "Permission"
             },
+            "ProfileSettingRequest": {
+                "type": "object",
+                "properties": {
+                    "profile_image": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 2048
+                    },
+                    "current_role": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "bio": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "experience": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "available_status": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "2-4 years"
+                    },
+                    "job_type_preference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "available for work | open to offers",
+                        "enum": [
+                            "remote",
+                            "hybrid",
+                            "onsite"
+                        ]
+                    },
+                    "state": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "job_type_preference remote | hybrid | onsite"
+                    },
+                    "country": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "title": "ProfileSettingRequest"
+            },
             "ResetPasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -2133,6 +2351,21 @@
                     "updated_at"
                 ],
                 "title": "Skill"
+            },
+            "SkillProfileSettingRequest": {
+                "type": "object",
+                "properties": {
+                    "skill_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "title": "SkillProfileSettingRequest"
             },
             "SkillRequest": {
                 "type": "object",
@@ -3194,6 +3427,25 @@
             }
         },
         "responses": {
+            "AuthenticationException": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
             "ValidationException": {
                 "description": "Validation error",
                 "content": {
@@ -3219,25 +3471,6 @@
                             "required": [
                                 "message",
                                 "errors"
-                            ]
-                        }
-                    }
-                }
-            },
-            "AuthenticationException": {
-                "description": "Unauthenticated",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "Error overview."
-                                }
-                            },
-                            "required": [
-                                "message"
                             ]
                         }
                     }
