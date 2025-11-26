@@ -6,7 +6,6 @@ use App\Repositories\JobTypeRepository;
 
 class JobTypeService
 {
-
     protected $jobTypeRepository;
 
     /**
@@ -16,7 +15,6 @@ class JobTypeService
     {
         $this->jobTypeRepository = $jobTypeRepository;
     }
-
 
     // Add service methods for job type management here
     public function getAllJobTypes()
@@ -29,7 +27,6 @@ class JobTypeService
     {
         // Logic to create a new job type
         return $this->jobTypeRepository->create($data);
-
     }
 
     public function getJobTypeById(string $id)
@@ -37,7 +34,6 @@ class JobTypeService
         // Logic to retrieve a job type by ID
         return $this->jobTypeRepository->findById($id);
     }
-
 
     public function updateJobType(string $id, array $data)
     {
@@ -50,4 +46,7 @@ class JobTypeService
         // Logic to delete a job type
         return $this->jobTypeRepository->destroy($id);
     }
+
+
+    public function getAllJobLevels() {}
 }

@@ -11,7 +11,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Company extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, HasUuids, InteractsWithMedia;
+    use HasFactory, HasUuids, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -22,8 +22,8 @@ class Company extends Model implements HasMedia
         'industry',
         'company_size',
         'website_url',
-        'state_id',
-        'country_id',
+        'state',
+        'country',
         'is_verified',
         'official_email',
         'status',
@@ -34,22 +34,12 @@ class Company extends Model implements HasMedia
      *
      * @var array
      */
-    protected $with = ['user', 'state:id,name', 'country:id,name'];
+    protected $with = ['user'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    public function state()
-    {
-        return $this->belongsTo(State::class);
-    }
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
-    }    
 
     public function jobs()
     {

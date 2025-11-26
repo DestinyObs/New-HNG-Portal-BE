@@ -24,12 +24,13 @@ class StoreDraftJobRequest extends FormRequest
     public function rules(): array
     {
         $companyId = $this->route('companyId');
+        // dd($companyId);
 
         return [
             'title' => 'required|string|max:255',
             'company' => [
                 Rule::exists('companies', 'id')
-                    ->where('user_id', Auth::id())
+                    ->where('user_id', Auth::id()),
             ],
             'job_id' => [
                 'sometimes',
@@ -46,13 +47,13 @@ class StoreDraftJobRequest extends FormRequest
             'category_id' => 'nullable|uuid|exists:categories,id',
             'job_type_id' => 'nullable|uuid|exists:job_types,id',
             'work_mode_id' => 'nullable|uuid|exists:work_modes,id',
+            'job_level_id' => 'nullable|uuid|exists:job_levels,id',
             'skills' => 'nullable|array',
             'skills.*' => 'uuid|exists:skills,id',
             'status' => 'nullable|in:draft',
             // 'publication_status' => 'nullable|in:published,unpublished',
         ];
     }
-
 
     public function messages(): array
     {
@@ -65,6 +66,7 @@ class StoreDraftJobRequest extends FormRequest
             'track_id.exists' => 'The selected track is invalid.',
             'category_id.exists' => 'The selected category is invalid.',
             'job_type_id.exists' => 'The selected job type is invalid.',
+            'job_level_id' => 'The selected job level is invalid.',
             'work_mode_id.exists' => 'The selected work mode is invalid.',
             'skills.array' => 'The skills must be an array of skill IDs.',
             'skills.*.exists' => 'One or more selected skills are invalid.',

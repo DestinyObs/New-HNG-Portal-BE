@@ -23,11 +23,10 @@ class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'current_password' => ['required',],
+            'current_password' => ['required'],
             'password' => ['required', 'min:8', 'confirmed'],
         ];
     }
-
 
     public function messages(): array
     {
@@ -39,22 +38,21 @@ class UpdatePasswordRequest extends FormRequest
         ];
     }
 
-
-    //? Add a validation after rule to check current password
+    // ? Add a validation after rule to check current password
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if (!$this->checkCurrentPassword()) {
+            if (! $this->checkCurrentPassword()) {
                 $validator->errors()->add('current_password', 'The current password is incorrect.');
             }
         });
     }
 
-
-    //? Access database to verify current password
+    // ? Access database to verify current password
     private function checkCurrentPassword(): bool
     {
         $user = $this->user();
+
         return Hash::check($this->current_password, $user->password) ?? false;
     }
 }

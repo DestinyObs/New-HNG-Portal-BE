@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Media;
 use App\Models\MediaAsset;
 use App\Models\User;
 use App\Models\UserBio;
@@ -18,6 +17,7 @@ class UserBioSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->warn('No users found. Please run UserSeeder first.');
+
             return;
         }
 
@@ -29,8 +29,9 @@ class UserBioSeeder extends Seeder
                 'user_id' => $user->id,
                 'track_id' => $tracks->isNotEmpty() ? $tracks->random() : null,
                 'cv_id' => MediaAsset::factory(),
+                'state' => 'lagos',
+                'country' => 'nigeria'
             ]);
         }
     }
 }
-

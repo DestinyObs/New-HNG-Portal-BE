@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46501a05c017e1bc2b94b84612812204",
+    "content-hash": "5dcc0d3d03e85fbe66846bf4129b620c",
     "packages": [
         {
             "name": "brick/math",
-            "version": "0.14.0",
+            "version": "0.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2"
+                "reference": "f05858549e5f9d7bb45875a75583240a38a281d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2",
-                "reference": "113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2",
+                "url": "https://api.github.com/repos/brick/math/zipball/f05858549e5f9d7bb45875a75583240a38a281d0",
+                "reference": "f05858549e5f9d7bb45875a75583240a38a281d0",
                 "shasum": ""
             },
             "require": {
@@ -56,7 +56,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.14.0"
+                "source": "https://github.com/brick/math/tree/0.14.1"
             },
             "funding": [
                 {
@@ -64,7 +64,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-29T12:40:03+00:00"
+            "time": "2025-11-24T14:40:29+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -1351,6 +1351,47 @@
             "time": "2025-08-22T14:27:06+00:00"
         },
         {
+            "name": "iamcal/sql-parser",
+            "version": "v0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iamcal/SQLParser.git",
+                "reference": "947083e2dca211a6f12fb1beb67a01e387de9b62"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iamcal/SQLParser/zipball/947083e2dca211a6f12fb1beb67a01e387de9b62",
+                "reference": "947083e2dca211a6f12fb1beb67a01e387de9b62",
+                "shasum": ""
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^1.0",
+                "phpunit/phpunit": "^5|^6|^7|^8|^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "iamcal\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cal Henderson",
+                    "email": "cal@iamcal.com"
+                }
+            ],
+            "description": "MySQL schema parser",
+            "support": {
+                "issues": "https://github.com/iamcal/SQLParser/issues",
+                "source": "https://github.com/iamcal/SQLParser/tree/v0.6"
+            },
+            "time": "2025-03-17T16:59:46+00:00"
+        },
+        {
             "name": "intervention/gif",
             "version": "4.2.2",
             "source": {
@@ -1577,6 +1618,101 @@
                 }
             ],
             "time": "2025-04-04T15:09:55+00:00"
+        },
+        {
+            "name": "larastan/larastan",
+            "version": "v3.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/larastan/larastan.git",
+                "reference": "2e653fd19585a825e283b42f38378b21ae481cc7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/2e653fd19585a825e283b42f38378b21ae481cc7",
+                "reference": "2e653fd19585a825e283b42f38378b21ae481cc7",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-json": "*",
+                "iamcal/sql-parser": "^0.6.0",
+                "illuminate/console": "^11.44.2 || ^12.4.1",
+                "illuminate/container": "^11.44.2 || ^12.4.1",
+                "illuminate/contracts": "^11.44.2 || ^12.4.1",
+                "illuminate/database": "^11.44.2 || ^12.4.1",
+                "illuminate/http": "^11.44.2 || ^12.4.1",
+                "illuminate/pipeline": "^11.44.2 || ^12.4.1",
+                "illuminate/support": "^11.44.2 || ^12.4.1",
+                "php": "^8.2",
+                "phpstan/phpstan": "^2.1.23"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^13",
+                "laravel/framework": "^11.44.2 || ^12.7.2",
+                "mockery/mockery": "^1.6.12",
+                "nikic/php-parser": "^5.4",
+                "orchestra/canvas": "^v9.2.2 || ^10.0.1",
+                "orchestra/testbench-core": "^9.12.0 || ^10.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0.1",
+                "phpunit/phpunit": "^10.5.35 || ^11.5.15"
+            },
+            "suggest": {
+                "orchestra/testbench": "Using Larastan for analysing a package needs Testbench"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Larastan\\Larastan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Can Vural",
+                    "email": "can9119@gmail.com"
+                }
+            ],
+            "description": "Larastan - Discover bugs in your code without running it. A phpstan/phpstan extension for Laravel",
+            "keywords": [
+                "PHPStan",
+                "code analyse",
+                "code analysis",
+                "larastan",
+                "laravel",
+                "package",
+                "php",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/larastan/larastan/issues",
+                "source": "https://github.com/larastan/larastan/tree/v3.7.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/canvural",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-10T19:42:11+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1983,17 +2119,23 @@
         },
         {
             "name": "laravel/socialite",
-            "version": "v5.23.1",
+            "version": "v5.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/socialite.git",
-                "reference": "83d7523c97c1101d288126948947891319eef800"
+                "reference": "d83639499ad14985c9a6a9713b70073300ce998d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/socialite/zipball/83d7523c97c1101d288126948947891319eef800",
-                "reference": "83d7523c97c1101d288126948947891319eef800",
-                "shasum": ""
+                "url": "https://api.github.com/repos/laravel/socialite/zipball/d83639499ad14985c9a6a9713b70073300ce998d",
+                "reference": "d83639499ad14985c9a6a9713b70073300ce998d",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-json": "*",
@@ -2051,7 +2193,7 @@
                 "issues": "https://github.com/laravel/socialite/issues",
                 "source": "https://github.com/laravel/socialite"
             },
-            "time": "2025-10-27T15:36:41+00:00"
+            "time": "2025-05-19T12:56:37+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2756,22 +2898,22 @@
         },
         {
             "name": "maennchen/zipstream-php",
-            "version": "3.2.0",
+            "version": "3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maennchen/ZipStream-PHP.git",
-                "reference": "9712d8fa4cdf9240380b01eb4be55ad8dcf71416"
+                "reference": "aeadcf5c412332eb426c0f9b4485f6accba2a99f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/9712d8fa4cdf9240380b01eb4be55ad8dcf71416",
-                "reference": "9712d8fa4cdf9240380b01eb4be55ad8dcf71416",
+                "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/aeadcf5c412332eb426c0f9b4485f6accba2a99f",
+                "reference": "aeadcf5c412332eb426c0f9b4485f6accba2a99f",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "ext-zlib": "*",
-                "php-64bit": "^8.3"
+                "php-64bit": "^8.2"
             },
             "require-dev": {
                 "brianium/paratest": "^7.7",
@@ -2780,7 +2922,7 @@
                 "guzzlehttp/guzzle": "^7.5",
                 "mikey179/vfsstream": "^1.6",
                 "php-coveralls/php-coveralls": "^2.5",
-                "phpunit/phpunit": "^12.0",
+                "phpunit/phpunit": "^11.0",
                 "vimeo/psalm": "^6.0"
             },
             "suggest": {
@@ -2822,7 +2964,7 @@
             ],
             "support": {
                 "issues": "https://github.com/maennchen/ZipStream-PHP/issues",
-                "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.2.0"
+                "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.1.2"
             },
             "funding": [
                 {
@@ -2830,7 +2972,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-17T11:15:13+00:00"
+            "time": "2025-01-27T12:07:53+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -3107,16 +3249,16 @@
         },
         {
             "name": "nette/utils",
-            "version": "v4.0.8",
+            "version": "v4.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "c930ca4e3cf4f17dcfb03037703679d2396d2ede"
+                "reference": "505a30ad386daa5211f08a318e47015b501cad30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/c930ca4e3cf4f17dcfb03037703679d2396d2ede",
-                "reference": "c930ca4e3cf4f17dcfb03037703679d2396d2ede",
+                "url": "https://api.github.com/repos/nette/utils/zipball/505a30ad386daa5211f08a318e47015b501cad30",
+                "reference": "505a30ad386daa5211f08a318e47015b501cad30",
                 "shasum": ""
             },
             "require": {
@@ -3190,9 +3332,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.0.8"
+                "source": "https://github.com/nette/utils/tree/v4.0.9"
             },
-            "time": "2025-08-06T21:43:34+00:00"
+            "time": "2025-10-31T00:45:47+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -3254,31 +3396,31 @@
         },
         {
             "name": "nunomaduro/termwind",
-            "version": "v2.3.2",
+            "version": "v2.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/termwind.git",
-                "reference": "eb61920a53057a7debd718a5b89c2178032b52c0"
+                "reference": "6fb2a640ff502caace8e05fd7be3b503a7e1c017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/termwind/zipball/eb61920a53057a7debd718a5b89c2178032b52c0",
-                "reference": "eb61920a53057a7debd718a5b89c2178032b52c0",
+                "url": "https://api.github.com/repos/nunomaduro/termwind/zipball/6fb2a640ff502caace8e05fd7be3b503a7e1c017",
+                "reference": "6fb2a640ff502caace8e05fd7be3b503a7e1c017",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": "^8.2",
-                "symfony/console": "^7.3.4"
+                "symfony/console": "^7.3.6"
             },
             "require-dev": {
                 "illuminate/console": "^11.46.1",
                 "laravel/pint": "^1.25.1",
                 "mockery/mockery": "^1.6.12",
-                "pestphp/pest": "^2.36.0 || ^3.8.4",
+                "pestphp/pest": "^2.36.0 || ^3.8.4 || ^4.1.3",
                 "phpstan/phpstan": "^1.12.32",
                 "phpstan/phpstan-strict-rules": "^1.6.2",
-                "symfony/var-dumper": "^7.3.4",
+                "symfony/var-dumper": "^7.3.5",
                 "thecodingmachine/phpstan-strict-rules": "^1.0.0"
             },
             "type": "library",
@@ -3321,7 +3463,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/termwind/issues",
-                "source": "https://github.com/nunomaduro/termwind/tree/v2.3.2"
+                "source": "https://github.com/nunomaduro/termwind/tree/v2.3.3"
             },
             "funding": [
                 {
@@ -3337,7 +3479,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-18T11:10:27+00:00"
+            "time": "2025-11-20T02:34:59+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -3691,67 +3833,57 @@
             "time": "2025-08-30T15:50:23+00:00"
         },
         {
-            "name": "provydon/docs-generate",
-            "version": "v1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/provydon/docs-generate.git",
-                "reference": "0cac5bd911391a6140d3d1de198b7315eeec3f47"
-            },
+            "name": "phpstan/phpstan",
+            "version": "2.1.32",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/provydon/docs-generate/zipball/0cac5bd911391a6140d3d1de198b7315eeec3f47",
-                "reference": "0cac5bd911391a6140d3d1de198b7315eeec3f47",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e126cad1e30a99b137b8ed75a85a676450ebb227",
+                "reference": "e126cad1e30a99b137b8ed75a85a676450ebb227",
+                "shasum": ""
             },
             "require": {
-                "illuminate/console": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/http": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/routing": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/validation": "^9.0|^10.0|^11.0|^12.0",
-                "php": "^8.1"
+                "php": "^7.4|^8.0"
             },
-            "require-dev": {
-                "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^7.0|^8.0|^9.0",
-                "phpunit/phpunit": "^9.5|^10.0"
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
             },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
             "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "SwaggerAuto\\Providers\\DocsGenerateServiceProvider"
-                    ]
-                }
-            },
             "autoload": {
-                "psr-4": {
-                    "SwaggerAuto\\": "src/"
-                }
+                "files": [
+                    "bootstrap.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "authors": [
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
                 {
-                    "name": "Provydon",
-                    "email": "providenceifeosame@gmail.com"
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
                 }
             ],
-            "description": "Automatic API documentation for your Laravel app — zero annotations, OpenAPI 3.0 JSON & Swagger UI.",
-            "support": {
-                "issues": "https://github.com/provydon/docs-generate/issues",
-                "source": "https://github.com/provydon/docs-generate/tree/v1.2.0"
-            },
-            "time": "2025-11-22T18:36:17+00:00"
+            "time": "2025-11-11T15:18:17+00:00"
         },
         {
             "name": "psr/cache",
@@ -4493,16 +4625,16 @@
         },
         {
             "name": "spatie/image",
-            "version": "3.8.6",
+            "version": "3.8.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image.git",
-                "reference": "0872c5968a7f044fe1e960c26433e54ceaede696"
+                "reference": "4d35db207c4b317bc221d02ab7ba94aa78b44c24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image/zipball/0872c5968a7f044fe1e960c26433e54ceaede696",
-                "reference": "0872c5968a7f044fe1e960c26433e54ceaede696",
+                "url": "https://api.github.com/repos/spatie/image/zipball/4d35db207c4b317bc221d02ab7ba94aa78b44c24",
+                "reference": "4d35db207c4b317bc221d02ab7ba94aa78b44c24",
                 "shasum": ""
             },
             "require": {
@@ -4512,18 +4644,18 @@
                 "php": "^8.2",
                 "spatie/image-optimizer": "^1.7.5",
                 "spatie/temporary-directory": "^2.2",
-                "symfony/process": "^6.4|^7.0"
+                "symfony/process": "^6.4|^7.0|^8.0"
             },
             "require-dev": {
                 "ext-gd": "*",
                 "ext-imagick": "*",
                 "laravel/sail": "^1.34",
-                "pestphp/pest": "^2.28",
+                "pestphp/pest": "^3.0|^4.0",
                 "phpstan/phpstan": "^1.10.50",
                 "spatie/pest-plugin-snapshots": "^2.1",
                 "spatie/pixelmatch-php": "^1.0",
                 "spatie/ray": "^1.40.1",
-                "symfony/var-dumper": "^6.4|7.0"
+                "symfony/var-dumper": "^6.4|^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -4550,7 +4682,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/image/tree/3.8.6"
+                "source": "https://github.com/spatie/image/tree/3.8.7"
             },
             "funding": [
                 {
@@ -4562,7 +4694,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-25T12:06:17+00:00"
+            "time": "2025-11-24T15:10:50+00:00"
         },
         {
             "name": "spatie/image-optimizer",
@@ -8049,137 +8181,6 @@
             "time": "2025-04-30T06:54:44+00:00"
         },
         {
-            "name": "iamcal/sql-parser",
-            "version": "v0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/iamcal/SQLParser.git",
-                "reference": "947083e2dca211a6f12fb1beb67a01e387de9b62"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/iamcal/SQLParser/zipball/947083e2dca211a6f12fb1beb67a01e387de9b62",
-                "reference": "947083e2dca211a6f12fb1beb67a01e387de9b62",
-                "shasum": ""
-            },
-            "require-dev": {
-                "php-coveralls/php-coveralls": "^1.0",
-                "phpunit/phpunit": "^5|^6|^7|^8|^9"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "iamcal\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Cal Henderson",
-                    "email": "cal@iamcal.com"
-                }
-            ],
-            "description": "MySQL schema parser",
-            "support": {
-                "issues": "https://github.com/iamcal/SQLParser/issues",
-                "source": "https://github.com/iamcal/SQLParser/tree/v0.6"
-            },
-            "time": "2025-03-17T16:59:46+00:00"
-        },
-        {
-            "name": "larastan/larastan",
-            "version": "v3.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/larastan/larastan.git",
-                "reference": "d13ef96d652d1b2a8f34f1760ba6bf5b9c98112e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/d13ef96d652d1b2a8f34f1760ba6bf5b9c98112e",
-                "reference": "d13ef96d652d1b2a8f34f1760ba6bf5b9c98112e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "iamcal/sql-parser": "^0.6.0",
-                "illuminate/console": "^11.44.2 || ^12.4.1",
-                "illuminate/container": "^11.44.2 || ^12.4.1",
-                "illuminate/contracts": "^11.44.2 || ^12.4.1",
-                "illuminate/database": "^11.44.2 || ^12.4.1",
-                "illuminate/http": "^11.44.2 || ^12.4.1",
-                "illuminate/pipeline": "^11.44.2 || ^12.4.1",
-                "illuminate/support": "^11.44.2 || ^12.4.1",
-                "php": "^8.2",
-                "phpstan/phpstan": "^2.1.29"
-            },
-            "require-dev": {
-                "doctrine/coding-standard": "^13",
-                "laravel/framework": "^11.44.2 || ^12.7.2",
-                "mockery/mockery": "^1.6.12",
-                "nikic/php-parser": "^5.4",
-                "orchestra/canvas": "^v9.2.2 || ^10.0.1",
-                "orchestra/testbench-core": "^9.12.0 || ^10.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0.1",
-                "phpunit/phpunit": "^10.5.35 || ^11.5.15"
-            },
-            "suggest": {
-                "orchestra/testbench": "Using Larastan for analysing a package needs Testbench",
-                "phpmyadmin/sql-parser": "Install to enable Larastan's optional phpMyAdmin-based SQL parser automatically"
-            },
-            "type": "phpstan-extension",
-            "extra": {
-                "phpstan": {
-                    "includes": [
-                        "extension.neon"
-                    ]
-                },
-                "branch-alias": {
-                    "dev-master": "3.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Larastan\\Larastan\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Can Vural",
-                    "email": "can9119@gmail.com"
-                }
-            ],
-            "description": "Larastan - Discover bugs in your code without running it. A phpstan/phpstan extension for Laravel",
-            "keywords": [
-                "PHPStan",
-                "code analyse",
-                "code analysis",
-                "larastan",
-                "laravel",
-                "package",
-                "php",
-                "static analysis"
-            ],
-            "support": {
-                "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.8.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/canvural",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-10-27T23:09:14+00:00"
-        },
-        {
             "name": "laravel/pail",
             "version": "v1.2.3",
             "source": {
@@ -8532,16 +8533,16 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v8.8.2",
+            "version": "v8.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "60207965f9b7b7a4ce15a0f75d57f9dadb105bdb"
+                "reference": "1dc9e88d105699d0fee8bb18890f41b274f6b4c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/60207965f9b7b7a4ce15a0f75d57f9dadb105bdb",
-                "reference": "60207965f9b7b7a4ce15a0f75d57f9dadb105bdb",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/1dc9e88d105699d0fee8bb18890f41b274f6b4c4",
+                "reference": "1dc9e88d105699d0fee8bb18890f41b274f6b4c4",
                 "shasum": ""
             },
             "require": {
@@ -8563,7 +8564,7 @@
                 "laravel/sanctum": "^4.1.1",
                 "laravel/tinker": "^2.10.1",
                 "orchestra/testbench-core": "^9.12.0 || ^10.4",
-                "pestphp/pest": "^3.8.2",
+                "pestphp/pest": "^3.8.2 || ^4.0.0",
                 "sebastian/environment": "^7.2.1 || ^8.0"
             },
             "type": "library",
@@ -8627,7 +8628,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2025-06-25T02:12:12+00:00"
+            "time": "2025-11-20T02:55:25+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -8746,59 +8747,6 @@
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
             "time": "2022-02-21T01:04:05+00:00"
-        },
-        {
-            "name": "phpstan/phpstan",
-            "version": "2.1.32",
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e126cad1e30a99b137b8ed75a85a676450ebb227",
-                "reference": "e126cad1e30a99b137b8ed75a85a676450ebb227",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4|^8.0"
-            },
-            "conflict": {
-                "phpstan/phpstan-shim": "*"
-            },
-            "bin": [
-                "phpstan",
-                "phpstan.phar"
-            ],
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPStan - PHP Static Analysis Tool",
-            "keywords": [
-                "dev",
-                "static analysis"
-            ],
-            "support": {
-                "docs": "https://phpstan.org/user-guide/getting-started",
-                "forum": "https://github.com/phpstan/phpstan/discussions",
-                "issues": "https://github.com/phpstan/phpstan/issues",
-                "security": "https://github.com/phpstan/phpstan/security/policy",
-                "source": "https://github.com/phpstan/phpstan-src"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/ondrejmirtes",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/phpstan",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-11-11T15:18:17+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -10335,12 +10283,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

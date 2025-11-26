@@ -17,11 +17,11 @@ class ProfileRepository implements ProfileRepositoryInterface
         return $user->refresh();
     }
 
-
     public function updateProfilePhoto(User $user, string $photoPath): User
     {
         $user->profile_url = $photoPath;
         $user->save();
+
         return $user->refresh();
     }
 }

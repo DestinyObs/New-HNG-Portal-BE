@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserFactory extends Factory
 {
@@ -28,21 +27,21 @@ class UserFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'active',
         ]);
     }
 
     public function suspended(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'suspended',
         ]);
     }
 
     public function banned(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'banned',
         ]);
     }

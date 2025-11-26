@@ -15,13 +15,13 @@ class WaitlistTest extends TestCase
     public function test_user_can_join_waitlist()
     {
         Mail::fake();
-        
+
         $response = $this->postJson('api/waitlist', [
             'full_name' => 'John Doe',
             'email' => 'test@example.com', // Use a test email, not your real one
-            'role' => 'talent'
+            'role' => 'talent',
         ]);
-        
+
         $response->assertStatus(201);
         Mail::assertSent(WaitlistJoined::class);
     }
@@ -31,7 +31,7 @@ class WaitlistTest extends TestCase
         $response = $this->postJson('api/waitlist', [
             'full_name' => 'John Doe',
             'email' => 'invalid-email',
-            'role' => 'talent'
+            'role' => 'talent',
         ]);
 
         $response->assertStatus(422);
@@ -43,13 +43,13 @@ class WaitlistTest extends TestCase
         Waitlist::create([
             'full_name' => 'Existing User',
             'email' => 'existing@example.com',
-            'role' => 'company'
+            'role' => 'company',
         ]);
 
         $response = $this->postJson('api/waitlist', [
             'full_name' => 'John Doe',
             'email' => 'existing@example.com', // Same email
-            'role' => 'talent'
+            'role' => 'talent',
         ]);
 
         $response->assertStatus(422);

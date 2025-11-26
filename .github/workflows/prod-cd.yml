@@ -1,0 +1,117 @@
+name: Deploy Laravel Backend to Production
+
+on:
+  push:
+    branches:
+      - prod
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-deploy:
+    runs-on: [self-hosted, hng-13-runner, linux]
+    steps:
+      - name: Setup SSH private key for secure server access
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Prepare Known Hosts
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+        run: |
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Git Operations on Remote
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git fetch origin && git reset --hard origin/prod && git clean -fd"
+
+      - name: Install Composer Dependencies
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
+
+      - name: Laravel Cache and Optimize
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize"
+
+      - name: Run Migrations
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate --force"
+
+      - name: Restart Backend Service
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "sudo systemctl daemon-reload && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
+
+      - name: Health Check (Smoke Test)
+        env:
+          HEALTHCHECK_URL: ${{ secrets.DEPLOY_PROD_HEALTHCHECK_URL }}
+        run: |
+          echo "Running health check on $HEALTHCHECK_URL..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTHCHECK_URL")
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Health check failed with status $STATUS."
+            exit 1
+          fi
+          echo "Health check passed."
+
+      - name: Rollback if Deployment Fails
+        if: failure()
+        env:
+          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+          APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
+        run: |
+          echo "Deployment failed. Rolling back to previous release..."
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git checkout HEAD@{1} && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize && php artisan migrate --force && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
+          echo "Rollback completed. Please investigate deployment failure."
+      
+      
+      - name: Notify Deployment Status
+        if: always()
+        env:
+          NOTIFY_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+          HEALTHCHECK_URL: ${{ secrets.DEPLOY_PROD_HEALTHCHECK_URL }}
+        run: |
+          STATUS="SUCCESS"
+          if [ "$GITHUB_JOB" = "build-deploy" ] && [ "$GITHUB_RUN_ATTEMPT" -gt 1 ]; then
+            STATUS="ROLLBACK"
+          fi
+          if [ "$GITHUB_JOB" = "build-deploy" ] && [ "$GITHUB_RUN_ATTEMPT" -eq 1 ] && [ "$GITHUB_RUN_STATUS" != "success" ]; then
+            STATUS="FAILED"
+          fi
+
+          # Health Check (now uses HTTPS and follows redirects if any)
+          echo "Running health check on $HEALTHCHECK_URL..."
+          if ! curl -Ls --fail "$HEALTHCHECK_URL"; then
+            STATUS="FAILED"
+          fi
+
+          MESSAGE="Production deployment status: $STATUS\nRepo: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\nHealthcheck: $HEALTHCHECK_URL"
+          if [ -n "$NOTIFY_WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"$MESSAGE\"}" "$NOTIFY_WEBHOOK_URL"
+          else
+            echo "$MESSAGE"
+          fi

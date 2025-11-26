@@ -7,7 +7,6 @@ use App\Models\JobListing;
 use App\Repositories\JobRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class JobService
 {
@@ -24,9 +23,47 @@ class JobService
             'title' => $params['title'] ?? null,
             'job_type_id' => $params['job_type_id'] ?? null,
             'category_id' => $params['category_id'] ?? null,
+            'track_id' => $params['track_id'] ?? null,
         ];
 
         return $this->repo->listForCompany($companyUuid, $perPage, $filters);
+    }
+
+
+    public function listDraftedJobs(
+        string $companyUuid,
+        array $params = [],
+        int $perPage = 15
+    ): object|array {
+        $filters = [
+            'title' => $params['title'] ?? null,
+            'job_type_id' => $params['job_type_id'] ?? null,
+            'category_id' => $params['category_id'] ?? null,
+            'track_id' => $params['track_id'] ?? null,
+        ];
+
+        try {
+            $listedDrafts = $this->repo->listDraftedJobs(
+                $companyUuid,
+                $perPage,
+                $filters
+            );
+
+            return (object) [
+                'success' => true,
+                'data' => $listedDrafts,
+                'message' => 'Drafted jobs retrive successfully',
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            logger()->error('Failed to retrieve drafted jobs: ' . $e->getMessage());
+
+            return (object) [
+                'success' => false,
+                'message' => 'Unabled to retrieve drafted jobs',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
     }
 
     public function getForCompany(string $companyUuid, string $jobId): ?JobListing
@@ -36,8 +73,8 @@ class JobService
 
     public function create(string $companyUuid, array $data): array|object
     {
-        //? check if company id exist and user owns a company
-        if (!$this->repo->checkIfCompanyIdExist($companyUuid)) {
+        // ? check if company id exist and user owns a company
+        if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
             return (object) [
                 'success' => false,
                 'message' => 'You can only create a job for a company linked to your account.',
@@ -47,10 +84,10 @@ class JobService
 
         try {
             DB::beginTransaction();
-            //? create a new job
+            // ? create a new job
             $createdJob = $this->repo->createForCompany($companyUuid, $data);
 
-            //? store job and skill relationship
+            // ? store job and skill relationship
             $skills = $data['skills'];
             $this->repo->addJobSkills($skills, $createdJob->id);
 
@@ -63,12 +100,12 @@ class JobService
                 'data' => $createdJob->load('skills'),
             ];
 
-            //? return job model
+            // ? return job model
             return $createdJob;
-            // return 
+            // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error("Unable to add job: " . $e->getMessage());
+            logger()->error('Unable to add job: ' . $e->getMessage());
 
             return (object) [
                 'success' => false,
@@ -78,15 +115,14 @@ class JobService
         }
     }
 
-
     public function createOrUpdate(
         string $companyUuid,
         array $data,
         bool $isDraft,
         bool $isPublish = false
     ): array|object {
-        //? check if company id exist and user owns a company
-        if (!$this->repo->checkIfCompanyIdExist($companyUuid)) {
+        // ? check if company id exist and user owns a company
+        if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
             return (object) [
                 'success' => false,
                 'message' => 'You can only create a job for a company linked to your account.',
@@ -96,7 +132,7 @@ class JobService
 
         try {
             DB::beginTransaction();
-            //? create a new job
+            // ? create a new job
             $updatedDraft = $this->repo->createOrUpdateJob(
                 $companyUuid,
                 $data,
@@ -104,7 +140,7 @@ class JobService
                 $isPublish
             );
 
-            //? store job and skill relationship
+            // ? store job and skill relationship
             $skills = $data['skills'];
             $this->repo->addJobSkills($skills, $updatedDraft->id);
 
@@ -121,16 +157,17 @@ class JobService
                     'category',
                     'jobType',
                     'track',
-                    'skills'
+                    'skills',
+                    'jobLevels'
                 ]),
             ];
 
-            //? return job model
+            // ? return job model
             return $createdJob;
-            // return 
+            // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error("Unable to save job: " . $e->getMessage());
+            logger()->error('Unable to save job: ' . $e->getMessage());
 
             return (object) [
                 'success' => false,
@@ -143,7 +180,7 @@ class JobService
     public function updateForCompany(string $companyUuid, string $jobId, array $data): JobListing|bool
     {
         $job = $this->getForCompany($companyUuid, $jobId);
-        if (!$job) {
+        if (! $job) {
             return false;
         }
 
@@ -152,18 +189,18 @@ class JobService
 
             $updatedJob = $this->repo->update($job, $data);
 
-            //? store job and skill relationship
+            // ? store job and skill relationship
             $skills = $data['skills'];
             $this->repo->addJobSkills($skills, $jobId);
 
             DB::commit();
 
-            //? return job model
+            // ? return job model
             return $updatedJob;
-            // return 
+            // return
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error("Unable to save job to update job: " . $e->getMessage());
+            logger()->error('Unable to save job to update job: ' . $e->getMessage());
 
             return false;
         }
@@ -172,10 +209,11 @@ class JobService
     public function deleteForCompany(string $companyUuid, string $jobId): bool
     {
         $job = $this->getForCompany($companyUuid, $jobId);
-        if (!$job) {
+        if (! $job) {
             return false;
         }
         $this->repo->softDelete($job);
+
         return true;
     }
 
@@ -184,19 +222,17 @@ class JobService
         return $this->repo->restore($jobId);
     }
 
-
     public function publish(string $companyUuid, string $jobId, string $isPublish)
     {
         $isPublish = $isPublish ? 'published' : 'unpublished';
 
         $job = $this->getForCompany($companyUuid, $jobId);
-        if (!$job) {
+        if (! $job) {
             return null;
         }
 
         return $this->repo->publish($job, $isPublish);
     }
-
 
     public function updateStatus(string $companyUuid, string $jobId, bool $isActive)
     {
@@ -205,7 +241,7 @@ class JobService
 
         $job = $this->getForCompany($companyUuid, $jobId);
         // dd($job);/
-        if (!$job) {
+        if (! $job) {
             return null;
         }
 

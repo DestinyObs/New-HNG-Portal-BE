@@ -4,7 +4,7 @@ namespace App\Http\Requests\Talent;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class   TalentOnboardingRequest extends FormRequest
+class TalentOnboardingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,12 @@ class   TalentOnboardingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'current_role'  => ['required'],
-            'bio' => ['required'],
-            'track_id' => ['required', 'exists:tracks,id'],
-            'project_name'  => ['required'],
-            'project_url'  => ['required'],
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'current_role'  => ['nullable'],
+            'bio' => ['nullable'],
+            'track_id' => ['nullable', 'exists:tracks,id'],
+            'project_name'  => ['nullable'],
+            'project_url'  => ['nullable'],
             'project_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,docx|max:2048',
         ];
     }

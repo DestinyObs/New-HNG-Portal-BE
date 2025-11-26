@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\Http;
 use App\Http\Requests\SkillRequest;
 use App\Services\SkillService;
-use Illuminate\Http\Request;
 
 class SkillController extends Controller
 {
@@ -26,6 +25,7 @@ class SkillController extends Controller
             // not found
             return $this->notFound('Skill no found');
         }
+
         return $this->successWithData($data, 'Skills retrieved successfully'); // 200
     }
 
@@ -36,6 +36,7 @@ class SkillController extends Controller
     {
         $validated = $request->validated();
         $data = $this->skillService->createSkill($validated);
+
         return $this->successWithData($data, 'created', Http::CREATED); // 201
     }
 
@@ -45,6 +46,7 @@ class SkillController extends Controller
     public function show($id)
     {
         $data = $this->skillService->getSkillById($id);
+
         return $this->successWithData($data, 'Skill retrieved successfully'); // 200
     }
 
@@ -55,6 +57,7 @@ class SkillController extends Controller
     {
         $validated = $request->validated();
         $data = $this->skillService->updateSkill($id, $validated);
+
         return $this->successWithData($data, 'updated'); // 200
     }
 
@@ -64,6 +67,7 @@ class SkillController extends Controller
     public function destroy(string $id)
     {
         $this->skillService->deleteSkill($id);
+
         return $this->success('deleted', Http::NO_CONTENT); // 204
     }
 }

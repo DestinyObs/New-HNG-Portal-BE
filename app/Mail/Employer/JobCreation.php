@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Employer;
 
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -22,7 +21,8 @@ class JobCreation extends Mailable
     public function __construct(
         public readonly User $user,
         public readonly Company $company
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.

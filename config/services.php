@@ -23,7 +23,6 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL', 'http://localhost:3000/home'),
     ],
 
-
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

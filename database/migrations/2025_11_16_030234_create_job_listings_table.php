@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('job_listings', function (Blueprint $table) {
@@ -30,6 +31,8 @@ return new class extends Migration {
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->uuid('job_type_id')->nullable();
             $table->foreign('job_type_id')->references('id')->on('job_types')->onDelete('set null');
+            $table->uuid('job_level_id')->nullable();
+            $table->foreign('job_level_id')->references('id')->on('job_levels')->onDelete('set null');
             $table->enum('publication_status', ['published', 'unpublished'])->default('unpublished');
             $table->enum('status', ['active', 'in-active', 'draft'])->default('draft');
             $table->softDeletes();

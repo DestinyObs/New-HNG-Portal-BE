@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Talent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Talent\UpdatePasswordRequest;
 use App\Http\Requests\Talent\UpdatePhotoRequest;
-use App\Models\User;
 use App\Services\Interfaces\Talent\ProfileServiceInterface;
 use Illuminate\Http\Request;
 
@@ -19,7 +18,7 @@ class ProfileController extends Controller
     {
         return $this->successWithData(
             $request->user(),
-            "Talent profile retrieved successfully.",
+            'Talent profile retrieved successfully.',
         );
     }
 
@@ -34,7 +33,7 @@ class ProfileController extends Controller
             $request->validated('password'),
         );
 
-        //? check if success is true
+        // ? check if success is true
         if ($response->success) {
             return $this->successWithData(
                 $response->user,
@@ -42,13 +41,12 @@ class ProfileController extends Controller
             );
         }
 
-        //? error message should be returned
+        // ? error message should be returned
         return $this->error(
             $response->message,
             $response->status,
         );
     }
-
 
     public function updatePhoto(UpdatePhotoRequest $request)
     {

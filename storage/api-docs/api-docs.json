@@ -490,159 +490,271 @@
                     }
                 }
             }
-        },
-        "/api/lookups/countries": {
-            "get": {
-                "tags": [
-                    "LookUp"
-                ],
-                "summary": "Countries Country",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@countries",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
+              }
             }
-        },
-        "/api/lookups/job-types": {
-            "get": {
-                "tags": [
-                    "LookUp"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Create a new user account. For company role, a company record will also be created.",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstname",
+                  "lastname",
+                  "email",
+                  "password",
+                  "password_confirmation",
+                  "role"
                 ],
-                "summary": "JobTypes Job Type",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@jobTypes",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+                "properties": {
+                  "firstname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "John"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Doe"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Acme Corporation",
+                    "description": "Required when role is 'company'"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "talent",
+                      "company"
+                    ],
+                    "example": "talent"
+                  }
                 }
+              }
             }
+          }
         },
-        "/api/lookups/skills": {
-            "get": {
-                "tags": [
-                    "LookUp"
-                ],
-                "summary": "Skills Skill",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@skills",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
                 }
+              }
             }
-        },
-        "/api/lookups/tracks": {
-            "get": {
-                "tags": [
-                    "LookUp"
-                ],
-                "summary": "Tracks Track",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@tracks",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
+              }
             }
-        },
-        "/api/lookups/work-modes": {
-            "get": {
-                "tags": [
-                    "LookUp"
-                ],
-                "summary": "WorkModes Work Mode",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@workModes",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+          }
+        }
+      }
+    },
+    "/api/auth/google": {
+      "post": {
+        "summary": "Authenticate or Register a user via Google-provided data",
+        "description": "Handles Google-based authentication using the email and profile data sent from the frontend. If the email already exists, the user is logged in. If the email does not exist, a new account is created based on the provided `role` and optional `company_name`.",
+        "tags": ["Authentication"],
+
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "name"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User email received from Google profile.",
+                    "example": "johndoe@gmail.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "User full name from Google profile.",
+                    "example": "John Doe"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["talent", "company"],
+                    "nullable": true,
+                    "description": "Required ONLY for new users. Ignored for existing users.",
+                    "example": "talent"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Required ONLY when signing up as a company. If not provided, backend infers from `name`.",
+                    "example": "Acme Corp"
+                  }
                 }
+              },
+
+              "examples": {
+                "existing-user-login": {
+                  "summary": "Existing user login — no role required",
+                  "value": {
+                    "email": "existing@example.com",
+                    "name": "Existing User"
+                  }
+                },
+                "new-talent-signup": {
+                  "summary": "New talent user signup",
+                  "value": {
+                    "email": "newtalent@example.com",
+                    "name": "Jane Talent",
+                    "role": "talent"
+                  }
+                },
+                "new-company-signup": {
+                  "summary": "New company user signup",
+                  "value": {
+                    "email": "hr@acme.com",
+                    "name": "Acme Corporation",
+                    "role": "company",
+                    "company_name": "Acme Corporation"
+                  }
+                }
+              }
             }
+          }
         },
-        "/api/lookups/states": {
-            "get": {
-                "tags": [
-                    "LookUp"
-                ],
-                "summary": "States State",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@states",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
+
+        "responses": {
+          "200": {
+            "description": "Login success — existing user returned with token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
             }
-        },
-        "/api/lookups/categories": {
-            "get": {
-                "tags": [
-                    "LookUp"
+          },
+          "201": {
+            "description": "Signup success — new user created and returned with token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request — missing fields or invalid payload.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed — missing role for new user, invalid company signup data, etc.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/auth/login": {
+      "post": {
+        "summary": "User login",
+        "description": "Authenticate user and return access token with user data.",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
                 ],
-                "summary": "Categories Category",
-                "description": "",
-                "operationId": "App\\Http\\Controllers\\LookUpController@categories",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123!"
+                  }
                 }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
         },
         "/api/admin/skills": {

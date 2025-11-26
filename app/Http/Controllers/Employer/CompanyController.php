@@ -7,7 +7,6 @@ use App\Http\Requests\Employer\StoreCompanyRequest;
 use App\Http\Requests\Employer\UpdateCompanyLogoRequest;
 use App\Http\Requests\Employer\UpdateCompanyRequest;
 use App\Services\Employer\CompanyService;
-use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {

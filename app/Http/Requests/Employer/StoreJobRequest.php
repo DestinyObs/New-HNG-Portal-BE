@@ -28,7 +28,7 @@ class StoreJobRequest extends FormRequest
         return [
             'company' => [
                 Rule::exists('companies', 'id')
-                    ->where('user_id', Auth::id())
+                    ->where('user_id', Auth::id()),
             ],
             'job_id' => [
                 'sometimes',
@@ -46,13 +46,13 @@ class StoreJobRequest extends FormRequest
             'category_id' => 'required|uuid|exists:categories,id',
             'job_type_id' => 'required|uuid|exists:job_types,id',
             'work_mode_id' => 'required|uuid|exists:work_modes,id',
+            'job_level_id' => 'required|uuid|exists:job_levels,id',
             'skills' => 'required|array',
             'skills.*' => 'uuid|exists:skills,id',
             // 'status' => 'required|in:active,in-active',
             // 'publication_status' => 'required|in:published',
         ];
     }
-
 
     public function messages(): array
     {
@@ -61,19 +61,19 @@ class StoreJobRequest extends FormRequest
             'job_id.exists' => 'The specified job does not exist or you do not have permission to edit it.',
             'title.required' => 'The job title is required.',
             'description.required' => 'The job description is required.',
-            'country_id.required' => "Country field is required",
+            'country_id.required' => 'Country field is required',
             'country_id.exists' => 'The selected country is invalid.',
-            'state_id.required' => "State field is required.",
+            'state_id.required' => 'State field is required.',
             'state_id.exists' => 'The selected state is invalid.',
-            'track_id.required' => "Track field is required.",
+            'track_id.required' => 'Track field is required.',
             'track_id.exists' => 'The selected track is invalid.',
-            'category_id.required' => "Category field is required.",
+            'category_id.required' => 'Category field is required.',
             'category_id.exists' => 'The selected category is invalid.',
-            'job_type_id.required' => "Job type field is required.",
+            'job_type_id.required' => 'Job type field is required.',
             'job_type_id.exists' => 'The selected job type is invalid.',
-            'work_mode_id.required' => "Work mode field is required.",
+            'work_mode_id.required' => 'Work mode field is required.',
             'work_mode_id.exists' => 'The selected work mode is invalid.',
-            'skills.required' => "Atleast one skill must be added.",
+            'skills.required' => 'Atleast one skill must be added.',
             'skills.array' => 'The skills must be an array of skill IDs.',
             'skills.*.exists' => 'One or more selected skills are invalid.',
             // 'status.required' => "Status must be added",

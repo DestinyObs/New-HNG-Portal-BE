@@ -10,16 +10,16 @@ class MediaAssetFactory extends Factory
     {
         $types = ['pdf', 'doc', 'docx', 'jpg', 'png'];
         $type = fake()->randomElement($types);
-        
+
         return [
-            'url' => 'https://example.com/media/' . fake()->uuid() . '.' . $type,
+            'url' => 'https://example.com/media/'.fake()->uuid().'.'.$type,
         ];
     }
 
     public function pdf(): static
     {
         return $this->state(fn (array $attributes) => [
-            'url' => 'https://example.com/media/' . fake()->uuid() . '.pdf',
+            'url' => 'https://example.com/media/'.fake()->uuid().'.pdf',
         ]);
     }
 
@@ -30,4 +30,3 @@ class MediaAssetFactory extends Factory
         ]);
     }
 }
-
