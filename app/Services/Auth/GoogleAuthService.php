@@ -12,67 +12,61 @@ class GoogleAuthService implements GoogleAuthInterface
 {
     public function __construct(protected UserInterface $userService) {}
 
-    public function handle(string $googleToken, ?string $role = null, ?string $companyName = null): array|\Exception
-    {
-        // Retrieve user info from Google using the token
-
+    public function handle(
+        string $googleToken,
+        ?string $role = null,
+        ?string $companyName = null
+    ): array |\Exception {
+        // Retrieve user info from Google
         try {
             $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
-            info('GOOGLE USER', ['user' => $googleUser]);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Invalid Google token provided.');
-        } catch (\Throwable $e) {
-            info('GOOGLE ERROR', ['error' => $e->getMessage()]);
-            throw new \Exception('An error occurred while authenticating with Google. Please try again later.');
         }
 
-        $googleUserData = [
-            'email' => $googleUser->getEmail(),
-            'name' => $googleUser->getName(),
-            'company_name' => $companyName,
-        ];
-
-        $email = $googleUserData['email'] ?? null;
+        $email = $googleUser->getEmail();
 
         // Check if user exists
         $user = User::where('email', $email)->first();
 
         if ($user) {
-            // LOGIN FLOW
-            $token = $user->createToken('auth_token')->plainTextToken;
-            dump($googleUserData);
+            // Always return user + token
             return [
-                'user' => $user,
-                'token' => $token,
+                'user'  => $user,
+                'token' => $user->createToken('auth_token')->plainTextToken,
             ];
         }
 
-        // SIGNUP FLOW
-
+        // SIGNUP FLOW — role is required
         if (!$role) {
             throw new \InvalidArgumentException('Role is required for new user signup.');
         }
 
-        $nameParts = explode(' ', $googleUserData['name'], 2);
         $generatedPassword = Str::random(12);
 
         $data = [
             'email' => $email,
             'password' => $generatedPassword,
             'role' => $role,
+            'email_verified_at' => now(),
         ];
 
         if ($role === 'talent') {
-            $nameParts = explode(' ', $googleUserData['name'], 2);
-            $data['firstname'] = $nameParts[0] ?? null;
-            $data['lastname'] = $nameParts[1] ?? null;
+            $parts = explode(' ', $googleUser->getName(), 2);
+            $data['firstname'] = $parts[0] ?? null;
+            $data['lastname']  = $parts[1] ?? null;
         }
 
         if ($role === 'company') {
-            $data['company_name'] = $googleUserData['company_name'] ?? $googleUserData['name'];
+            $data['company_name'] = $companyName ?? $googleUser->getName();
         }
 
-        // Delegate to UserService to handle full signup (OTP, role, company/userbio, auth)
-        return $this->userService->create($data);
+
+        $result = $this->userService->create($data);
+
+        $result['user'] = $result['user']->resource;
+
+        return $result;
     }
+
 }

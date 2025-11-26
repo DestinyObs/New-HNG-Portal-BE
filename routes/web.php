@@ -4,9 +4,8 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => redirect('/up'));
+Route::get('/api', fn () => redirect('/up'));
 
 Route::prefix('setup')->group(function () {
     Route::get('clear-all', function () {

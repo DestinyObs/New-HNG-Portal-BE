@@ -65,23 +65,35 @@ return Application::configure(basePath: dirname(__DIR__))
                 $statusCode = 500;
 
                 // Customize response for different exception types
-                if ($e instanceof ModelNotFoundException) {
-                    $response['message'] = 'Resource not found.';
-                    $statusCode = 404;
-                } elseif ($e instanceof NotFoundHttpException) {
-                    $response['message'] = 'Endpoint not found.';
-                    $statusCode = 404;
-                } elseif ($e instanceof AuthenticationException) {
-                    $response['message'] = 'Unauthenticated.';
-                    $statusCode = 401;
-                } elseif ($e instanceof AuthorizationException) {
-                    $response['message'] = 'Unauthorized.';
-                    $statusCode = 403;
-                } elseif ($e instanceof ValidationException) {
-                    $response['message'] = 'Validation failed.';
-                    $response['errors'] = $e->errors();
-                    $statusCode = 422;
+                switch (true) {
+                    case $e instanceof ValidationException:
+                        $response['message'] = 'Validation failed, please check your input.';
+                        $response['errors'] = $e->errors();
+                        $statusCode = 422;
+                        break;
+                    case $e instanceof AuthenticationException:
+                        $response['message'] = 'Unauthenticated. Please log in.';
+                        $statusCode = 401;
+                        break;
+                    case $e instanceof AuthorizationException:
+                        $response['message'] = 'Unauthorized. You do not have permission.';
+                        $statusCode = 403;
+                        break;
+                    case $e instanceof ModelNotFoundException:
+                        $response['message'] = 'Resource not found.';
+                        $statusCode = 404;
+                        break;
+                    case $e instanceof NotFoundHttpException:
+                        $response['message'] = 'Endpoint not found.';
+                        $statusCode = 404;
+                        break;
+                    default:
+                        if ($e instanceof \Illuminate\Database\QueryException) {
+                            $response['message'] = 'Database error occurred. Please check your request.';
+                            $statusCode = 500;
+                        }
                 }
+
                 $response['status'] = $statusCode;
 
                 return response()->json($response, $statusCode);

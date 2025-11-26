@@ -82,12 +82,12 @@ class UserService implements UserInterface
 
             // Assign role object to user
             $user->assignRole($roleMap[$role]);
+            if (!isset($data['email_verified_at'])) {
+                $otpCode = $this->generateOtp($user);
 
-            $otpCode = $this->generateOtp($user);
-
-            // ? Send email to user (commented out for now)
-            Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
-
+                // ? Send email to user (commented out for now)
+                Mail::to($user->email)->send(new OtpVerification($user, $otpCode));
+            }
             // ? authenticate user after registration
             $credentials = [
                 'email' => $data['email'],
