@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_levels', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->unique();  // e.g. "Senior-Level"
+            $table->string('name');  // e.g. "Senior-Level"
             $table->string('slug')->unique();  // e.g. "senior-level"
             $table->text('description')->nullable();
             $table->timestamps();

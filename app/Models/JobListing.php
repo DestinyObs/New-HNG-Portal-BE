@@ -59,6 +59,11 @@ class JobListing extends Model
         return $this->belongsTo(State::class, 'state_id');
     }
 
+    public function workModes()
+    {
+        return $this->belongsTo(WorkMode::class, 'work_mode_id');
+    }
+
     public function countries()
     {
         return $this->belongsTo(Country::class, 'country_id');
@@ -67,6 +72,13 @@ class JobListing extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
+    }
+
+
+    public function bookmarks()
+    {
+        return $this->belongsToMany(JobListing::class, 'bookmarked_jobs', 'user_id', 'job_listing_id')
+            ->withTimestamps();
     }
 
     public function skills()

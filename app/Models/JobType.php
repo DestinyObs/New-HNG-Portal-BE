@@ -13,4 +13,9 @@ class JobType extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function jobListings()
+    {
+        return $this->hasMany(JobListing::class, 'job_type_id', 'id');
+    }
 }

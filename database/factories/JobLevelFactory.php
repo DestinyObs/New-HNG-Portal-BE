@@ -2,16 +2,19 @@
 
 namespace Database\Factories;
 
+use App\Models\JobLevel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class JobTypeFactory extends Factory
+class JobLevelFactory extends Factory
 {
+    protected $model = JobLevel::class;
+
     public function definition(): array
     {
         return [
-            'name' => fake()->word() . ' ' . fake()->randomNumber(3),
             'slug' => Str::slug($this->faker->unique()->word()),
+            'name' => $this->faker->word(),
         ];
     }
 }
