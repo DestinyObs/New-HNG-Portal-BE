@@ -23,6 +23,16 @@ class ProfileSettingController extends Controller
         return $this->successWithData($user_bio, 'User profile retrieved successfully');
     }
 
+
+    public function getSkills(Request $request)
+    {
+        $user = $request->user();
+
+        $user_skills = $user->skills;
+
+        return $this->successWithData($user_skills, 'User skills retrieved successfully');
+    }
+
     public function skill(SkillProfileSettingRequest $request)
     {
         $skill_ids = $request->validated();
