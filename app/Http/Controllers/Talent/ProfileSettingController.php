@@ -16,11 +16,22 @@ class ProfileSettingController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $user_bio = UserBio::where('user_id', $user->id)->firstOrFail();
-        $user_bio->load('user', 'user.skills');
-        $user_bio->getMedia();
+        $user->load('bio', 'skills', 'experiences', 'portfolios');
+        // $user_bio = UserBio::where('user_id', $user->id)->firstOrFail();
+        // $user_bio->load('user', 'user.skills', 'user.experiences', 'user.portfolios');
+        // $user_bio->getMedia();
 
-        return $this->successWithData($user_bio, 'User profile retrieved successfully');
+        return $this->successWithData($user, 'User profile retrieved successfully');
+    }
+
+
+    public function getSkills(Request $request)
+    {
+        $user = $request->user();
+
+        $user_skills = $user->skills;
+
+        return $this->successWithData($user_skills, 'User skills retrieved successfully');
     }
 
     public function skill(SkillProfileSettingRequest $request)
@@ -43,29 +54,45 @@ class ProfileSettingController extends Controller
         return $this->successWithData($user->skills, 'User skills updated successfully');
     }
 
-    public function experience(WorkExperienceProfileSettingRequest $request)
-    {
-        $data = $request->validated();
-        $user = $request->user();
-        return $experience = $user->experiences()->create();
-    }
 
     public function store(ProfileSettingRequest $request)
     {
-        // dd($request->all());
-        // return $request;
 
         $data = $request->validated();
         $user = $request->user();
-        $user_bio = UserBio::where('user_id', $user->id)->first();
+        $user_bio = UserBio::where('user_id', $user->id)->firstOrFail();
 
         if ($request->hasFile('profile_image')) {
             $user_bio->media->each->delete();
-            $user_bio->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $url = $user_bio->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+
+            // Update model with profile image url - optional
+            $user->update([
+                'photo_url' => $url?->original_url
+            ]);
         }
 
         $user_bio->update($data);
 
         return $this->successWithData($user_bio, 'User profile updated successfully');
+    }
+
+    public function update(Request $request)
+    {
+
+        $data = $request->validate([
+            "firstname" => ['nullable', 'string'],
+            "lastname" => ['nullable', 'string'],
+            'othername' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string'],
+            'dob' => ['nullable', 'date'],
+            'current_role' => ['nullable', 'string'],
+            'photo_url' => ['nullable', 'string'],
+        ]);
+
+        $user = $request->user();
+        $user->update($data);
+
+        return $this->successWithData($user, 'User info updated successfully');
     }
 }

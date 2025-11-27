@@ -26,13 +26,13 @@ class ProfileSettingRequest extends FormRequest
             'current_role'  => ['nullable'],
 
             'bio' => ['nullable'],
-            
+
             'experience'  => ['nullable'], // 2-4 years
             'available_status'  => ['nullable'], // available for work | open to offers
             'job_type_preference'  => ['nullable', 'in:remote,hybrid,onsite'], // job_type_preference remote | hybrid | onsite
-            
+
             'state' => ['nullable'],
-            'country' => ['nullable'],  
+            'country' => ['nullable'],
         ];
     }
 }
