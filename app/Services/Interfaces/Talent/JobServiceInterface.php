@@ -19,4 +19,6 @@ interface JobServiceInterface
     public function saveJob(string $jobUuid): object|array;
 
     public function getAllSavedJobs(array $params, int $perPage): object|array;
+
+    public function getCompany(string $companyId): object|array;
 }

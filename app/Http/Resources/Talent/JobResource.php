@@ -47,6 +47,7 @@ class JobResource extends JsonResource
             'total_applications' => $this->whenCounted('applications'),
             // 'published_at'       => $this->published_at,
             'created_at'      => $this->created_at?->diffForHumans(),
+            // 'application_link' => 
         ];
     }
 }

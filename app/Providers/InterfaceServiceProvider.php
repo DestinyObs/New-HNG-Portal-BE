@@ -13,6 +13,7 @@ use App\Services\Interfaces\Admin\WorkModeServiceInterface;
 use App\Services\Interfaces\Auth\GoogleAuthInterface;
 use App\Services\Interfaces\Auth\LoginInterface;
 use App\Services\Interfaces\Auth\PasswordResetInterface;
+use App\Services\Interfaces\Talent\ApplicationServiceInterface;
 use App\Services\Interfaces\Talent\JobServiceInterface;
 use App\Services\Interfaces\Talent\ProfileServiceInterface;
 use App\Services\Interfaces\UserInterface;
@@ -44,6 +45,7 @@ class InterfaceServiceProvider extends ServiceProvider
         StateServiceInterface::class => \App\Services\Admin\StateService::class,
         JobLevelServiceInterface::class => \App\Services\Admin\JobLevelService::class,
         JobServiceInterface::class => \App\Services\Talent\JobService::class,
+        ApplicationServiceInterface::class => \App\Services\Talent\ApplicationService::class
     ];
 
     /**
