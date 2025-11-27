@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\Company;
+
 interface CompanyRepositoryInterface
 {
     public function create(array $data);
@@ -11,4 +13,6 @@ interface CompanyRepositoryInterface
     public function update(array $data, string $uuid);
 
     public function updateLogo(mixed $file, string $uuid);
+
+    public function getApplications(string $companyUuid): Company;
 }
