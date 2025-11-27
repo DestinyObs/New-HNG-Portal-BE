@@ -2,6 +2,7 @@
 
 // ? API routes for talent functionalities
 
+use App\Http\Controllers\Talent\ApplicationController;
 use App\Http\Controllers\Talent\JobController;
 use App\Http\Controllers\Talent\ExperienceSettingController;
 use App\Http\Controllers\Talent\PortfolioController;
@@ -40,12 +41,20 @@ Route::prefix('api/talent')->group(function () {
                 Route::get('/bookmark', 'getSaveJobs');
                 Route::get('/{jobId}', 'show');
                 Route::put('/{jobId}/bookmark', 'saveJob');
+                Route::get('/company/{companyId}', "viewCompanyProfile");
             });
         });
-    });
 
+        // Talent Applications
+        Route::controller(ApplicationController::class)->group(function () {
+            Route::prefix('applications')->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/view/{applicationId}', 'show');
+                Route::put('/withdraw/{applicationId}', 'withdraw');
+            });
+        });
 
-    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
         // TALENT Profile Settings
         Route::controller(ProfileSettingController::class)->group(function () {
             // Profile

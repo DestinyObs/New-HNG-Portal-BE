@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\StoreCompanyRequest;
 use App\Http\Requests\Employer\UpdateCompanyLogoRequest;
 use App\Http\Requests\Employer\UpdateCompanyRequest;
+use App\Http\Resources\Employer\CompanyResource;
 use App\Services\Employer\CompanyService;
 
 class CompanyController extends Controller
@@ -38,5 +39,25 @@ class CompanyController extends Controller
         $company = $this->companyService->updateCompanyLogo($request->file('logo'), $uuid);
 
         return $this->successWithData($company, 'Company Logo updated successfully');
+    }
+
+    public function applications(string $uuid)
+    {
+        $response = $this->companyService->getAllApplication($uuid);
+        // dd($response);
+
+        if ($response->success) {
+            // $applications = CompanyResource::collection($response->applications);
+            return $this->successWithData(
+                new CompanyResource($response->applications),
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
+        );
     }
 }

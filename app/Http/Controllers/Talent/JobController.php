@@ -107,4 +107,25 @@ class JobController extends Controller
             $response->status,
         );
     }
+
+
+    public function viewCompanyProfile(Request $request, string $companyId)
+    {
+        $response = $this->jobService->getCompany($companyId);
+        // dd($response);
+
+        if ($response->success) {
+
+            return $this->successWithData(
+                $response->company,
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status,
+        );
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Http;
+use App\Enums\Status;
 use App\Models\JobListing;
 use App\Repositories\JobRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -19,6 +20,11 @@ class JobService
 
     public function listForCompany(string $companyUuid, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
+        // ? check if company id exist and user owns a company
+        if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
+            throw new \Exception('You can only create a job for a company linked to your account.');
+        }
+
         $filters = [
             'title' => $params['title'] ?? null,
             'job_type_id' => $params['job_type_id'] ?? null,
@@ -217,6 +223,7 @@ class JobService
         return true;
     }
 
+
     public function restore(string $jobId): ?JobListing
     {
         return $this->repo->restore($jobId);
@@ -234,17 +241,143 @@ class JobService
         return $this->repo->publish($job, $isPublish);
     }
 
-    public function updateStatus(string $companyUuid, string $jobId, bool $isActive)
+    public function getAllApplication(string $companyUuid, string $uuid)
     {
-        // dd($companyUuid, $jobId);
-        $isActive = $isActive ? 'active' : 'in-active';
+        try {
+            if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'You can only create a job for a company linked to your account.',
+                    'status' => Http::INTERNAL_SERVER_ERROR,
+                ];
+            }
 
-        $job = $this->getForCompany($companyUuid, $jobId);
-        // dd($job);/
-        if (! $job) {
-            return null;
+            $applications = $this->repo->getApplications($uuid);
+
+            return (object) [
+                'success' => true,
+                'message' => 'Applications retrieved successfully',
+                'applications' => $applications,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to retrieve applications',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
         }
+    }
 
-        return $this->repo->updateStatus($job, $isActive);
+
+    public function updateStatus(string $companyUuid, string $uuid, bool $status)
+    {
+        try {
+            if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'You can only create a job for a company linked to your account.',
+                    'status' => Http::INTERNAL_SERVER_ERROR,
+                ];
+            }
+
+            $status = $status ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+            $job = $this->getForCompany($companyUuid, $uuid);
+            if (! $job) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'You can only create a job for a company linked to your account.',
+                    'status' => Http::INTERNAL_SERVER_ERROR,
+                ];
+            }
+
+            $job = $this->repo->updateStatus($job, $status);
+
+            return (object) [
+                'success' => true,
+                'message' => 'Job status updates successfully',
+                'job' => $job,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to update status',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
+    }
+
+
+    public function getSingleApplication(string $companyUuid, string $jobId, string $applicationId)
+    {
+        try {
+            $companyJob = $this->getForCompany($companyUuid, $jobId);
+            // dd($companyJob);
+
+            if (!$companyJob) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'Company or job do not exist',
+                    'status' => Http::NOT_FOUND,
+                ];
+            }
+
+            $application = $this->repo->getSingleApplication($jobId, $applicationId);
+            // dd($application);
+
+            return (object) [
+                'success' => true,
+                'message' => 'Single application gotten successfully',
+                'application' => $application,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to unable to retrieve application',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
+    }
+
+
+    public function updateApplicationStatus(string $companyUuid, string $jobId, string $applicationId, string $status)
+    {
+        try {
+            $companyJob = $this->getForCompany($companyUuid, $jobId);
+            // dd($companyJob);
+
+            if (!$companyJob) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'Company or job do not exist',
+                    'status' => Http::NOT_FOUND,
+                ];
+            }
+            $updatedApplication = $this->repo->updateApplicationStatus($applicationId, $status);
+
+            if (!$updatedApplication) {
+                return (object) [
+                    'success' => false,
+                    'message' => 'Application not found',
+                    'status' => Http::NOT_FOUND,
+                ];
+            }
+
+            return (object) [
+                'success' => true,
+                'message' => "Application status updated to {$status}",
+                'application' => $updatedApplication,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to update application status',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
     }
 }

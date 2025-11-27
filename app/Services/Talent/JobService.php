@@ -129,6 +129,30 @@ class JobService implements JobServiceInterface
         }
     }
 
+    public function getCompany(string $companyId): object|array
+    {
+        try {
+            $companyDetail = $this->jobRepository->getCompanyDetails($companyId);
+
+            // logger()->info("Saved jobs retried successfully");
+
+            return (object) [
+                'success' => true,
+                'message' => 'Company detail retrieved successfully',
+                'company' => $companyDetail,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            logger()->error("unable to retrieve saved jobs: " . $e->getMessage());
+
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to retrieve company',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
+    }
+
     public function filters(): object|array
     {
         throw new \Exception('Not implemented');
