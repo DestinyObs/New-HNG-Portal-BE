@@ -18,7 +18,7 @@ return [
     /*
      * The path where your OpenAPI specification will be exported.
      */
-    'export_path' => 'api.json',
+    'export_path' => storage_path('api-docs/api-docs.json'),
 
     'info' => [
         /*
@@ -90,7 +90,6 @@ return [
      * ```
      */
     'servers' => null,
-
     /**
      * Determines how Scramble stores the descriptions of enum cases.
      * Available options:
@@ -129,7 +128,7 @@ return [
 
     'middleware' => [
         'web',
-        RestrictedDocsAccess::class,
+        RestrictedDocsAccess::class //this will be updated to disallow unauthorized access,
     ],
 
     'extensions' => [],
