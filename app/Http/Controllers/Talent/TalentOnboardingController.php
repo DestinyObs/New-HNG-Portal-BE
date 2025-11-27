@@ -29,12 +29,18 @@ class TalentOnboardingController extends Controller
 
         if ($request->hasFile('profile_image')) {
             $user_bio->media->each->delete();
-            $user_bio->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $url = $user_bio->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            // Update model with profile image url - optional
+            $user->update([
+                'photo_url' => $url?->original_urls
+            ]);
         }
 
         if ($request->hasFile('project_file')) {
             $user_bio->media->each->delete();
-            $user_bio->addMediaFromRequest('project_file')->toMediaCollection('project_file');
+            $url = $user_bio->addMediaFromRequest('project_file')->toMediaCollection('project_file');
+            // Update model with project file url - optional
+            $user_bio['project_file_url'] = $url?->original_url;
         }
         // $user_bio->update($data);
         // $user_bio = $this->userBioService->updateUserBio($data, $user_bio->id);

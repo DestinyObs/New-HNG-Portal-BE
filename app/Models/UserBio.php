@@ -19,6 +19,7 @@ class UserBio extends Model implements HasMedia
         'track_id',
         'project_name',
         'project_url',
+        'project_file_url',
         'state',
         'country',
         'experience',
@@ -26,12 +27,13 @@ class UserBio extends Model implements HasMedia
         'job_type_preference'
     ];
 
+
     /**
      * The relationships that should always be loaded.
      *
      * @var array
      */
-    protected $with = ['user'];
+    protected $with = ['user', 'media'];
 
     public function user()
     {
