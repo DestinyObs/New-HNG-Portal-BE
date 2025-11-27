@@ -46,6 +46,7 @@ class ApplicationRepository implements ApplicationRepositoryInterface
         return $application->load(['user', 'job', 'job.company']);
     }
 
+
     public function show(string $appId): Application|EloquentCollection
     {
         $user = Auth::user();
