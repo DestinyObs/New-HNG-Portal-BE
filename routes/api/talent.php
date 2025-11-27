@@ -2,8 +2,10 @@
 
 // ? API routes for talent functionalities
 
+use App\Http\Controllers\Talent\ApplicationController;
 use App\Http\Controllers\Talent\JobController;
 use App\Http\Controllers\Talent\ExperienceSettingController;
+use App\Http\Controllers\Talent\PortfolioController;
 use App\Http\Controllers\Talent\ProfileController;
 use App\Http\Controllers\Talent\ProfileSettingController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
@@ -39,20 +41,38 @@ Route::prefix('api/talent')->group(function () {
                 Route::get('/bookmark', 'getSaveJobs');
                 Route::get('/{jobId}', 'show');
                 Route::put('/{jobId}/bookmark', 'saveJob');
+                Route::get('/company/{companyId}', "viewCompanyProfile");
             });
         });
-    });
 
+        // Talent Applications
+        Route::controller(ApplicationController::class)->group(function () {
+            Route::prefix('applications')->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/view/{applicationId}', 'show');
+                Route::put('/withdraw/{applicationId}', 'withdraw');
+            });
+        });
 
-    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
         // TALENT Profile Settings
         Route::controller(ProfileSettingController::class)->group(function () {
+            // Profile
             Route::get('profile', 'index');
             Route::post('profile', 'store');
+            Route::put('profile', 'update');
+
+            // Skills
+            Route::get('skills', 'getSkills');
             Route::post('skills', 'skill');
-            Route::post('profile', 'store');
         });
         // TALENT Experiences
         Route::apiResource('work-experiences', ExperienceSettingController::class);
+
+        // TALENT Portfolios
+        Route::apiResource('portfolios', PortfolioController::class)
+            ->only(['index', 'show', 'store', 'destroy']);
+        // TALENT Portfolios for Update - put method doesn't work with file uploads
+        Route::post('portfolios/{portfolio}/update', [PortfolioController::class, 'update']);
     });
 });

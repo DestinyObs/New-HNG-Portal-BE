@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Enums\Status;
+use App\Models\Application;
 use App\Models\Company;
 use App\Models\JobListing;
 use App\Models\JobListingSkill;
@@ -73,7 +74,7 @@ class JobRepository
                 'jobType',
                 'track',
                 'skills',
-                'jobLevels'
+                'jobLevels',
             ]);
 
         return $this->filterDatas($query, $filters, $perPage);
@@ -218,7 +219,17 @@ class JobRepository
         $job->status = $isActive;
         $job->save();
 
-        return $job;
+        return $job->load([
+            'applications.user',
+            'category',
+            'states',
+            'countries',
+            'category',
+            'jobType',
+            'track',
+            'skills',
+            'jobLevels'
+        ]);
     }
 
     public function softDelete(JobListing $job): void
@@ -234,5 +245,68 @@ class JobRepository
         }
 
         return $job;
+    }
+
+
+    public function getApplications(string $jobId): JobListing
+    {
+        return JobListing::query()
+            ->with([
+                'applications.user',
+                'category',
+                'states',
+                'countries',
+                'category',
+                'jobType',
+                'track',
+                'skills',
+                'jobLevels'
+            ])
+            ->findOrFail($jobId);
+    }
+
+
+    public function getSingleApplication(string $jobId, string $applicationId): Application
+    {
+        $job = JobListing::query()
+            ->with([
+                'applications.user',
+                'category',
+                'states',
+                'countries',
+                'jobType',
+                'track',
+                'skills',
+                'jobLevels'
+            ])
+            ->findOrFail($jobId);
+
+        // dd($job);
+
+        // Get a single application from the loaded relationship
+        $application = $job->applications()
+            ->where('id', $applicationId)
+            ->with(['user', 'job'])
+            ->firstOrFail();
+
+        // dd($application);
+
+        return $application;
+    }
+
+    public function updateApplicationStatus(string $applicationId, string $status): ?Application
+    {
+        $application = Application::query()
+            ->where('id', $applicationId)
+            ->first();
+
+        if (!$application) {
+            return null;
+        }
+
+        $application->status = $status;
+        $application->save();
+
+        return $application->load(['user', 'job']); // Load relations if needed
     }
 }

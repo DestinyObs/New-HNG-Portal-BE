@@ -45,4 +45,17 @@ class Company extends Model implements HasMedia
     {
         return $this->hasMany(JobListing::class);
     }
+
+
+    public function applications()
+    {
+        return $this->hasManyThrough(
+            Application::class,
+            JobListing::class,
+            'company_id',   // Foreign key on job_listings table
+            'job_id',       // Foreign key on applications table
+            'id',           // Local key on companies table
+            'id'            // Local key on job_listings table
+        );
+    }
 }
