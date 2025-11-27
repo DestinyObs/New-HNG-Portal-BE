@@ -19,6 +19,11 @@ class JobService
 
     public function listForCompany(string $companyUuid, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
+        // ? check if company id exist and user owns a company
+        if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
+            throw new \Exception('You can only create a job for a company linked to your account.');
+        }
+
         $filters = [
             'title' => $params['title'] ?? null,
             'job_type_id' => $params['job_type_id'] ?? null,

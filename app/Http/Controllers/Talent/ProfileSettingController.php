@@ -52,6 +52,7 @@ class ProfileSettingController extends Controller
 
     public function store(ProfileSettingRequest $request)
     {
+        // dd($request->all());
         // return $request;
 
         $data = $request->validated();
