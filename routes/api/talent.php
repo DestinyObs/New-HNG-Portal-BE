@@ -49,6 +49,7 @@ Route::prefix('api/talent')->group(function () {
         Route::controller(ProfileSettingController::class)->group(function () {
             Route::get('profile', 'index');
             Route::post('profile', 'store');
+            Route::get('skills', 'getSkills');
             Route::post('skills', 'skill');
             Route::post('profile', 'store');
         });
