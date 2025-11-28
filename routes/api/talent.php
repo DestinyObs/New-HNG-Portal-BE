@@ -2,14 +2,20 @@
 
 // ? API routes for talent functionalities
 
-use App\Http\Controllers\Talent\JobController;
+use App\Http\Controllers\Talent\DashboardController;
 use App\Http\Controllers\Talent\ExperienceSettingController;
+use App\Http\Controllers\Talent\JobController;
 use App\Http\Controllers\Talent\ProfileController;
 use App\Http\Controllers\Talent\ProfileSettingController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::prefix('api/talent')->group(function () {
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::get('dashboard/analysis', [DashboardController::class, 'analysis']);
+    Route::get('dashboard/recommended', [DashboardController::class, 'recommendedJobs']);
+    });
     Route::get('/test', function () {
         dd('Talent route reached');
     });

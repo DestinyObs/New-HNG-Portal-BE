@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Talent;
 
+use Illuminate\Support\Facades\Auth;
 use App\Enums\Http;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -133,4 +134,26 @@ class JobService implements JobServiceInterface
     {
         throw new \Exception('Not implemented');
     }
+
+     public function dashboardAnalysis(): object|array
+{
+    try {
+        $user = Auth::user();
+
+        return (object)[
+            'success' => true,
+            'status' => 200,
+            'message' => 'Dashboard analysis retrieved',
+            'saved_jobs' => $user->bookmarks()->count(),
+            'applications' => $user->applications()->count(),
+        ];
+
+    } catch (\Exception $e) {
+        return (object)[
+            'success' => false,
+            'status' => 500,
+            'message' => $e->getMessage(),
+        ];
+    }
+}
 }
