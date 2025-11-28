@@ -54,7 +54,11 @@ Route::prefix('api/talent')->group(function () {
                 Route::put('/withdraw/{applicationId}', 'withdraw');
             });
         });
+    });
 
+
+    // TALENT SETTINGS
+    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
         // TALENT Profile Settings
         Route::controller(ProfileSettingController::class)->group(function () {
             // Profile
