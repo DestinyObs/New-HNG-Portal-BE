@@ -1116,6 +1116,43 @@
                 }
             }
         },
+         "/talent/dashboard/analysis": {
+            "get": {
+            "operationId": "talent.dashboard.analysis",
+            "tags": ["Dashboard"],
+            "summary": "Get dashboard analysis data for the talent user",
+            "responses": {
+                "200": {
+                "description": "Dashboard metrics including total applications and saved jobs",
+                "content": {
+                    "application/json": { "schema": { "type": "string" } }
+                }
+                },
+                "401": {
+                "$ref": "#/components/responses/AuthenticationException"
+                }
+            }
+            }
+        },
+
+        "/talent/dashboard/recommended": {
+            "get": {
+            "operationId": "talent.dashboard.recommendedJobs",
+            "tags": ["Dashboard"],
+            "summary": "Get recommended jobs for the authenticated talent user",
+            "responses": {
+                "200": {
+                "description": "List of recommended jobs",
+                "content": {
+                    "application/json": { "schema": { "type": "string" } }
+                }
+                },
+                "401": {
+                "$ref": "#/components/responses/AuthenticationException"
+                }
+            }
+            }
+        },
         "/admin/job-types": {
             "get": {
                 "operationId": "admin.job-types.index",
