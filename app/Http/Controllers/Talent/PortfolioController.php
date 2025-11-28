@@ -17,6 +17,9 @@ class PortfolioController extends Controller
     {
         $user = $request->user();
         $portfolios = $user->portfolios;
+        if ($portfolios->isEmpty()) {
+            return $this->notFound('Not found, No portfolios added yet!');
+        }
         return $this->successWithData($portfolios, 'User portfolio retrieved successfully');
     }
 
