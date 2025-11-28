@@ -54,7 +54,11 @@ Route::prefix('api/talent')->group(function () {
                 Route::put('/withdraw/{applicationId}', 'withdraw');
             });
         });
+    });
 
+
+    // TALENT SETTINGS
+    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
         // TALENT Profile Settings
         Route::controller(ProfileSettingController::class)->group(function () {
             // Profile
@@ -72,6 +76,7 @@ Route::prefix('api/talent')->group(function () {
         // TALENT Portfolios
         Route::apiResource('portfolios', PortfolioController::class)
             ->only(['index', 'show', 'store', 'destroy']);
+
         // TALENT Portfolios for Update - put method doesn't work with file uploads
         Route::post('portfolios/{portfolio}/update', [PortfolioController::class, 'update']);
     });
