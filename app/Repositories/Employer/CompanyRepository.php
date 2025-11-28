@@ -61,4 +61,15 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         return $this->company->findOrFail($uuid);
     }
+
+    public function getApplications(string $companyId): Company
+    {
+        // dd($companyId);
+        return Company::query()
+            ->with([
+                'applications.user',
+                'applications.job'
+            ])
+            ->findOrFail($companyId);
+    }
 }

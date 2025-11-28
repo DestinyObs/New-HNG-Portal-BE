@@ -32,6 +32,8 @@ return new class extends Migration
 
             $table->string('project_name')->nullable();
             $table->string('project_url')->nullable();
+            $table->string('project_file_url')->nullable();
+
             $table->string('state')->nullable();
             $table->string('country')->nullable();
             $table->string('onboarding_status')->default(OnboardingEnum::PENDING->value);

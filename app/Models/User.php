@@ -52,8 +52,8 @@ class User extends Authenticatable
 
     public function userSkills()
     {
-        return $this->belongsToMany(Skill::class, 'user_skills', 'user_id', 'skill_id');     
-    }    
+        return $this->belongsToMany(Skill::class, 'user_skills', 'user_id', 'skill_id');
+    }
 
     public function experiences()
     {
@@ -93,7 +93,13 @@ class User extends Authenticatable
     }
 
     public function applications()
-{
-    return $this->hasMany(Application::class, 'user_id');
-}
+    {
+        return $this->hasMany(Application::class, 'user_id');
+    }
+
+    // portfolios
+    public function portfolios()
+    {
+        return $this->hasMany(Portfolio::class, 'user_id');
+    }
 }

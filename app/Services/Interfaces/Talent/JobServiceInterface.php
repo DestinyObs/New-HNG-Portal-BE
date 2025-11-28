@@ -22,4 +22,5 @@ interface JobServiceInterface
 
     public function dashboardAnalysis(): object|array;
 
+    public function getCompany(string $companyId): object|array;
 }

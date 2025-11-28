@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Resources\Talent;
+namespace App\Http\Resources\Employer;
 
+use App\Http\Resources\Talent\ApplicationResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class JobResource extends JsonResource
+class JobListingResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id'                 => $this->id,
@@ -24,17 +25,6 @@ class JobResource extends JsonResource
             // Status
             'status'             => $this->status,
             'is_published'       => $this->publication_status,
-
-            // Bookmark / Saved Job
-            'is_saved' => auth()->check()
-                ? auth()->user()->bookmarks()->where('job_listing_id', $this->id)->exists()
-                : false,
-
-            'is_applied' => auth()->check()
-                ? auth()->user()->applications()
-                ->where('job_id', $this->id)
-                ->exists()
-                : false,
 
             // Location
             'state'              => $this->whenLoaded('states'),
@@ -51,6 +41,9 @@ class JobResource extends JsonResource
 
             // Extra computed data (custom)
             'total_applications' => $this->whenCounted('applications'),
+            'applications' => ApplicationResource::collection(
+                $this->whenLoaded('applications')
+            ),
             // 'published_at'       => $this->published_at,
             'created_at'      => $this->created_at?->diffForHumans(),
             // 'application_link' => 

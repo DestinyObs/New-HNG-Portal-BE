@@ -14,7 +14,10 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->uuid('job_id');
             $table->foreign('job_id')->references('id')->on('job_listings')->onDelete('cascade');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->text('cover_letter');
+            $table->string('portfolio_link')->nullable();
+            // $table->string('attachment');
+            $table->enum('status', ['pending', 'accepted', 'rejected', 'withdraw'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });
