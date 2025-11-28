@@ -72,6 +72,7 @@ Route::prefix('api/talent')->group(function () {
         // TALENT Portfolios
         Route::apiResource('portfolios', PortfolioController::class)
             ->only(['index', 'show', 'store', 'destroy']);
+
         // TALENT Portfolios for Update - put method doesn't work with file uploads
         Route::post('portfolios/{portfolio}/update', [PortfolioController::class, 'update']);
     });
