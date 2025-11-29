@@ -20,7 +20,7 @@ class JobTypeSeeder extends Seeder
         ];
 
         foreach ($jobTypes as $jobType) {
-            JobType::factory()->create([
+            JobType::create([
                 'name' => $jobType['name'],
                 'slug' => Str::slug($jobType['name']),
             ]);
