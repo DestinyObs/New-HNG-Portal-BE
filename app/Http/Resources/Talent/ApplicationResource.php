@@ -21,6 +21,7 @@ class ApplicationResource extends JsonResource
             $job = new JobListingResource($this->whenLoaded('job'));
         }
 
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
