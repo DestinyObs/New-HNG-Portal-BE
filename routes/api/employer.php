@@ -8,14 +8,14 @@ use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
 
 // API routes for employer functionalities
-Route::middleware('auth:sanctum')->prefix('api/employer')->group(function () {
+Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->group(function () {
 
     Route::get('/test', function () {
         dd('Employer route reached');
     });
 
     // ? Employer Company Jobs Routes
-    Route::prefix('company/{companyId}')->group(function () {
+    Route::prefix('company/{companyId}')->middleware('company.owner')->group(function () {
         Route::prefix('jobs')->group(function () {
             Route::controller(JobController::class)->group(function () {
 
@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->prefix('api/employer')->group(function () {
                 Route::post('/draft', 'draft');
                 Route::get('/draft', 'listDraftedJobs');
 
-                Route::prefix('{job_id}')->group(function () {
+                Route::prefix('{job_id}')->middleware('company.job')->group(function () {
                     Route::get('/', 'show');
                     Route::put('/', 'update');
                     Route::delete('/', 'destroy');
@@ -56,10 +56,12 @@ Route::middleware('auth:sanctum')->prefix('api/employer')->group(function () {
     Route::controller(CompanyController::class)->group(function () {
         Route::prefix('company')->group(function () {
             Route::post('company', 'store');
-            Route::get('{companyId}', 'show');
-            Route::put('{companyId}', 'update');
-            Route::put('{companyId}/logo', 'updateLogo');
-            Route::get('{companyId}/applications', 'applications');
+            Route::middleware('company.owner')->group(function () {
+                Route::get('{companyId}', 'show');
+                Route::put('{companyId}', 'update');
+                Route::put('{companyId}/logo', 'updateLogo');
+                Route::get('{companyId}/applications', 'applications');
+            });
         });
     });
 

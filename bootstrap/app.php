@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\EnsureCompanyOwner;
+use App\Http\Middleware\EnsureJobBelongsToCompany;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,9 +17,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             Route::middleware(['api'])
@@ -40,6 +43,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         // End of customized middleware
 
+        $middleware->alias([
+            'role'           => CheckRole::class,
+            'company.owner'  => EnsureCompanyOwner::class,
+            'company.job'    => EnsureJobBelongsToCompany::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
 
@@ -97,9 +105,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $response['status'] = $statusCode;
 
                 return response()->json($response, $statusCode);
-
             }
-
         });
         // End of render customized error message
 
