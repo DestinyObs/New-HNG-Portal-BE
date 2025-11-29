@@ -32,7 +32,11 @@ class CompanyOnboardingController extends Controller
 
         if ($request->hasFile('logo')) {
             $company->media->each->delete();
-            $company->addMediaFromRequest('logo')->toMediaCollection('logo');
+            $url = $company->addMediaFromRequest('logo')->toMediaCollection('logo');
+             // Update model with profile image url - optional
+            $company->update([
+                'logo_url' => $url?->original_urls
+            ]);
         }
 
         // $company->update($data);
