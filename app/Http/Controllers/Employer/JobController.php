@@ -271,6 +271,7 @@ class JobController extends Controller
 
     public function applications(string $uuid, string $job_id)
     {
+        // dd('reached here');
         $response = $this->service->getAllApplication($uuid, $job_id);
         // dd($response);
 
