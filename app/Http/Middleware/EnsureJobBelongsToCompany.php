@@ -19,11 +19,12 @@ class EnsureJobBelongsToCompany
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $company = $request->company; // added from previous middleware
+        $companyId = $request->route('companyId');
         $jobId   = $request->route('job_id');
+        // dd($company, $jobId);
 
         $job = JobListing::where('id', $jobId)
-            ->where('company_id', $company->id)
+            ->where('company_id', $companyId)
             ->first();
 
         if (!$job) {
