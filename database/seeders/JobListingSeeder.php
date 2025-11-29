@@ -19,18 +19,19 @@ class JobListingSeeder extends Seeder
     {
 
         JobListing::factory()
-            ->count(30)
+            ->count(5)
             ->create([
-                'company_id' => fn() => Company::factory(),
-                'state_id' => fn() => State::factory(),
-                'country_id' => fn() => Country::factory(),
-                'track_id' => fn() => Track::factory(),
-                'category_id' => fn() => Category::factory(),
-                'job_type_id' => fn() => JobType::factory(),
-                'work_mode_id' => fn() => WorkMode::factory(),
-                'job_level_id' => fn() => JobLevel::factory(),
+                'company_id'        => fn() => Company::inRandomOrder()->value('id'),
+                'state_id'          => fn() => State::inRandomOrder()->value('id'),
+                'country_id'        => fn() => Country::inRandomOrder()->value('id'),
+                'track_id'          => fn() => Track::inRandomOrder()->value('id'),
+                'category_id'       => fn() => Category::inRandomOrder()->value('id'),
+                'job_type_id'       => fn() => JobType::inRandomOrder()->value('id'),
+                'work_mode_id'      => fn() => WorkMode::inRandomOrder()->value('id'),
+                'job_level_id'      => fn() => JobLevel::inRandomOrder()->value('id'),
+
                 'publication_status' => fn() => ['published', 'unpublished'][rand(0, 1)],
-                'status' => fn() => ['active', 'in-active', 'draft'][rand(0, 2)],
+                'status'            => fn() => ['active', 'in-active', 'draft'][rand(0, 2)],
             ]);
     }
 }

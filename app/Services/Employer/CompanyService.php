@@ -2,6 +2,7 @@
 
 namespace App\Services\Employer;
 
+use App\Enums\Http;
 use App\Repositories\Employer\CompanyRepository;
 
 class CompanyService
@@ -26,5 +27,26 @@ class CompanyService
     public function updateCompanyLogo($file, $uuid)
     {
         return $this->companyRepository->updateLogo($file, $uuid);
+    }
+
+    public function getAllApplication(string $uuid)
+    {
+        try {
+            $applications = $this->companyRepository->getApplications($uuid);
+            // dd($applications);
+
+            return (object) [
+                'success' => true,
+                'message' => 'Applications retrieved successfully',
+                'applications' => $applications,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to retrieve applications',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
     }
 }

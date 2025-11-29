@@ -30,6 +30,12 @@ class JobResource extends JsonResource
                 ? auth()->user()->bookmarks()->where('job_listing_id', $this->id)->exists()
                 : false,
 
+            'is_applied' => auth()->check()
+                ? auth()->user()->applications()
+                ->where('job_id', $this->id)
+                ->exists()
+                : false,
+
             // Location
             'state'              => $this->whenLoaded('states'),
             'country'            => $this->whenLoaded('countries'),
@@ -47,6 +53,7 @@ class JobResource extends JsonResource
             'total_applications' => $this->whenCounted('applications'),
             // 'published_at'       => $this->published_at,
             'created_at'      => $this->created_at?->diffForHumans(),
+            // 'application_link' => 
         ];
     }
 }

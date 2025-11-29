@@ -19,15 +19,15 @@ class TrackSeeder extends Seeder
             ['name' => 'Product Management'],
             ['name' => 'Data Science'],
             ['name' => 'Machine Learning'],
-            ['name' => 'Quality Assurance'],
-            ['name' => 'Cybersecurity'],
-            ['name' => 'Cloud Engineering'],
             ['name' => 'Blockchain Development'],
+            // ['name' => 'Quality Assurance'],
+            // ['name' => 'Cybersecurity'],
+            // ['name' => 'Cloud Engineering'],
         ];
 
         foreach ($tracks as $track) {
             $track['slug'] = Str::slug($track['name']);
-            Track::factory()->create($track);
+            Track::create($track);
         }
     }
 }

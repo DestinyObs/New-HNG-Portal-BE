@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   build-deploy:
-    runs-on: [self-hosted, hng-13-runner, linux]
+    # runs-on: [self-hosted, hng-13-runner, linux]
+    runs-on: [self-hosted, hngconnect, not4hng, ourserver]
     steps:
       - name: Install sshpass
         run: |

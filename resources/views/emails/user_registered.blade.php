@@ -1,34 +1,32 @@
 <x-mail::message>
-# Welcome to <?php config('app.name') ?>, {{ $company->name }}!
+    # Welcome to {{ config('app.name') }}, {{ $user->firstname }}!
 
-Your company account has been successfully created on {{ $user->created_at->format('jS F, Y') }}.
+    Your talent account has been successfully created on {{ $user->created_at->format('jS F, Y') }}.
 
-## Company Details
-**Company Name:** {{ $company->name }}
-**Official Email:** {{ $company->official_email }}
+    ## Account Information
+    **Name:** {{ $user->firstname }} {{ $user->lastname }}
+    **Email:** {{ $user->email }}
 
-## Account Information
-**Account Holder:** {{ $user->firstname }} {{ $user->lastname }}
-**Email:** {{ $user->email }}
+    We're excited to have you join our platform! You now have access to apply for jobs, build your profile, and connect
+    with top companies.
 
-We're excited to have your company join our platform! You now have access to connect with talented developers and find the perfect candidates for your team.
+    ## Next Steps
+    1. **Complete your talent profile** – Add your skills, experience, and portfolio
+    2. **Verify your email** – Unlock full account access
+    3. **Upload your resume** – Stand out to employers
+    4. **Start applying to job opportunities** – Your next role might be waiting!
 
-## Next Steps
-1. **Complete your company profile** - Add your logo, description, and company details
-2. **Verify your company account** - Ensure full access to all features
-3. **Post your first job listing** - Start attracting top talent
-4. **Browse developer profiles** - Discover skilled candidates
+    To get started, sign in using the button below:
 
-To get started, please sign in to your account using the button below:
+    <x-mail::button :url="config('services.frontend.login')">
+        Access Talent Dashboard
+    </x-mail::button>
 
-<x-mail::button :url="config('services.frontend.login')">
-Access Company Dashboard
-</x-mail::button>
+    If you need assistance setting up your profile or exploring job opportunities, our support team is here to help at
+    {{ config('mail.from.address') }}.
 
-If you need any assistance setting up your account or posting jobs, our support team is here to help at {{ config('mail.from.address') }}.
+    We’re excited to support your career journey!
 
-We look forward to helping you build an amazing team!
-
-Best regards,<br>
-The {{ config('app.name') }} Team
+    Best regards,
+    The {{ config('app.name') }} Team
 </x-mail::message>

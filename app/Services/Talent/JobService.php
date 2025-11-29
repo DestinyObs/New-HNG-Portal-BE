@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Talent;
 
+use Illuminate\Support\Facades\Auth;
 use App\Enums\Http;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -129,8 +130,54 @@ class JobService implements JobServiceInterface
         }
     }
 
+    public function getCompany(string $companyId): object|array
+    {
+        try {
+            $companyDetail = $this->jobRepository->getCompanyDetails($companyId);
+
+            // logger()->info("Saved jobs retried successfully");
+
+            return (object) [
+                'success' => true,
+                'message' => 'Company detail retrieved successfully',
+                'company' => $companyDetail,
+                'status' => Http::OK,
+            ];
+        } catch (\Exception $e) {
+            logger()->error("unable to retrieve saved jobs: " . $e->getMessage());
+
+            return (object) [
+                'success' => false,
+                'message' => 'Unable to retrieve company',
+                'status' => Http::INTERNAL_SERVER_ERROR,
+            ];
+        }
+    }
+
     public function filters(): object|array
     {
         throw new \Exception('Not implemented');
     }
+
+     public function dashboardAnalysis(): object|array
+{
+    try {
+        $user = Auth::user();
+
+        return (object)[
+            'success' => true,
+            'status' => 200,
+            'message' => 'Dashboard analysis retrieved',
+            'saved_jobs' => $user->bookmarks()->count(),
+            'applications' => $user->applications()->count(),
+        ];
+
+    } catch (\Exception $e) {
+        return (object)[
+            'success' => false,
+            'status' => 500,
+            'message' => $e->getMessage(),
+        ];
+    }
+}
 }

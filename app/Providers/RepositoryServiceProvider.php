@@ -20,10 +20,12 @@ use App\Repositories\Interfaces\Admin\LocationRepositoryInterface;
 use App\Repositories\Interfaces\Admin\StateRepositoryInterface;
 use App\Repositories\Interfaces\Admin\TrackRepositoryInterface;
 use App\Repositories\Interfaces\Admin\WorkModeRepositoryInterface;
+use App\Repositories\Interfaces\Talent\ApplicationRepositoryInterface;
 use App\Repositories\Interfaces\Talent\JobRepositoryInterface;
 use App\Repositories\Interfaces\Talent\ProfileRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\JobRepository;
+use App\Repositories\Talent\ApplicationRepository;
 use App\Repositories\Talent\JobRepository as TalentJobRepository;
 use App\Repositories\Talent\ProfileRepository;
 use App\Repositories\UserRepository;
@@ -56,7 +58,7 @@ class RepositoryServiceProvider extends ServiceProvider
         StateRepositoryInterface::class => StateRepository::class,
         JobLevelRepositoryInterface::class => JobLevelRepository::class,
         JobRepositoryInterface::class => TalentJobRepository::class,
-
+        ApplicationRepositoryInterface::class => ApplicationRepository::class,
     ];
 
     public function register(): void

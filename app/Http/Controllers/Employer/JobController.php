@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\StoreDraftJobRequest;
 use App\Http\Requests\Employer\StoreJobRequest;
 use App\Http\Requests\Employer\UpdateJobRequest;
+use App\Http\Resources\Employer\JobListingResource;
+use App\Http\Resources\Talent\ApplicationResource;
+use App\Http\Resources\Talent\JobResource;
 use App\Services\JobService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -232,11 +235,11 @@ class JobController extends Controller
     public function updateStatusToActive($company_id, $job_id)
     {
         // dd($company_id, $job_id);
-        $job = $this->service->updateStatus($company_id, $job_id, true);
+        $response = $this->service->updateStatus($company_id, $job_id, true);
 
-        if ($job) {
+        if ($response->success) {
             return $this->successWithData(
-                $job,
+                $response->job,
                 'Job status updated successfully',
                 Http::OK,
             );
@@ -254,7 +257,7 @@ class JobController extends Controller
 
         if ($job) {
             return $this->successWithData(
-                $job,
+                new JobResource($job),
                 'Job status updated successfully',
                 Http::OK,
             );
@@ -263,6 +266,67 @@ class JobController extends Controller
         return $this->success(
             'Unable to update status',
             Http::INTERNAL_SERVER_ERROR,
+        );
+    }
+
+    public function applications(string $uuid, string $job_id)
+    {
+        // dd('reached here');
+        $response = $this->service->getAllApplication($uuid, $job_id);
+        // dd($response);
+
+        if ($response->success) {
+            // $applications = CompanyResource::collection($response->applications);
+            return $this->successWithData(
+                new JobListingResource($response->applications),
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
+        );
+    }
+
+
+    public function viewSingleApplication(string $uuid, string $job_id, string $applicationId)
+    {
+        $response = $this->service->getSingleApplication($uuid, $job_id, $applicationId);
+        // dd($response);
+
+        if ($response->success) {
+            // $applications = CompanyResource::collection($response->applications);
+            return $this->successWithData(
+                new ApplicationResource($response->application),
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
+        );
+    }
+
+
+    public function updateApplicationStatus(string $uuid, string $job_id, string $applicationId, string $status)
+    {
+        $response = $this->service->updateApplicationStatus($uuid, $job_id, $applicationId, $status);
+
+        if ($response->success) {
+            return $this->successWithData(
+                new ApplicationResource($response->application),
+                $response->message,
+                $response->status
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
         );
     }
 }

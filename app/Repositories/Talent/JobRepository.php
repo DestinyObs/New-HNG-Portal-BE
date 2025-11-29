@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Talent;
 
+use App\Enums\Status;
 use App\Models\BookmarkedJob;
+use App\Models\Company;
 use App\Models\JobListing;
 use App\Models\User;
 use App\Models\WorkMode;
@@ -178,5 +180,14 @@ class JobRepository implements JobRepositoryInterface
 
 
         return $query->latest()->paginate($perPage);
+    }
+
+
+    public function getCompanyDetails(string $companyId): Company
+    {
+        return Company::query()
+            ->where('id', $companyId)
+            ->where('status', Status::ACTIVE->value)
+            ->first();
     }
 }
