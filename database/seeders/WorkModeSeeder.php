@@ -17,11 +17,11 @@ class WorkModeSeeder extends Seeder
             ['slug' => 'onsite',    'name' => 'Onsite'],
             ['slug' => 'hybrid',    'name' => 'Hybrid'],
             ['slug' => 'freelance', 'name' => 'Freelance'],
-            ['slug' => 'contract',  'name' => 'Contract'],
+            // ['slug' => 'contract',  'name' => 'Contract'],
         ];
 
         foreach ($workModes as $mode) {
-            WorkMode::factory()->create([
+            WorkMode::create([
                 'slug' => $mode['slug'],
                 'name' => $mode['name'],
             ]);

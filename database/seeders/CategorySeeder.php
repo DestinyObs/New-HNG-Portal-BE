@@ -19,13 +19,13 @@ class CategorySeeder extends Seeder
             ['name' => 'Finance'],
             ['name' => 'Operations'],
             ['name' => 'Product'],
-            ['name' => 'Engineering'],
-            ['name' => 'Data & Analytics'],
-            ['name' => 'Security'],
+            // ['name' => 'Engineering'],
+            // ['name' => 'Data & Analytics'],
+            // ['name' => 'Security'],
         ];
 
         foreach ($categories as $category) {
-            Category::factory()->create([
+            Category::create([
                 'name' => $category['name'],
                 'slug' => \Illuminate\Support\Str::slug($category['name']),
             ]);
