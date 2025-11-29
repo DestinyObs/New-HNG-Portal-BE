@@ -20,10 +20,10 @@ class JobLevelSeeder extends Seeder
             "Senior-Level",
             "Lead-Level",
             "Manager-Level",
-            "Director-Level",
-            "VP-Level",
-            "C-Level",
-            "Contract / Consultant",
+            // "Director-Level",
+            // "VP-Level",
+            // "C-Level",
+            // "Contract / Consultant",
         ];
 
         foreach ($levels as $level) {
