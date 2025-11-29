@@ -11,7 +11,7 @@ use App\Http\Controllers\Talent\ProfileSettingController;
 use App\Http\Controllers\Talent\TalentOnboardingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('api/talent')->group(function () {
+Route::middleware(['auth:sanctum', 'role:talent'])->prefix('api/talent')->group(function () {
     Route::get('/test', function () {
         dd('Talent route reached');
     });
@@ -61,5 +61,12 @@ Route::middleware('auth:sanctum')->prefix('api/talent')->group(function () {
 
         // TALENT Experiences
         Route::apiResource('work-experiences', ExperienceSettingController::class);
+
+        // TALENT Portfolios
+        Route::apiResource('portfolios', PortfolioController::class)
+            ->only(['index', 'show', 'store', 'destroy']);
+
+        // TALENT Portfolios for Update - put method doesn't work with file uploads
+        Route::post('portfolios/{portfolio}/update', [PortfolioController::class, 'update']);
     });
 });
