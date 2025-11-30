@@ -4,8 +4,10 @@
 
 use App\Http\Controllers\Employer\CompanyController;
 use App\Http\Controllers\Employer\CompanyOnboardingController;
+use App\Http\Controllers\Employer\DashboardController;
 use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
+
 
 // API routes for employer functionalities
 Route::middleware('auth:sanctum')->prefix('api/employer')->group(function () {
@@ -13,6 +15,8 @@ Route::middleware('auth:sanctum')->prefix('api/employer')->group(function () {
     Route::get('/test', function () {
         dd('Employer route reached');
     });
+
+    Route::middleware(['auth:sanctum'])->get('dashboard', [DashboardController::class, 'index']);
 
     // ? Employer Company Jobs Routes
     Route::prefix('company/{companyId}')->group(function () {
