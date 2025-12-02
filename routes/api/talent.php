@@ -16,7 +16,7 @@ Route::middleware(['auth:sanctum', 'role:talent'])->prefix('api/talent')->group(
     Route::get('/test', function () {
         dd('Talent route reached');
     });
-  
+
     // TALENT DASHBOARD
     Route::get('dashboard/analysis', [DashboardController::class, 'analysis']);
     Route::get('dashboard/recommended', [DashboardController::class, 'recommendedJobs']);
@@ -61,7 +61,8 @@ Route::middleware(['auth:sanctum', 'role:talent'])->prefix('api/talent')->group(
             Route::get('profile', 'index');
             Route::post('profile', 'store');
             Route::post('skills', 'skill');
-            Route::post('profile', 'store');
+            Route::get('skills', 'getSkill');
+            Route::put('profile', 'update');
         });
 
         // TALENT Experiences

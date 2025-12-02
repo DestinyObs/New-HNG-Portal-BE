@@ -43,9 +43,12 @@ class ExperienceSettingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        $experience = TalentWorkExperience::where('id', $id)->firstOrFail();
+        $user = $request->user();
+        $experience = TalentWorkExperience::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
         if (!$experience) {
             return $this->notFound('Not found!');
         }
@@ -58,7 +61,11 @@ class ExperienceSettingController extends Controller
      */
     public function update(WorkExperienceProfileSettingRequest $request, string $id)
     {
-        $experience = TalentWorkExperience::where('id', $id)->firstOrFail();
+        $user = $request->user();
+
+        $experience = TalentWorkExperience::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
         if (!$experience) {
             return $this->notFound('No experience added yet!');
         }
@@ -70,13 +77,17 @@ class ExperienceSettingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $experience = TalentWorkExperience::where('id', $id)->firstOrFail();
+        $user = $request->user();
+
+        $experience = TalentWorkExperience::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
         if (!$experience) {
             return $this->notFound('No experience added yet!');
         }
         $experience->delete();
-        return $this->noContent();
+        return $this->successWithData([], 'User experience deleted successfully');
     }
 }
