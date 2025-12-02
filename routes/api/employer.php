@@ -41,6 +41,8 @@ Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->gr
                     Route::put('active', 'updateStatusToActive');
                     Route::put('inactive', 'updateStatusToInActive');
 
+
+
                     // Job Application
                     Route::get('applications', 'applications');
 
