@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens, HasFactory, HasRoles, HasUuids, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, HasUuids, Notifiable, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'firstname',
@@ -32,10 +34,17 @@ class User extends Authenticatable
 
     protected $hidden = ['password'];
 
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
     protected $with = [
         'roles',
-        'permissions'
+        'permissions',
+        'media'
     ];
+
 
     protected $casts = [
         'dob' => 'date',

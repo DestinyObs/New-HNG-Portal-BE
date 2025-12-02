@@ -28,11 +28,17 @@ class CompanyOnboardingController extends Controller
 
         $data = $request->validated();
         $user = $request->user();
-        $company = Company::where('user_id', $user->id)->first();
+        $company = Company::where('user_id', $user->id)->firstOrFail();
 
         if ($request->hasFile('logo')) {
             $company->media->each->delete();
-            $company->addMediaFromRequest('logo')->toMediaCollection('logo');
+            $url = $company->addMediaFromRequest('logo')->toMediaCollection('logo');
+            // Update model with profile image url - optional
+            $data['logo_url'] = $url?->original_url;
+            // Update model with profile image url - optional
+            $user->update([
+                'photo_url' => $url?->original_url
+            ]);
         }
 
         // $company->update($data);
@@ -43,12 +49,13 @@ class CompanyOnboardingController extends Controller
 
 
     // implement onboarding status
-    public function onBoardingStatus(array $data){
+    public function onBoardingStatus(array $data)
+    {
         $status = false;
-        foreach($data as $record){
-            if($record == null){
+        foreach ($data as $record) {
+            if ($record == null) {
                 $status = false;
-            }else{
+            } else {
                 $status = true;
             }
         }

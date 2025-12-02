@@ -25,16 +25,19 @@ class TalentOnboardingController extends Controller
 
         $data = $request->validated();
         $user = $request->user();
-        $user_bio = UserBio::where('user_id', $user->id)->first();
+        $user_bio = UserBio::where('user_id', $user->id)->firstOrFail();
 
         if ($request->hasFile('profile_image')) {
-            $user_bio->media->each->delete();
-            $url = $user_bio->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $user->media->each->delete();
+            $url = $user->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+
             // Update model with profile image url - optional
             $user->update([
-                'photo_url' => $url?->original_urls
+                'photo_url' => $url?->original_url
             ]);
         }
+
+        // return $user->fresh();
 
         if ($request->hasFile('project_file')) {
             $user_bio->media->each->delete();
