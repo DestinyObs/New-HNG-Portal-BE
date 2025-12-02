@@ -34,7 +34,7 @@ class Company extends Model implements HasMedia
      *
      * @var array
      */
-    protected $with = ['user'];
+    protected $with = ['user', 'media'];
 
     public function user()
     {
