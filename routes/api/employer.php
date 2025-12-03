@@ -17,8 +17,13 @@ Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->gr
         dd('Employer route reached');
     });
 
-    Route::middleware(['auth:sanctum'])->get('dashboard', [DashboardController::class, 'index']);
+    Route::get('dashboard', [DashboardController::class, 'index']);
+    Route::get('dashboard/{companyId}/active-jobs', [DashboardController::class, 'activeJobs'])->middleware('company.owner');
 
+    // Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
+    //     Route::get('', 'index');
+    //     Route::get('/');
+    // });
     // ? Employer Company Jobs Routes
     Route::prefix('company/{companyId}')->middleware('company.owner')->group(function () {
         Route::prefix('jobs')->group(function () {
@@ -52,7 +57,7 @@ Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->gr
 
                         // Update application status
                         Route::put('/status/{status}', 'updateApplicationStatus')
-                            ->whereIn('status', ['pending', 'accepted', 'rejected']);
+                            ->whereIn('status', ['pending', 'accepted', 'rejected', 'interview', 'shortlisted', 'hired']);
                     });
                 });
             });

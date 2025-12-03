@@ -12,6 +12,7 @@ class DashboardController extends Controller
     public function __construct(
         private readonly JobServiceInterface $jobService,
     ) {}
+
     public function analysis(Request $request)
     {
         $user = Auth::user();
@@ -28,15 +29,16 @@ class DashboardController extends Controller
         ], 'Dashboard analyis fetched successfully.');
     }
 
-public function recommendedJobs(Request $request)
-{
-    $response = $this->jobService->getJobs(
-        $request->only(['category', 'job_level', 'job_type', 'work_mode']),
-        (int) $request->query('per_page', 15)
-    );
 
-    return $response->success
-        ? $this->successWithData($response->jobs, $response->message, $response->status)
-        : $this->error($response->message, $response->status);
-}
+    public function recommendedJobs(Request $request)
+    {
+        $response = $this->jobService->getJobs(
+            $request->only(['category', 'job_level', 'job_type', 'work_mode']),
+            (int) $request->query('per_page', 15)
+        );
+
+        return $response->success
+            ? $this->successWithData($response->jobs, $response->message, $response->status)
+            : $this->error($response->message, $response->status);
+    }
 }
