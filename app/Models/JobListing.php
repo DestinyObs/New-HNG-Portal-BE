@@ -19,8 +19,8 @@ class JobListing extends Model
         'description',
         'acceptance_criteria',
         // 'candidate_location_id',
-        'state_id',
-        'country_id',
+        'state',
+        'country',
         'company_id',
         'price',
         'track_id',
@@ -54,20 +54,20 @@ class JobListing extends Model
     //     return $this->belongsTo(Location::class, 'candidate_location_id');
     // }
 
-    public function states()
-    {
-        return $this->belongsTo(State::class, 'state_id');
-    }
+    // public function states()
+    // {
+    //     return $this->belongsTo(State::class, 'state_id');
+    // }
 
     public function workModes()
     {
         return $this->belongsTo(WorkMode::class, 'work_mode_id');
     }
 
-    public function countries()
-    {
-        return $this->belongsTo(Country::class, 'country_id');
-    }
+    // public function countries()
+    // {
+    //     return $this->belongsTo(Country::class, 'country_id');
+    // }
 
     public function company()
     {

@@ -30,7 +30,7 @@ class JobController extends Controller
     {
         $perPage = (int) $request->query('per_page', 15);
         $result = $this->service->listForCompany($uuid, $request->only(
-            ['title', 'job_type_id', 'category_id', 'track_id']
+            ['title', 'job_type_id', 'category_id', 'track_id', 'sort_by']
         ), $perPage);
 
         return $this->successWithData(
@@ -50,7 +50,7 @@ class JobController extends Controller
         // dd($request->all());
         $perPage = (int) $request->query('per_page', 15);
         $response = $this->service->listDraftedJobs($companyUuid, $request->only(
-            ['title', 'job_type_id', 'category_id', 'track_id']
+            ['title', 'job_type_id', 'category_id', 'track_id', 'sort_by']
         ), $perPage);
 
         // return response when passed

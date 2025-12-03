@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('cover_letter');
             $table->string('portfolio_link')->nullable();
             // $table->string('attachment');
-            $table->enum('status', ['pending', 'accepted', 'rejected', 'withdraw'])->default('pending');
+            $table->enum('status', ['pending', 'accepted', 'rejected', 'withdraw', 'interview', 'shortlisted', 'hired'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

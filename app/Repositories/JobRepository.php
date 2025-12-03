@@ -23,6 +23,7 @@ class JobRepository
             'jobType',
             'track',
             'skills',
+            'workModes',
         ])
             ->find($id);
     }
@@ -33,13 +34,12 @@ class JobRepository
             ->where('id', $jobId)
             ->with([
                 'category',
-                'states',
-                'countries',
                 'category',
                 'jobType',
                 'track',
                 'skills',
-                'jobLevels'
+                'jobLevels',
+                'workModes',
             ])
             ->first();
     }
@@ -49,13 +49,28 @@ class JobRepository
         $query = JobListing::where('company_id', $companyUuid)
             ->with([
                 'category',
-                'states',
-                'countries',
+                'jobType',
+                'track',
+                'skills',
+                'jobLevels',
+                'workModes',
+            ]);
+
+        return $this->filterDatas($query, $filters, $perPage);
+    }
+
+
+    public function listActiveJobs(string $companyUuId, int $perPage = 15, array $filters = [])
+    {
+        $query = JobListing::where('company_id', $companyUuId)
+            ->where('status', Status::ACTIVE->value)
+            ->with([
                 'category',
                 'jobType',
                 'track',
                 'skills',
-                'jobLevels'
+                'jobLevels',
+                'workModes',
             ]);
 
         return $this->filterDatas($query, $filters, $perPage);
@@ -68,13 +83,11 @@ class JobRepository
             ->where('status', 'draft')
             ->with([
                 'category',
-                'states',
-                'countries',
-                'category',
                 'jobType',
                 'track',
                 'skills',
                 'jobLevels',
+                'workModes',
             ]);
 
         return $this->filterDatas($query, $filters, $perPage);
@@ -83,6 +96,7 @@ class JobRepository
 
     private function filterDatas(Builder $query, array $filters, int $perPage): LengthAwarePaginator
     {
+        $sortBy = 'desc';
         // apply simple filters if provided
         if (!empty($filters['title'])) {
             $query->where('title', 'like', '%' . $filters['title'] . '%');
@@ -98,7 +112,14 @@ class JobRepository
             $query->where('track_id', $filters['track_id']);
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        if (!empty($filters['sort_by'])) {
+            $sort = $filters['sort_by'];
+
+            //? sort data to get new added or old added datas
+            $sortBy = $sort == 'oldest' ? 'asc' : 'desc';
+        }
+
+        return $query->orderBy('created_at', $sortBy)->paginate($perPage);
     }
 
 
@@ -222,13 +243,11 @@ class JobRepository
         return $job->load([
             'applications.user',
             'category',
-            'states',
-            'countries',
-            'category',
             'jobType',
             'track',
             'skills',
-            'jobLevels'
+            'jobLevels',
+            'workModes',
         ]);
     }
 
@@ -254,13 +273,11 @@ class JobRepository
             ->with([
                 'applications.user',
                 'category',
-                'states',
-                'countries',
-                'category',
                 'jobType',
                 'track',
                 'skills',
-                'jobLevels'
+                'jobLevels',
+                'workModes',
             ])
             ->findOrFail($jobId);
     }
@@ -272,12 +289,11 @@ class JobRepository
             ->with([
                 'applications.user',
                 'category',
-                'states',
-                'countries',
                 'jobType',
                 'track',
                 'skills',
-                'jobLevels'
+                'jobLevels',
+                'workModes',
             ])
             ->findOrFail($jobId);
 
