@@ -27,8 +27,8 @@ class JobListingResource extends JsonResource
             'is_published'       => $this->publication_status,
 
             // Location
-            'state'              => $this->whenLoaded('states'),
-            'country'            => $this->whenLoaded('countries'),
+            'state'              => $this->state,
+            'country'            => $this->country,
 
             // Relations
             'skills'             => $this->whenLoaded('skills'),
@@ -38,6 +38,7 @@ class JobListingResource extends JsonResource
             'job_type'           => $this->whenLoaded('jobType'),
             'company'            => $this->whenLoaded('company'),
             'saved_jobs'        => $this->whenLoaded('bookmarks'),
+            'works_mode'        => $this->whenLoaded('workModes'),
 
             // Extra computed data (custom)
             'total_applications' => $this->whenCounted('applications'),

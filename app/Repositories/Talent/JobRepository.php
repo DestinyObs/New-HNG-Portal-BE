@@ -25,14 +25,12 @@ class JobRepository implements JobRepositoryInterface
             ->where('status', 'active')
             ->with([
                 'category',
-                'states',
-                'countries',
-                'category',
                 'jobType',
                 'track',
                 'skills',
                 'jobLevels',
                 'company',
+                'workModes',
             ]);
 
         return $this->fileterDatas($query, $params, $perPage);
@@ -44,9 +42,6 @@ class JobRepository implements JobRepositoryInterface
             ->where('id', $jobUuiD)
             ->where('status', 'active')
             ->with([
-                'category',
-                'states',
-                'countries',
                 'category',
                 'jobType',
                 'track',
@@ -64,8 +59,6 @@ class JobRepository implements JobRepositoryInterface
         $user = auth()->user();
         $job = JobListing::with([
             'category',
-            'states',
-            'countries',
             'jobType',
             'track',
             'skills',
@@ -112,8 +105,6 @@ class JobRepository implements JobRepositoryInterface
                 'jobListing' => function ($q) {
                     $q->with([
                         'category',
-                        'states',
-                        'countries',
                         'jobType',
                         'track',
                         'skills',

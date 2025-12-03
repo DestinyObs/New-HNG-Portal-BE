@@ -22,8 +22,8 @@ class JobListingSeeder extends Seeder
             ->count(5)
             ->create([
                 'company_id'        => fn() => Company::inRandomOrder()->value('id'),
-                'state_id'          => fn() => State::inRandomOrder()->value('id'),
-                'country_id'        => fn() => Country::inRandomOrder()->value('id'),
+                // 'state'          => fn() => State::inRandomOrder()->value('id'),
+                // 'country'        => fn() => Country::inRandomOrder()->value('id'),
                 'track_id'          => fn() => Track::inRandomOrder()->value('id'),
                 'category_id'       => fn() => Category::inRandomOrder()->value('id'),
                 'job_type_id'       => fn() => JobType::inRandomOrder()->value('id'),

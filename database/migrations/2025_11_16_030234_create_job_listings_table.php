@@ -14,11 +14,14 @@ return new class extends Migration
             $table->text('description');
             $table->text('acceptance_criteria')->nullable();
 
-            $table->uuid('state_id')->nullable();
-            $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
+            // $table->uuid('state_id')->nullable();
+            // $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
 
-            $table->uuid('country_id')->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
+            // $table->uuid('country_id')->nullable();
+            // $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
+
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
 
             $table->uuid('company_id');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');

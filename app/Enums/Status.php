@@ -34,7 +34,7 @@ enum Status: string
 
     case CANCELLED = 'cancelled';
 
-    // case INACTIVE = 'inactive';
+        // case INACTIVE = 'inactive';
 
     case LOCKED = 'locked';
 
@@ -56,4 +56,12 @@ enum Status: string
     case DRAFT = 'draft';
 
     case EXPIRED = 'expired';
+
+    case INTERVIEW = "interview";
+
+    case SHORTLISTED = "shortlisted";
+
+    case REJECTED = "rejected";
+
+    case HIRED = 'hired';
 }
