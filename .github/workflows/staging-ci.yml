@@ -10,7 +10,7 @@ permissions:
 jobs:
   checks:
     # runs-on: [self-hosted, hng-13-runner, linux]
-    runs-on: [self-hosted, hngconnect, not4hng, ourserver]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
