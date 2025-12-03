@@ -117,6 +117,11 @@ class JobRepository
 
             //? sort data to get new added or old added datas
             $sortBy = $sort == 'oldest' ? 'asc' : 'desc';
+            // dd($sortBy);
+        }
+
+        if (!empty($filters['search'])) {
+            $query->where('title', 'like', '%' . $filters['search'] . '%');
         }
 
         return $query->orderBy('created_at', $sortBy)->paginate($perPage);

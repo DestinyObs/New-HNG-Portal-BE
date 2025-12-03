@@ -76,10 +76,10 @@ class ApplicationService implements ApplicationServiceInterface
     }
 
 
-    public function listApplications(): object|array
+    public function listApplications(array $params, int $perPage): object|array
     {
         try {
-            $applications = $this->applicationRepository->getAll();
+            $applications = $this->applicationRepository->getAll($params, $perPage);
 
             return (object) [
                 'success' => true,

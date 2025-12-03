@@ -22,7 +22,9 @@ class JobController extends Controller
             'category',
             'job_level',
             'job_type',
-            'work_mode'
+            'work_mode',
+            'sort_by',
+            'search',
         ]), $perPage);
 
         if ($response->success) {
