@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Employer\CompanyController;
 use App\Http\Controllers\Employer\CompanyOnboardingController;
+use App\Http\Controllers\Employer\CompanyProfileSettingController;
 use App\Http\Controllers\Employer\DashboardController;
 use App\Http\Controllers\Employer\JobController;
 use Illuminate\Support\Facades\Route;
@@ -81,4 +82,15 @@ Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->gr
         Route::get('onboarding', 'index');
         Route::post('onboarding', 'store');
     });
+
+
+    // TALENT Profile Settings
+    Route::prefix('settings')->group(function () {
+        Route::controller(CompanyProfileSettingController::class)->group(function () {
+            Route::get('profile', 'profile');
+            Route::post('profile', 'store');
+        });  
+        
+    });    
+    
 });
