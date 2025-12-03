@@ -27,6 +27,11 @@ class Company extends Model implements HasMedia
         'is_verified',
         'official_email',
         'status',
+
+        'tagline',
+        'value_proposition',
+        'why_talents_should_work_with_us',
+        
     ];
 
     /**
