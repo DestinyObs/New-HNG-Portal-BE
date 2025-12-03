@@ -30,9 +30,24 @@ class JobService
             'job_type_id' => $params['job_type_id'] ?? null,
             'category_id' => $params['category_id'] ?? null,
             'track_id' => $params['track_id'] ?? null,
+            'sort_by' => $params['sort_by'] ?? null,
         ];
 
         return $this->repo->listForCompany($companyUuid, $perPage, $filters);
+    }
+
+
+    public function listActiveJobs(string $companyUuid, array $params = [], int $perPage = 15)
+    {
+        $filters = [
+            'title' => $params['title'] ?? null,
+            'job_type_id' => $params['job_type_id'] ?? null,
+            'category_id' => $params['category_id'] ?? null,
+            'track_id' => $params['track_id'] ?? null,
+            'sort_by' => $params['sort_by'] ?? null,
+        ];
+
+        return $this->repo->listActiveJobs($companyUuid, $perPage, $filters);
     }
 
 
