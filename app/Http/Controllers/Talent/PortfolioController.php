@@ -111,14 +111,16 @@ class PortfolioController extends Controller
     {
         $user = $request->user();
 
-        $experience = Portfolio::where('id', $portfolio)
+        $portfolio = Portfolio::where('id', $portfolio->id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
-        if (!$experience) {
+        if (!$portfolio) {
             return $this->notFound('portfolio not found!');
         }
-        $experience->delete();
-        return $this->noContent();
+        $portfolio->delete();
+        // return $this->noContent();
+        // FE needs a message from the server
+        return $this->successWithData([], 'User portfolio deleted successfully');
     }
 }
