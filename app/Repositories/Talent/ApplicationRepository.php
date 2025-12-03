@@ -58,15 +58,15 @@ class ApplicationRepository implements ApplicationRepositoryInterface
             ->firstOrFail();
     }
 
-    public function getAll(): Application|EloquentCollection
+    public function getAll(array $params, int $perPage): LengthAwarePaginator
     {
         $applications = Application::query()
             ->with(['user', 'job', 'job.company'])
-            ->where('user_id', Auth::user()->id)
-            ->latest()
-            ->get();
+            ->where('user_id', Auth::user()->id);
+        // ->latest()
+        // ->get();
 
-        return $applications;
+        return $this->fileterDatas($applications, $params, $perPage);;
     }
 
     public function withdraw(string $appId): Application|EloquentCollection
@@ -90,5 +90,67 @@ class ApplicationRepository implements ApplicationRepositoryInterface
             ->where('status', 'active')
             ->where('publication_status', 'published')
             ->exists();
+    }
+
+
+    private function fileterDatas(Builder $query, array $params, int $perPage)
+    {
+        // dd($params);
+        $sortBy = 'desc';
+
+        //? filter by category
+        if (!empty($params['category'])) {
+            $categories = explode(',', $params['category']);
+
+            $query->whereHas('job.category', function ($q) use ($categories) {
+                $q->whereIn('slug', $categories);
+            });
+        }
+
+        // //? filter by job type
+        if (!empty($params['job_type'])) {
+            $types = explode(',', $params['job_type']);
+
+            $query->whereHas('job.jobType', function ($q) use ($types) {
+                $q->whereIn('slug', $types);
+            });
+        }
+
+        //? filter by job level
+
+        if (!empty($params['job_level'])) {
+            $levels = explode(',', $params['job_level']);
+
+            $query->whereHas('job.jobLevels', function ($q) use ($levels) {
+                $q->whereIn('slug', $levels);
+            });
+        }
+
+        //? filter by work mode
+        if (!empty($params['work_mode'])) {
+            $modes = explode(',', $params['work_mode']);
+
+            // dd(WorkMode::whereIn('slug', $modes)->get());
+            $query->whereHas('job.workModes', function ($q) use ($modes) {
+                $q->whereIn('slug', $modes);
+            });
+        }
+
+        if (!empty($params['sort_by'])) {
+            $sort = $params['sort_by'];
+
+            $sortBy = $sort == 'oldest' ? 'asc' : 'desc';
+            // dd($sortBy);
+        }
+
+        if (!empty($params['search'])) {
+            $search = $params['search'];
+
+            $query->whereHas('job', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy('created_at', $sortBy)->paginate($perPage);
     }
 }

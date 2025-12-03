@@ -39,7 +39,6 @@ class StoreJobRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'acceptance_criteria' => 'required|string',
-            'country_id' => 'required|uuid|exists:countries,id',
             'country' => 'required|string',
             'state' => 'required|string',
             'track_id' => 'required|uuid|exists:tracks,id',

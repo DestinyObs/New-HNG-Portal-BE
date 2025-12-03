@@ -14,7 +14,7 @@ interface ApplicationRepositoryInterface
 {
     public function store(array $data): Application|EloquentCollection;
     public function show(string $applicationId): Application|EloquentCollection;
-    public function getAll(): Application|EloquentCollection;
+    public function getAll(array $params, int $perPage): LengthAwarePaginator;
     public function withdraw(string $applicationId): Application|EloquentCollection;
     public function checkIfJobCanBeApplied(string $jobId): bool;
 }
