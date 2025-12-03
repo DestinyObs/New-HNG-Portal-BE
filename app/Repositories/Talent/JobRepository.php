@@ -131,6 +131,9 @@ class JobRepository implements JobRepositoryInterface
 
     private function fileterDatas(Builder $query, array $params, int $perPage)
     {
+        // dd($params);
+        $sortBy = 'desc';
+
         //? filter by category
         if (!empty($params['category'])) {
             $categories = explode(',', $params['category']);
@@ -169,8 +172,22 @@ class JobRepository implements JobRepositoryInterface
             });
         }
 
+        if (!empty($params['sort_by'])) {
+            $sort = $params['sort_by'];
 
-        return $query->latest()->paginate($perPage);
+            $sortBy = $sort == 'oldest' ? 'asc' : 'desc';
+            // dd($sortBy);
+        }
+
+        if (!empty($params['search'])) {
+            $search = $params['search'];
+
+            $query->whereHas('jobListing', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy('created_at', $sortBy)->paginate($perPage);
     }
 
 

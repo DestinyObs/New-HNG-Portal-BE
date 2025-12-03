@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Talent;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Talent\JobResource;
 use App\Services\Interfaces\Talent\JobServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,12 +34,21 @@ class DashboardController extends Controller
     public function recommendedJobs(Request $request)
     {
         $response = $this->jobService->getJobs(
-            $request->only(['category', 'job_level', 'job_type', 'work_mode']),
+            $request->only(['category', 'job_level', 'job_type', 'work_mode', 'sort_by']),
             (int) $request->query('per_page', 15)
         );
 
-        return $response->success
-            ? $this->successWithData($response->jobs, $response->message, $response->status)
-            : $this->error($response->message, $response->status);
+        // dd($result);
+        if ($response->success) {
+            $jobs = JobResource::collection($response->jobs);
+
+            return $this->paginated(
+                $jobs,
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error($response->message, $response->status);
     }
 }

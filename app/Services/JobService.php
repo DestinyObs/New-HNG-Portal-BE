@@ -173,8 +173,6 @@ class JobService
                 'status' => Http::OK,
                 'data' => $updatedDraft->load([
                     'category',
-                    'states',
-                    'countries',
                     'category',
                     'jobType',
                     'track',
