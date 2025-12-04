@@ -7,6 +7,7 @@ use App\Models\BookmarkedJob;
 use App\Models\Company;
 use App\Models\JobListing;
 use App\Models\User;
+use App\Models\UserBio;
 use App\Models\WorkMode;
 use App\Repositories\Interfaces\Talent\ProfileRepositoryInterface;
 use App\Repositories\Interfaces\Talent\JobRepositoryInterface;
@@ -19,6 +20,31 @@ class JobRepository implements JobRepositoryInterface
 {
     public function getJobs(array $params, int $perPage): LengthAwarePaginator
     {
+        $user = auth()->user();
+        // fetch user tracks in bio
+        $userBio = UserBio::query()
+            ->where('user_id', $user->id)
+            ->first();
+
+        // dd($userBio);
+
+        if (!empty($userBio)) {
+            // get jobs related to user's track
+            $query = JobListing::query()
+                ->where('status', 'active')
+                ->where('track_id', $userBio->track_id)
+                ->with([
+                    'category',
+                    'jobType',
+                    'track',
+                    'skills',
+                    'jobLevels',
+                    'company',
+                    'workModes',
+                ]);
+
+            return $this->fileterDatas($query, $params, $perPage);
+        }
         // dd($params);
         //? get all latest job listings
         $query = JobListing::query()
