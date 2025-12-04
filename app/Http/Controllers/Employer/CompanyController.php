@@ -7,6 +7,7 @@ use App\Http\Requests\Employer\StoreCompanyRequest;
 use App\Http\Requests\Employer\UpdateCompanyLogoRequest;
 use App\Http\Requests\Employer\UpdateCompanyRequest;
 use App\Http\Resources\Employer\CompanyResource;
+use App\Http\Resources\Talent\ApplicationResource;
 use App\Services\Employer\CompanyService;
 
 class CompanyController extends Controller
@@ -43,13 +44,15 @@ class CompanyController extends Controller
 
     public function applications(string $uuid)
     {
-        $response = $this->companyService->getAllApplication($uuid);
-        // dd($response);
+        $request = request();
+        $perPage = $request->query('per_page', 15);
+        $filters = $request->only(['search', 'status', 'date_from', 'date_to']);
+
+        $response = $this->companyService->getAllApplication($uuid, $filters, $perPage);
 
         if ($response->success) {
-            // $applications = CompanyResource::collection($response->applications);
             return $this->successWithData(
-                new CompanyResource($response->applications),
+                ApplicationResource::collection($response->applications)->response()->getData(true),
                 $response->message,
                 $response->status,
             );
