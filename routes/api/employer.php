@@ -89,8 +89,7 @@ Route::middleware(['auth:sanctum', 'role:employer'])->prefix('api/employer')->gr
         Route::controller(CompanyProfileSettingController::class)->group(function () {
             Route::get('profile', 'profile');
             Route::post('profile', 'store');
-        });  
-        
-    });    
-    
+            Route::put('profile/change-password', 'changePassword');
+        });
+    });
 });
