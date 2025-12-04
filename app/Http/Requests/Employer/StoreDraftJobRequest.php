@@ -38,7 +38,7 @@ class StoreDraftJobRequest extends FormRequest
                 Rule::exists('job_listings', 'id')
                     ->where('company_id', $companyId),
             ],
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'acceptance_criteria' => 'nullable|string',
             'country' => 'nullable|string',
             'state' => 'nullable|string',
