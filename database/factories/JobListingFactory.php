@@ -27,23 +27,25 @@ class JobListingFactory extends Factory
             'Technical Lead',
         ];
 
-        // Fetch all countries
-        $countries = Http::get('https://countriesnow.space/api/v0.1/countries/positions')
-            ->json()['data'];
+        $countriesResponse = Http::get('https://countriesnow.space/api/v0.1/countries/positions');
 
-        // Get already used countries
-        $usedCountries = \App\Models\JobListing::pluck('country')->toArray();
+        $countries = $countriesResponse->successful()
+            ? ($countriesResponse->json()['data'] ?? [])
+            : [];
 
-        // Pick a random country
-        $country = collect($countries)->random();
-        $countryName = $country['name'];
+        $randomCountry = collect($countries)->random();
+        $countryName = $randomCountry['name'] ?? 'Nigeria';
 
-        // Fetch states for this country
-        $statesResp = Http::post('https://countriesnow.space/api/v0.1/countries/states', [
+        $stateResponse = Http::post('https://countriesnow.space/api/v0.1/countries/states', [
             'country' => $countryName
-        ])->json()['data']['states'];
+        ]);
 
-        $state = collect($statesResp)->random()['name'] ?? null;
+        $states = $stateResponse->successful()
+            ? ($stateResponse->json()['data']['states'] ?? [])
+            : [];
+
+        $state = collect($states)->random()['name'] ?? null;
+
 
         return [
             'title' => fake()->randomElement($jobTitles),
