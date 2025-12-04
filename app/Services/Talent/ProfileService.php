@@ -18,8 +18,7 @@ class ProfileService implements ProfileServiceInterface
 
     public function __construct(
         private readonly ProfileRepositoryInterface $profileRepository
-    ) {
-    }
+    ) {}
 
     public function changePassword(User $user, string $newPassword): object|array
     {
@@ -28,15 +27,7 @@ class ProfileService implements ProfileServiceInterface
 
             logger()->info("Password updated successfully for user ID {$user->id}");
 
-            $user->load([
-                'company',
-                'bio',
-                'skills',
-                'experiences',
-                'verification',
-                'preferences',
-                'jobs',
-            ]);
+            $user->load(['bio', 'company']);
 
             return (object) [
                 'success' => true,
