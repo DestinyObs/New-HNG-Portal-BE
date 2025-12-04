@@ -73,7 +73,7 @@ class JobService
             return (object) [
                 'success' => true,
                 'data' => $listedDrafts,
-                'message' => 'Drafted jobs retrive successfully',
+                'message' => 'Drafted jobs retrived successfully',
                 'status' => Http::OK,
             ];
         } catch (\Exception $e) {
@@ -109,8 +109,10 @@ class JobService
             $createdJob = $this->repo->createForCompany($companyUuid, $data);
 
             // ? store job and skill relationship
-            $skills = $data['skills'];
-            $this->repo->addJobSkills($skills, $createdJob->id);
+            if (isset($data['skills'])) {
+                $skills = $data['skills'];
+                $this->repo->addJobSkills($skills, $createdJob->id);
+            }
 
             DB::commit();
 
@@ -162,14 +164,16 @@ class JobService
             );
 
             // ? store job and skill relationship
-            $skills = $data['skills'];
-            $this->repo->addJobSkills($skills, $updatedDraft->id);
+            if (isset($data['skills'])) {
+                $skills = $data['skills'];
+                $this->repo->addJobSkills($skills, $updatedDraft->id);
+            }
 
             DB::commit();
 
             return (object) [
                 'success' => true,
-                'message' => 'Job added to successfully',
+                'message' => 'Job created or updated successfully',
                 'status' => Http::OK,
                 'data' => $updatedDraft->load([
                     'category',
@@ -209,8 +213,10 @@ class JobService
             $updatedJob = $this->repo->update($job, $data);
 
             // ? store job and skill relationship
-            $skills = $data['skills'];
-            $this->repo->addJobSkills($skills, $jobId);
+            if (isset($data['skills'])) {
+                $skills = $data['skills'];
+                $this->repo->addJobSkills($skills, $jobId);
+            }
 
             DB::commit();
 

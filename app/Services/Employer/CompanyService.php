@@ -29,11 +29,10 @@ class CompanyService
         return $this->companyRepository->updateLogo($file, $uuid);
     }
 
-    public function getAllApplication(string $uuid)
+    public function getAllApplication(string $uuid, array $params = [], int $perPage = 15)
     {
         try {
-            $applications = $this->companyRepository->getApplications($uuid);
-            // dd($applications);
+            $applications = $this->companyRepository->getApplications($uuid, $params, $perPage);
 
             return (object) [
                 'success' => true,
