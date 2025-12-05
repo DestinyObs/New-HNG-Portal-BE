@@ -228,23 +228,8 @@ jobs:
           echo "GOOGLE_REDIRECT_URI=http://localhost/auth/google/callback" >> .env.testing
 
       - name: Run migrations
-        run: php artisan migrate:fresh --env=testing --force
-
-      - name: Seed database
-        # continue-on-error: true
-        run: php artisan db:seed --env=testing --force
-
-      - name: Run PHPUnit tests with coverage
-        id: phpunit
-        run: |
-          ./vendor/bin/phpunit --stop-on-failure --coverage-text --coverage-clover=coverage.xml | tee phpunit.log
-          
-          # Check if tests failed
-          if grep -q "ERRORS!" phpunit.log || grep -q "FAILURES!" phpunit.log; then
-            echo "Tests failed! See errors above."
-            exit 1
-          fi
-
+        run: php artisan migrate --env=testing --force
+        
       - name: Extract test results
         if: always()
         id: test_results

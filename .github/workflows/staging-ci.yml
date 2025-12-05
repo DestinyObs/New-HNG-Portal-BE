@@ -4,6 +4,16 @@ on:
   pull_request:
     branches:
       - staging
+  workflow_dispatch:
+    inputs:
+      run_seed:
+        description: 'Run database seeding? (yes/no)'
+        required: false
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
 
 permissions:
   contents: read
@@ -231,7 +241,7 @@ jobs:
         run: php artisan migrate --env=testing --force
 
       - name: Seed database
-        # # continue-on-error: true
+        if: ${{ github.event.inputs.run_seed == 'yes' }}
         run: php artisan db:seed --env=testing --force
 
       - name: Run PHPUnit tests with coverage
