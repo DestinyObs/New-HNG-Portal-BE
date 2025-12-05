@@ -17,7 +17,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
         run: |
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "attachments": [{
@@ -35,6 +36,7 @@ jobs:
               "ts": '$(date +%s)'
             }]
           }'
+          fi
       
       - name: Setup SSH private key for secure server access
         run: |
@@ -136,7 +138,8 @@ jobs:
             MESSAGE="@channel PRODUCTION DEPLOYMENT FAILED! Immediate attention required!"
           fi
           
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "text": "'"$MESSAGE"'",

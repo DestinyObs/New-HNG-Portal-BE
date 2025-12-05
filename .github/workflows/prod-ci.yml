@@ -64,7 +64,8 @@ jobs:
             STATUS="Completed with warnings"
           fi
           
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "attachments": [{
@@ -82,6 +83,7 @@ jobs:
               "ts": '$(date +%s)'
             }]
           }'
+          fi
 
   security-scan:
     name: Security & Vulnerability Scan
@@ -149,7 +151,8 @@ jobs:
             STATUS="Scan completed with warnings"
           fi
           
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "attachments": [{
@@ -167,6 +170,7 @@ jobs:
               "ts": '$(date +%s)'
             }]
           }'
+          fi
 
   tests:
     name: Feature & Unit Tests
@@ -267,7 +271,8 @@ jobs:
             STATUS="Tests failed!"
           fi
           
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "attachments": [{
@@ -289,6 +294,7 @@ jobs:
               "ts": '$(date +%s)'
             }]
           }'
+          fi
 
   final-status:
     name: CI Pipeline Status
@@ -322,7 +328,8 @@ jobs:
             EMOJI=":no_entry:"
           fi
           
-          curl -X POST $SLACK_WEBHOOK_URL \
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
           -H 'Content-Type: application/json' \
           -d '{
             "attachments": [{
