@@ -14,5 +14,5 @@ interface CompanyRepositoryInterface
 
     public function updateLogo(mixed $file, string $uuid);
 
-    public function getApplications(string $companyUuid): Company;
+    public function getApplications(string $companyUuid, array $filters = [], int $perPage = 15);
 }

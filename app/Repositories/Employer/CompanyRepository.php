@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Employer;
 
+use App\Models\Application;
 use App\Models\Company;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Services\UploadDrivers\LocalUploader;
@@ -62,14 +63,23 @@ class CompanyRepository implements CompanyRepositoryInterface
         return $this->company->findOrFail($uuid);
     }
 
-    public function getApplications(string $companyId): Company
+    public function getApplications(string $companyId, array $filters = [], int $perPage = 15)
     {
-        // dd($companyId);
-        return Company::query()
-            ->with([
-                'applications.user',
-                'applications.job'
-            ])
-            ->findOrFail($companyId);
+        return $this->company->findOrFail($companyId)
+            ->applications()
+            ->with(['user', 'job'])
+            ->when($filters['search'] ?? null, function ($q, $search) {
+                $q->where(function ($query) use ($search) {
+                    $query->whereHas('user', fn($u) => $u->where('firstname', 'like', "%{$search}%")
+                        ->orWhere('lastname', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('job', fn($j) => $j->where('title', 'like', "%{$search}%"));
+                });
+            })
+            ->when($filters['status'] ?? null, fn($q, $status) => $q->where('status', $status))
+            ->when($filters['date_from'] ?? null, fn($q, $date) => $q->whereDate('created_at', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn($q, $date) => $q->whereDate('created_at', '<=', $date))
+            ->latest()
+            ->paginate($perPage);
     }
 }

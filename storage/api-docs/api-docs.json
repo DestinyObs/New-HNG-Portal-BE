@@ -10,6 +10,197 @@
         }
     ],
     "paths": {
+        "/user": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "`User`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/employer/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/test": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/applications": {
+            "get": {
+                "operationId": "application.index",
+                "tags": [
+                    "Application"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return error message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "application.store",
+                "tags": [
+                    "Application"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreApplicationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "return error message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/talent/applications/view/{applicationId}": {
+            "get": {
+                "operationId": "application.show",
+                "tags": [
+                    "Application"
+                ],
+                "parameters": [
+                    {
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return error message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/applications/withdraw/{applicationId}": {
+            "put": {
+                "operationId": "application.withdraw",
+                "tags": [
+                    "Application"
+                ],
+                "parameters": [
+                    {
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return error message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/employer/company/company": {
             "post": {
                 "operationId": "company.store",
@@ -168,6 +359,39 @@
                 }
             }
         },
+        "/employer/company/{uuid}/applications": {
+            "get": {
+                "operationId": "company.applications",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "$applications = CompanyResource::collection($response->applications);",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/employer/onboarding": {
             "get": {
                 "operationId": "companyOnboarding.index",
@@ -220,6 +444,203 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/employer/settings/profile": {
+            "get": {
+                "operationId": "companyProfileSetting.profile",
+                "summary": "Display a listing of the resource",
+                "tags": [
+                    "CompanyProfileSetting"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "companyProfileSetting.store",
+                "summary": "Store a newly created resource in storage",
+                "tags": [
+                    "CompanyProfileSetting"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompanyProfileSettingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/employer/settings/profile/change-password": {
+            "put": {
+                "operationId": "companyProfileSetting.changePassword",
+                "summary": "Change company password",
+                "tags": [
+                    "CompanyProfileSetting"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "? error message should be returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/employer/dashboard": {
+            "get": {
+                "operationId": "dashboard.index",
+                "tags": [
+                    "Dashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/employer/dashboard/{companyId}/active-jobs": {
+            "get": {
+                "operationId": "dashboard.activeJobs",
+                "tags": [
+                    "Dashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "companyId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/dashboard/analysis": {
+            "get": {
+                "operationId": "dashboard.analysis",
+                "tags": [
+                    "Dashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/dashboard/recommended": {
+            "get": {
+                "operationId": "dashboard.recommendedJobs",
+                "tags": [
+                    "Dashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -1004,6 +1425,153 @@
                 }
             }
         },
+        "/employer/company/{uuid}/jobs/{job_id}/applications": {
+            "get": {
+                "operationId": "job.applications",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "$applications = CompanyResource::collection($response->applications);",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/employer/company/{uuid}/jobs/{job_id}/applications/{applicationId}": {
+            "get": {
+                "operationId": "job.viewSingleApplication",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "$applications = CompanyResource::collection($response->applications);",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/employer/company/{uuid}/jobs/{job_id}/applications/{applicationId}/status/{status}": {
+            "put": {
+                "operationId": "job.updateApplicationStatus",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/talent/jobs": {
             "get": {
                 "operationId": "talent.job.index",
@@ -1116,41 +1684,37 @@
                 }
             }
         },
-         "/talent/dashboard/analysis": {
+        "/talent/jobs/company/{companyId}": {
             "get": {
-            "operationId": "talent.dashboard.analysis",
-            "tags": ["Dashboard"],
-            "summary": "Get dashboard analysis data for the talent user",
-            "responses": {
-                "200": {
-                "description": "Dashboard metrics including total applications and saved jobs",
-                "content": {
-                    "application/json": { "schema": { "type": "string" } }
+                "operationId": "job.viewCompanyProfile",
+                "tags": [
+                    "Job"
+                ],
+                "parameters": [
+                    {
+                        "name": "companyId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
                 }
-                },
-                "401": {
-                "$ref": "#/components/responses/AuthenticationException"
-                }
-            }
-            }
-        },
-
-        "/talent/dashboard/recommended": {
-            "get": {
-            "operationId": "talent.dashboard.recommendedJobs",
-            "tags": ["Dashboard"],
-            "summary": "Get recommended jobs for the authenticated talent user",
-            "responses": {
-                "200": {
-                "description": "List of recommended jobs",
-                "content": {
-                    "application/json": { "schema": { "type": "string" } }
-                }
-                },
-                "401": {
-                "$ref": "#/components/responses/AuthenticationException"
-                }
-            }
             }
         },
         "/admin/job-types": {
@@ -1576,6 +2140,191 @@
                 }
             }
         },
+        "/talent/settings/portfolios": {
+            "get": {
+                "operationId": "portfolios.index",
+                "summary": "Display a listing of the resource",
+                "tags": [
+                    "Portfolio"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "portfolios.store",
+                "summary": "Store a newly created resource in storage",
+                "tags": [
+                    "Portfolio"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePortfolioRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "return response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/talent/settings/portfolios/{portfolio}": {
+            "get": {
+                "operationId": "portfolios.show",
+                "summary": "Display the specified resource",
+                "tags": [
+                    "Portfolio"
+                ],
+                "parameters": [
+                    {
+                        "name": "portfolio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The portfolio ID",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "portfolios.destroy",
+                "summary": "Remove the specified resource from storage",
+                "tags": [
+                    "Portfolio"
+                ],
+                "parameters": [
+                    {
+                        "name": "portfolio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The portfolio ID",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return $this->noContent();\nFE needs a message from the server",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/talent/settings/portfolios/{portfolio}/update": {
+            "post": {
+                "operationId": "portfolio.update",
+                "summary": "Update the specified resource in storage",
+                "tags": [
+                    "Portfolio"
+                ],
+                "parameters": [
+                    {
+                        "name": "portfolio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The portfolio ID",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePortfolioRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "return response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/talent/profile": {
             "get": {
                 "operationId": "profile.show",
@@ -1673,7 +2422,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "$user_bio = UserBio::where('user_id', $user->id)->firstOrFail();\n$user_bio->load('user', 'user.skills', 'user.experiences', 'user.portfolios');\n$user_bio->getMedia();",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1717,6 +2466,84 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "profileSetting.update",
+                "tags": [
+                    "ProfileSetting"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "firstname": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "lastname": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "othername": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "phone": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "dob": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    },
+                                    "current_role": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "photo_url": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -2158,6 +2985,24 @@
                             "null"
                         ]
                     },
+                    "tagline": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "value_proposition": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "why_talents_should_work_with_us": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
                     "logo_url": {
                         "type": [
                             "string",
@@ -2232,6 +3077,12 @@
                     },
                     "user": {
                         "$ref": "#/components/schemas/User"
+                    },
+                    "media": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Media"
+                        }
                     }
                 },
                 "required": [
@@ -2240,6 +3091,9 @@
                     "name",
                     "slug",
                     "description",
+                    "tagline",
+                    "value_proposition",
+                    "why_talents_should_work_with_us",
                     "logo_url",
                     "industry",
                     "company_size",
@@ -2314,6 +3168,89 @@
                 },
                 "title": "CompanyOnboardingRequest"
             },
+            "CompanyProfileSettingRequest": {
+                "type": "object",
+                "properties": {
+                    "logo": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 2048
+                    },
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "industry": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "company_size": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "website_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "state": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "country": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tagline": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "value_proposition": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "why_talents_should_work_with_us": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "official_email": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "email"
+                    }
+                },
+                "title": "CompanyProfileSettingRequest"
+            },
             "ForgotPasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -2385,6 +3322,118 @@
                     "password"
                 ],
                 "title": "LoginRequest"
+            },
+            "Media": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "model_type": {
+                        "type": "string"
+                    },
+                    "model_id": {
+                        "type": "string"
+                    },
+                    "uuid": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "collection_name": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "file_name": {
+                        "type": "string"
+                    },
+                    "mime_type": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "disk": {
+                        "type": "string"
+                    },
+                    "conversions_disk": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "size": {
+                        "type": "integer"
+                    },
+                    "manipulations": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "custom_properties": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "generated_conversions": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "responsive_images": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "order_column": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "preview_url": {
+                        "type": "string"
+                    },
+                    "original_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "model_type",
+                    "model_id",
+                    "uuid",
+                    "collection_name",
+                    "name",
+                    "file_name",
+                    "mime_type",
+                    "disk",
+                    "conversions_disk",
+                    "size",
+                    "manipulations",
+                    "custom_properties",
+                    "generated_conversions",
+                    "responsive_images",
+                    "order_column",
+                    "created_at",
+                    "updated_at",
+                    "preview_url",
+                    "original_url"
+                ],
+                "title": "Media"
             },
             "OtpTokenRequest": {
                 "type": "object",
@@ -2635,6 +3684,42 @@
                 ],
                 "title": "SkillRequest"
             },
+            "StoreApplicationRequest": {
+                "type": "object",
+                "properties": {
+                    "job_id": {
+                        "type": "string"
+                    },
+                    "portfolio_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri",
+                        "description": "Portfolio link must be a valid URL",
+                        "maxLength": 500
+                    },
+                    "resume": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "PDF only \u2014 max 5MB",
+                        "maxLength": 5120
+                    },
+                    "cover_letter": {
+                        "type": "string",
+                        "description": "Cover letter \u2014 minimum 30 words, max 300 words",
+                        "minLength": 50,
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "job_id",
+                    "resume",
+                    "cover_letter"
+                ],
+                "title": "StoreApplicationRequest"
+            },
             "StoreCompanyRequest": {
                 "type": "object",
                 "properties": {
@@ -2718,7 +3803,10 @@
                         "type": "string"
                     },
                     "description": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     },
                     "acceptance_criteria": {
                         "type": [
@@ -2726,19 +3814,17 @@
                             "null"
                         ]
                     },
-                    "country_id": {
+                    "country": {
                         "type": [
                             "string",
                             "null"
-                        ],
-                        "format": "uuid"
+                        ]
                     },
-                    "state_id": {
+                    "state": {
                         "type": [
                             "string",
                             "null"
-                        ],
-                        "format": "uuid"
+                        ]
                     },
                     "price": {
                         "type": [
@@ -2802,8 +3888,7 @@
                     }
                 },
                 "required": [
-                    "title",
-                    "description"
+                    "title"
                 ],
                 "title": "StoreDraftJobRequest"
             },
@@ -2826,16 +3911,11 @@
                     "acceptance_criteria": {
                         "type": "string"
                     },
-                    "country_id": {
-                        "type": "string",
-                        "format": "uuid"
+                    "country": {
+                        "type": "string"
                     },
-                    "state_id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "price": {
-                        "type": "number"
+                    "state": {
+                        "type": "string"
                     },
                     "track_id": {
                         "type": "string",
@@ -2869,9 +3949,8 @@
                     "title",
                     "description",
                     "acceptance_criteria",
-                    "country_id",
-                    "state_id",
-                    "price",
+                    "country",
+                    "state",
                     "track_id",
                     "category_id",
                     "job_type_id",
@@ -2880,6 +3959,39 @@
                     "skills"
                 ],
                 "title": "StoreJobRequest"
+            },
+            "StorePortfolioRequest": {
+                "type": "object",
+                "properties": {
+                    "banner_image": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 2048
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "link": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "title": "StorePortfolioRequest"
             },
             "TalentOnboardingRequest": {
                 "type": "object",
@@ -3150,14 +4262,12 @@
                         "type": "number",
                         "description": "Price"
                     },
-                    "state_id": {
+                    "country": {
                         "type": "string",
-                        "format": "uuid",
                         "description": "Location fields"
                     },
-                    "country_id": {
-                        "type": "string",
-                        "format": "uuid"
+                    "state": {
+                        "type": "string"
                     },
                     "track_id": {
                         "type": "string",
@@ -3224,6 +4334,39 @@
                     "photo"
                 ],
                 "title": "UpdatePhotoRequest"
+            },
+            "UpdatePortfolioRequest": {
+                "type": "object",
+                "properties": {
+                    "banner_image": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 2048
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "link": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "title": "UpdatePortfolioRequest"
             },
             "User": {
                 "type": "object",
@@ -3321,6 +4464,12 @@
                         "items": {
                             "$ref": "#/components/schemas/Permission"
                         }
+                    },
+                    "media": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Media"
+                        }
                     }
                 },
                 "required": [
@@ -3402,6 +4551,24 @@
                             "null"
                         ]
                     },
+                    "experience": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "available_status": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "job_type_preference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
                     "project_name": {
                         "type": [
                             "string",
@@ -3409,6 +4576,12 @@
                         ]
                     },
                     "project_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "project_file_url": {
                         "type": [
                             "string",
                             "null"
@@ -3448,6 +4621,12 @@
                     },
                     "user": {
                         "$ref": "#/components/schemas/User"
+                    },
+                    "media": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Media"
+                        }
                     }
                 },
                 "required": [
@@ -3462,8 +4641,12 @@
                     "cv_id",
                     "current_role",
                     "bio",
+                    "experience",
+                    "available_status",
+                    "job_type_preference",
                     "project_name",
                     "project_url",
+                    "project_file_url",
                     "state",
                     "country",
                     "onboarding_status",
@@ -3720,6 +4903,25 @@
             }
         },
         "responses": {
+            "AuthenticationException": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
             "ValidationException": {
                 "description": "Validation error",
                 "content": {
@@ -3745,25 +4947,6 @@
                             "required": [
                                 "message",
                                 "errors"
-                            ]
-                        }
-                    }
-                }
-            },
-            "AuthenticationException": {
-                "description": "Unauthenticated",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "Error overview."
-                                }
-                            },
-                            "required": [
-                                "message"
                             ]
                         }
                     }
