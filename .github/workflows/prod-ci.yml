@@ -238,7 +238,6 @@ jobs:
         id: phpunit
         run: |
           ./vendor/bin/phpunit --stop-on-failure --coverage-text --coverage-clover=coverage.xml | tee phpunit.log
-          echo "TESTS_PASSED=$?" >> $GITHUB_OUTPUT
 
       - name: Extract test results
         if: always()
