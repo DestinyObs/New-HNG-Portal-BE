@@ -127,8 +127,8 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
-        # continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -244,11 +244,11 @@ jobs:
         if: always()
         id: test_results
         run: |
-          TESTS_RUN=$(grep -oP 'Tests: \K\d+' phpunit.log || echo "0")
-          ASSERTIONS=$(grep -oP 'Assertions: \K\d+' phpunit.log || echo "0")
-          FAILURES=$(grep -oP 'Failures: \K\d+' phpunit.log || echo "0")
-          ERRORS=$(grep -oP 'Errors: \K\d+' phpunit.log || echo "0")
-          COVERAGE=$(grep -oP 'Lines:\s+\K[\d.]+%' phpunit.log || echo "N/A")
+          TESTS_RUN=$(grep -oP 'Tests: \K\d+' phpunit.log | head -1 || echo "0")
+          ASSERTIONS=$(grep -oP 'Assertions: \K\d+' phpunit.log | head -1 || echo "0")
+          FAILURES=$(grep -oP 'Failures: \K\d+' phpunit.log | head -1 || echo "0")
+          ERRORS=$(grep -oP 'Errors: \K\d+' phpunit.log | head -1 || echo "0")
+          COVERAGE=$(grep 'Lines:' phpunit.log | grep -oP '\d+\.\d+%' | head -1 || echo "N/A")
           
           echo "tests_run=$TESTS_RUN" >> $GITHUB_OUTPUT
           echo "assertions=$ASSERTIONS" >> $GITHUB_OUTPUT
