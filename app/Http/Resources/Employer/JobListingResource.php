@@ -20,7 +20,7 @@ class JobListingResource extends JsonResource
             'title'              => $this->title,
             'description'        => $this->description,
             'acceptance_criteria' => $this->acceptance_criteria,
-            'salary'              => format_price((float) $this->price),
+            'salary'              => (float) $this->price,
 
             // Status
             'status'             => $this->status,
