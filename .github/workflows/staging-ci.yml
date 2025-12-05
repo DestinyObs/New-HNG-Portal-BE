@@ -59,46 +59,6 @@ jobs:
             echo "Pint not installed, skipping..."
           fi
 
-      - name: Notify Slack - Code Quality
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            COLOR="good"
-            EMOJI=":white_check_mark:"
-            STATUS="All checks passed"
-          elif [ "${{ job.status }}" == "failure" ]; then
-            COLOR="danger"
-            EMOJI=":x:"
-            STATUS="Failed - Review required"
-          else
-            COLOR="warning"
-            EMOJI=":warning:"
-            STATUS="Completed with issues"
-          fi
-          
-          if [ -n "$SLACK_WEBHOOK_URL" ]; then
-            curl -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' [HNG Portal BE] Code Quality - Staging",
-                "fields": [
-                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
-                  {"title": "Status", "value": "'"$STATUS"'", "short": true},
-                  {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
-                  {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true},
-                  {"title": "PR", "value": "<'"${{ github.event.pull_request.html_url }}"'|#'"${{ github.event.pull_request.number }}"'>", "short": true}
-                ],
-                "footer": "HNG Portal Backend - Staging CI",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
-          fi
-
   security-scan:
     name: Security & Vulnerability Scan
     runs-on: ubuntu-latest
@@ -145,46 +105,6 @@ jobs:
         # continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
-
-      - name: Notify Slack - Security Scan
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            COLOR="good"
-            EMOJI=":shield:"
-            STATUS="No vulnerabilities found"
-          elif [ "${{ job.status }}" == "failure" ]; then
-            COLOR="danger"
-            EMOJI=":rotating_light:"
-            STATUS="Vulnerabilities detected!"
-          else
-            COLOR="warning"
-            EMOJI=":warning:"
-            STATUS="Scan completed with warnings"
-          fi
-          
-          if [ -n "$SLACK_WEBHOOK_URL" ]; then
-            curl -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' [HNG Portal BE] Security Scan - Staging",
-                "fields": [
-                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
-                  {"title": "Status", "value": "'"$STATUS"'", "short": true},
-                  {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
-                  {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "Trivy Scan", "value": "CRITICAL & HIGH checked", "short": true},
-                  {"title": "Composer Audit", "value": "Dependencies verified", "short": true}
-                ],
-                "footer": "HNG Portal Backend - Staging CI",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
-          fi
 
   tests:
     name: Feature & Unit Tests
@@ -275,46 +195,6 @@ jobs:
           echo "errors=$ERRORS" >> $GITHUB_OUTPUT
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
-      - name: Notify Slack - Test Results
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
-        run: |
-          if [ "${{ steps.phpunit.outcome }}" == "success" ]; then
-            COLOR="good"
-            EMOJI=":test_tube:"
-            STATUS="All tests passed!"
-          else
-            COLOR="danger"
-            EMOJI=":x:"
-            STATUS="Tests failed!"
-          fi
-          
-          if [ -n "$SLACK_WEBHOOK_URL" ]; then
-            curl -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' [HNG Portal BE] Test Results - Staging",
-                "fields": [
-                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
-                  {"title": "Status", "value": "'"$STATUS"'", "short": true},
-                  {"title": "Tests Run", "value": "'"${{ steps.test_results.outputs.tests_run }}"'", "short": true},
-                  {"title": "Assertions", "value": "'"${{ steps.test_results.outputs.assertions }}"'", "short": true},
-                  {"title": "Failures", "value": "'"${{ steps.test_results.outputs.failures }}"'", "short": true},
-                  {"title": "Errors", "value": "'"${{ steps.test_results.outputs.errors }}"'", "short": true},
-                  {"title": "Coverage", "value": "'"${{ steps.test_results.outputs.coverage }}"'", "short": true},
-                  {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
-                  {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "PR", "value": "<'"${{ github.event.pull_request.html_url }}"'|#'"${{ github.event.pull_request.number }}"'>", "short": true}
-                ],
-                "footer": "HNG Portal Backend - Staging CI",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
-          fi
-
   final-status:
     name: CI Pipeline Status
     runs-on: ubuntu-latest
@@ -341,10 +221,29 @@ jobs:
         run: |
           if [ "${{ steps.check_status.outputs.status }}" == "success" ]; then
             COLOR="good"
-            EMOJI=":rocket:"
+            SUMMARY="All CI checks passed! Ready to merge."
           else
             COLOR="danger"
-            EMOJI=":no_entry:"
+            SUMMARY="CI pipeline failed. Review required before merging."
+          fi
+          
+          # Build detailed status
+          if [ "${{ needs.code-quality.result }}" == "success" ]; then
+            QUALITY_STATUS="PASSED: PHPStan + Pint"
+          else
+            QUALITY_STATUS="FAILED: Static analysis issues"
+          fi
+          
+          if [ "${{ needs.security-scan.result }}" == "success" ]; then
+            SECURITY_STATUS="PASSED: Trivy + Composer Audit clean"
+          else
+            SECURITY_STATUS="FAILED: Vulnerabilities detected"
+          fi
+          
+          if [ "${{ needs.tests.result }}" == "success" ]; then
+            TEST_STATUS="PASSED: All tests successful"
+          else
+            TEST_STATUS="FAILED: Test failures detected"
           fi
           
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
@@ -353,18 +252,19 @@ jobs:
             -d '{
               "attachments": [{
                 "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' [HNG Portal BE] Pipeline Complete - Staging",
-                "text": "'"${{ steps.check_status.outputs.message }}"'",
+                "title": "[HNG Portal BE] CI Pipeline Complete - Staging",
+                "text": "'"$SUMMARY"'",
                 "fields": [
                   {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                   {"title": "Overall Status", "value": "'"${{ steps.check_status.outputs.status }}"'", "short": true},
-                  {"title": "Code Quality", "value": "'"${{ needs.code-quality.result }}"'", "short": true},
-                  {"title": "Security Scan", "value": "'"${{ needs.security-scan.result }}"'", "short": true},
-                  {"title": "Tests", "value": "'"${{ needs.tests.result }}"'", "short": true},
+                  {"title": "Code Quality (PHPStan + Pint)", "value": "'"$QUALITY_STATUS"'", "short": false},
+                  {"title": "Security Scan (Trivy + Audit)", "value": "'"$SECURITY_STATUS"'", "short": false},
+                  {"title": "Tests (PHPUnit)", "value": "'"$TEST_STATUS"'", "short": false},
                   {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
                   {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "Trigger", "value": "PR #'"${{ github.event.pull_request.number }}"' to staging", "short": true},
-                  {"title": "View Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Workflow Run>", "short": false}
+                  {"title": "PR", "value": "<'"${{ github.event.pull_request.html_url }}"'|#'"${{ github.event.pull_request.number }}"'>", "short": true},
+                  {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true},
+                  {"title": "View Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|Full Workflow Run>", "short": false}
                 ],
                 "footer": "HNG Portal Backend - Staging CI",
                 "ts": '"$(date +%s)"'

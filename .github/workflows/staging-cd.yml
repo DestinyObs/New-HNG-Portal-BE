@@ -34,7 +34,7 @@ jobs:
           -d '{
             "attachments": [{
               "color": "#36a64f",
-              "title": ":rocket: [HNG Portal BE] Deployment Started - Staging",
+              "title": "[HNG Portal BE] Deployment Started - Staging",
               "fields": [
                 {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                 {"title": "Status", "value": "In Progress...", "short": true},
@@ -190,11 +190,9 @@ jobs:
         run: |
           if [ "${{ steps.deployment_status.outputs.status }}" == "success" ]; then
             COLOR="good"
-            EMOJI=":white_check_mark:"
             STATUS="Success"
           else
             COLOR="danger"
-            EMOJI=":x:"
             STATUS="Failed"
           fi
           
@@ -204,7 +202,7 @@ jobs:
           -d '{
             "attachments": [{
               "color": "'$COLOR'",
-              "title": "'$EMOJI' [HNG Portal BE] Deployment Complete - Staging",
+              "title": "[HNG Portal BE] Deployment Complete - Staging",
               "text": "'"${{ steps.deployment_status.outputs.message }}"'",
               "fields": [
                 {"title": "Repository", "value": "HNG Portal Backend", "short": true},
