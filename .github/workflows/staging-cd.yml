@@ -1,6 +1,3 @@
-
-
-
 name: Deploy Laravel Backend to Staging
 
 on:
@@ -27,9 +24,32 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Notify Slack - Deployment Started
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "#36a64f",
+              "title": ":rocket: Staging Deployment Started",
+              "fields": [
+                {"title": "Environment", "value": "Staging", "short": true},
+                {"title": "Status", "value": "In Progress", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
+                {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true}
+              ],
+              "footer": "HNG Portal Deployment",
+              "ts": '$(date +%s)'
+            }]
+          }'
+      
       - name: Deployment Started
         run: |
-          echo "🚀 Starting deployment to staging..."
+          echo "Starting deployment to staging..."
           echo "Fresh seed: ${{ github.event.inputs.fresh_seed || 'no' }}"
       
       - name: Install sshpass
@@ -57,30 +77,30 @@ jobs:
             set -e
             cd "$APP_DIR"
             
-            echo "📦 Pulling latest code..."
+            echo "Pulling latest code..."
             git fetch origin
             git reset --hard origin/staging
             git clean -fd
             
-            echo "📚 Installing dependencies..."
+            echo "Installing dependencies..."
             /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
             
-            echo "🧹 Clearing caches..."
+            echo "Clearing caches..."
             php artisan config:clear
             php artisan cache:clear
             php artisan route:clear
             php artisan view:clear
             
-            echo "🔄 Running migrations..."
-            php artisan migrate --force
+            echo "Running migrations..."
+            php artisan migrate 
             
-            echo "⚡ Optimizing application..."
+            echo "Optimizing application..."
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan optimize
             
-            echo "✅ Standard deployment completed"
+            echo "Standard deployment completed"
           ENDSSH
 
       - name: Deploy Application (Fresh Migration + Seed)
@@ -95,12 +115,12 @@ jobs:
             set -e
             cd "$APP_DIR"
             
-            echo "📦 Pulling latest code..."
+            echo " Pulling latest code..."
             git fetch origin
             git reset --hard origin/staging
             git clean -fd
             
-            echo "📚 Installing dependencies..."
+            echo "Installing dependencies..."
             /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
             
             echo "🧹 Clearing caches..."
@@ -109,17 +129,17 @@ jobs:
             php artisan route:clear
             php artisan view:clear
             
-            echo "⚠️  WARNING: Running migrate:fresh + seed (DATABASE WILL BE WIPED)"
-            php artisan migrate:fresh --force
-            php artisan db:seed --force
+            echo "WARNING: Running migrate:fresh + seed (DATABASE WILL BE WIPED)"
+            php artisan migrate:fresh
+            php artisan db:seed
             
-            echo "⚡ Optimizing application..."
+            echo "Optimizing application..."
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan optimize
             
-            echo "✅ Fresh migration + seed completed"
+            echo "Fresh migration + seed completed"
           ENDSSH
 
       - name: Restart Backend Service
@@ -130,16 +150,16 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "bash -s" << ENDSSH
             set -e
-            echo "🔄 Restarting backend service..."
+            echo "Restarting backend service..."
             sudo systemctl daemon-reload
             sudo systemctl restart staging-backend
             sleep 3
             
             if systemctl is-active --quiet staging-backend; then
-              echo "✅ Backend service is running"
+              echo "Backend service is running"
               sudo systemctl status staging-backend --no-pager
             else
-              echo "❌ Backend service failed to start"
+              echo "Backend service failed to start"
               sudo systemctl status staging-backend --no-pager
               exit 1
             fi
@@ -147,14 +167,55 @@ jobs:
 
       - name: Deployment Summary
         if: always()
+        id: deployment_status
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment to staging completed successfully!"
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Deployment completed successfully!" >> $GITHUB_OUTPUT
+            echo "Deployment to staging completed successfully!"
             echo "Fresh seed: ${{ github.event.inputs.fresh_seed || 'no' }}"
           else
-            echo "❌ Deployment failed. Check logs above."
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=Deployment failed. Check logs for details." >> $GITHUB_OUTPUT
+            echo "Deployment failed. Check logs above."
             exit 1
           fi
+
+      - name: Notify Slack - Deployment Complete
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          if [ "${{ steps.deployment_status.outputs.status }}" == "success" ]; then
+            COLOR="good"
+            EMOJI=":white_check_mark:"
+            STATUS="Success"
+          else
+            COLOR="danger"
+            EMOJI=":x:"
+            STATUS="Failed"
+          fi
+          
+          curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "'$COLOR'",
+              "title": "'$EMOJI' Staging Deployment Complete",
+              "text": "'"${{ steps.deployment_status.outputs.message }}"'",
+              "fields": [
+                {"title": "Environment", "value": "Staging", "short": true},
+                {"title": "Status", "value": "'$STATUS'", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
+                {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "<'"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"'|'"${GITHUB_SHA:0:7}"'>", "short": true},
+                {"title": "Workflow Run", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Details>", "short": false}
+              ],
+              "footer": "HNG Portal Deployment System",
+              "ts": '$(date +%s)'
+            }]
+          }'
 
 
 

@@ -4,16 +4,54 @@ on:
   push:
     branches:
       - prod
+      
+  workflow_dispatch:
+    inputs:
+      confirm_production:
+        description: 'Type "DEPLOY" to confirm production deployment'
+        required: true
+        type: string
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   build-deploy:
-    # runs-on: [self-hosted, hng-13-runner, linux]
     runs-on: ubuntu-latest
+    
     steps:
+      - name: Validate Production Deployment
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.event.inputs.confirm_production }}" != "DEPLOY" ]; then
+            echo "❌ Production deployment not confirmed. Exiting."
+            exit 1
+          fi
+          echo "✅ Production deployment confirmed"
+
+      - name: Notify Slack - Deployment Started
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "#ff9900",
+              "title": ":warning: Production Deployment Started",
+              "fields": [
+                {"title": "Environment", "value": "PRODUCTION", "short": true},
+                {"title": "Status", "value": "In Progress", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Trigger", "value": "'"${{ github.event_name }}"'", "short": true},
+                {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true}
+              ],
+              "footer": "HNG Portal Production Deployment",
+              "ts": '$(date +%s)'
+            }]
+          }'
+      
       - name: Setup SSH private key for secure server access
         run: |
           mkdir -p ~/.ssh
@@ -59,11 +97,79 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate --force"
 
       - name: Restart Backend Service
+        id: restart_service
         env:
           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
           APP_DIR: ${{ secrets.DEPLOY_PROD_APP_DIR }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "sudo systemctl daemon-reload && sudo systemctl restart prod-backend && sudo systemctl status prod-backend --no-pager"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 "$SERVER_USER@$SERVER_HOST" "bash -s" << ENDSSH
+            set -e
+            echo "🔄 Restarting production backend service..."
+            sudo systemctl daemon-reload
+            sudo systemctl restart prod-backend
+            sleep 3
+            
+            if systemctl is-active --quiet prod-backend; then
+              echo "✅ Production backend service is running"
+              sudo systemctl status prod-backend --no-pager
+            else
+              echo "❌ Production backend service failed to start"
+              sudo systemctl status prod-backend --no-pager
+              exit 1
+            fi
+          ENDSSH
 
-  
+      - name: Deployment Summary
+        if: always()
+        id: deployment_status
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Production deployment completed successfully!" >> $GITHUB_OUTPUT
+            echo "✅ Production deployment completed successfully!"
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=Production deployment failed. Immediate attention required!" >> $GITHUB_OUTPUT
+            echo "❌ Production deployment failed!"
+            exit 1
+          fi
+
+      - name: Notify Slack - Deployment Complete
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          if [ "${{ steps.deployment_status.outputs.status }}" == "success" ]; then
+            COLOR="good"
+            EMOJI=":tada:"
+            STATUS="Success"
+            MESSAGE="Production deployment completed successfully! :rocket:"
+          else
+            COLOR="danger"
+            EMOJI=":fire:"
+            STATUS="Failed"
+            MESSAGE="@channel PRODUCTION DEPLOYMENT FAILED! Immediate attention required!"
+          fi
+          
+          curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "'"$MESSAGE"'",
+            "attachments": [{
+              "color": "'$COLOR'",
+              "title": "'$EMOJI' Production Deployment Complete",
+              "text": "'"${{ steps.deployment_status.outputs.message }}"'",
+              "fields": [
+                {"title": "Environment", "value": "PRODUCTION :red_circle:", "short": true},
+                {"title": "Status", "value": "'$STATUS'", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Trigger", "value": "'"${{ github.event_name }}"'", "short": true},
+                {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "<'"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"'|'"${GITHUB_SHA:0:7}"'>", "short": true},
+                {"title": "Workflow Run", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Details>", "short": false}
+              ],
+              "footer": "HNG Portal Production Deployment System",
+              "ts": '$(date +%s)'
+            }]
+          }'  
