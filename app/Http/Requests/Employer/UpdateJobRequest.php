@@ -40,8 +40,8 @@ class UpdateJobRequest extends FormRequest
             'price' => 'sometimes|numeric',
 
             // Location fields
-            'state_id' => 'sometimes|uuid|exists:states,id',
-            'country_id' => 'sometimes|uuid|exists:countries,id',
+            'country' => 'sometimes|string',
+            'state' => 'sometimes|string',
 
             // Relation fields
             'track_id' => 'sometimes|uuid|exists:tracks,id',
@@ -68,8 +68,7 @@ class UpdateJobRequest extends FormRequest
             'title.string' => 'The job title must be a valid string.',
             'description.string' => 'The job description must be text.',
 
-            'state_id.exists' => 'Invalid state selected.',
-            'country_id.exists' => 'Invalid country selected.',
+            
             'track_id.exists' => 'Invalid track selected.',
             'category_id.exists' => 'Invalid category selected.',
             'job_type_id.exists' => 'Invalid job type selected.',
@@ -77,6 +76,8 @@ class UpdateJobRequest extends FormRequest
 
             'skills.array' => 'Skills must be an array.',
             'skills.*.exists' => 'One or more skills are invalid.',
+            'country.sometimes' => 'Country field is required',
+            'state.sometimes' => 'State field is required',
 
             'price.required' => 'Salary is required.',
             'price.numeric'  => 'Salary must be a valid number.',

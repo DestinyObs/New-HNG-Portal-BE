@@ -11,7 +11,6 @@ class SkillSeeder extends Seeder
     public function run(): void
     {
         $skills = [
-            'Ruby',
             'Rust',
             'React',
             'C/C++',
@@ -30,7 +29,6 @@ class SkillSeeder extends Seeder
             "Ruby",
             "SQL",
             "TypeScript",
-            "Asana",
             "Firefox",
             "Google Suite",
             "Jira",
@@ -39,8 +37,6 @@ class SkillSeeder extends Seeder
             "Slack",
             "Skype",
             "Smartsheets",
-            "Trello",
-            "Zapier",
             "Search engine optimization",
             "Access",
             "Asana",
@@ -55,7 +51,6 @@ class SkillSeeder extends Seeder
             "OneNote",
             "Evernote",
             "Salesforce",
-            "Slack",
             "Todoist",
             "Toggl",
             "Trello",
