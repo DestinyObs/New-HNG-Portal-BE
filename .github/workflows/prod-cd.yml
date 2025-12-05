@@ -23,16 +23,16 @@ jobs:
           -d '{
             "attachments": [{
               "color": "#ff9900",
-              "title": ":warning: Production Deployment Started",
+              "title": ":warning: [HNG Portal BE] Deployment Started - PRODUCTION",
               "fields": [
-                {"title": "Environment", "value": "PRODUCTION", "short": true},
-                {"title": "Status", "value": "In Progress", "short": true},
+                {"title": "Repository", "value": "HNG Portal Backend", "short": true},
+                {"title": "Environment", "value": "PRODUCTION :red_circle:", "short": true},
+                {"title": "Status", "value": "In Progress...", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
-                {"title": "Trigger", "value": "'"${{ github.event_name }}"'", "short": true},
                 {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
                 {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true}
               ],
-              "footer": "HNG Portal Production Deployment",
+              "footer": "HNG Portal Backend - Production Deployment",
               "ts": '$(date +%s)'
             }]
           }'
@@ -145,18 +145,18 @@ jobs:
             "text": "'"$MESSAGE"'",
             "attachments": [{
               "color": "'$COLOR'",
-              "title": "'$EMOJI' Production Deployment Complete",
+              "title": "'$EMOJI' [HNG Portal BE] Deployment Complete - PRODUCTION",
               "text": "'"${{ steps.deployment_status.outputs.message }}"'",
               "fields": [
+                {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                 {"title": "Environment", "value": "PRODUCTION :red_circle:", "short": true},
                 {"title": "Status", "value": "'$STATUS'", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
-                {"title": "Trigger", "value": "'"${{ github.event_name }}"'", "short": true},
                 {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
                 {"title": "Commit", "value": "<'"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"'|'"${GITHUB_SHA:0:7}"'>", "short": true},
-                {"title": "Workflow Run", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Details>", "short": false}
+                {"title": "Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Workflow Run>", "short": false}
               ],
-              "footer": "HNG Portal Production Deployment System",
+              "footer": "HNG Portal Backend - Production Deployment",
               "ts": '$(date +%s)'
             }]
           }'  

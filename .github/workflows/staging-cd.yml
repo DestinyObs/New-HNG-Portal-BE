@@ -34,16 +34,16 @@ jobs:
           -d '{
             "attachments": [{
               "color": "#36a64f",
-              "title": ":rocket: Staging Deployment Started",
+              "title": ":rocket: [HNG Portal BE] Deployment Started - Staging",
               "fields": [
-                {"title": "Environment", "value": "Staging", "short": true},
-                {"title": "Status", "value": "In Progress", "short": true},
+                {"title": "Repository", "value": "HNG Portal Backend", "short": true},
+                {"title": "Status", "value": "In Progress...", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
                 {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
                 {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
                 {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true}
               ],
-              "footer": "HNG Portal Deployment",
+              "footer": "HNG Portal Backend - Staging Deployment",
               "ts": '$(date +%s)'
             }]
           }'
@@ -204,18 +204,18 @@ jobs:
           -d '{
             "attachments": [{
               "color": "'$COLOR'",
-              "title": "'$EMOJI' Staging Deployment Complete",
+              "title": "'$EMOJI' [HNG Portal BE] Deployment Complete - Staging",
               "text": "'"${{ steps.deployment_status.outputs.message }}"'",
               "fields": [
-                {"title": "Environment", "value": "Staging", "short": true},
+                {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                 {"title": "Status", "value": "'$STATUS'", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
                 {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
                 {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
                 {"title": "Commit", "value": "<'"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"'|'"${GITHUB_SHA:0:7}"'>", "short": true},
-                {"title": "Workflow Run", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Details>", "short": false}
+                {"title": "Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Workflow Run>", "short": false}
               ],
-              "footer": "HNG Portal Deployment System",
+              "footer": "HNG Portal Backend - Staging Deployment",
               "ts": '$(date +%s)'
             }]
           }'

@@ -67,11 +67,15 @@ jobs:
           if [ "${{ job.status }}" == "success" ]; then
             COLOR="good"
             EMOJI=":white_check_mark:"
-            STATUS="Passed"
+            STATUS="All checks passed"
+          elif [ "${{ job.status }}" == "failure" ]; then
+            COLOR="danger"
+            EMOJI=":x:"
+            STATUS="Failed - Review required"
           else
             COLOR="warning"
             EMOJI=":warning:"
-            STATUS="Completed with warnings"
+            STATUS="Completed with issues"
           fi
           
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
@@ -80,16 +84,16 @@ jobs:
             -d '{
               "attachments": [{
                 "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' Staging CI - Code Quality",
+                "title": "'"$EMOJI"' [HNG Portal BE] Code Quality - Staging",
                 "fields": [
-                  {"title": "Environment", "value": "Staging", "short": true},
+                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                   {"title": "Status", "value": "'"$STATUS"'", "short": true},
                   {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
                   {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
                   {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true},
                   {"title": "PR", "value": "<'"${{ github.event.pull_request.html_url }}"'|#'"${{ github.event.pull_request.number }}"'>", "short": true}
                 ],
-                "footer": "GitHub Actions",
+                "footer": "HNG Portal Backend - Staging CI",
                 "ts": '"$(date +%s)"'
               }]
             }'
@@ -138,7 +142,7 @@ jobs:
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        continue-on-error: true
+        # continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -167,16 +171,16 @@ jobs:
             -d '{
               "attachments": [{
                 "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' Staging CI - Security Scan",
+                "title": "'"$EMOJI"' [HNG Portal BE] Security Scan - Staging",
                 "fields": [
-                  {"title": "Environment", "value": "Staging", "short": true},
+                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                   {"title": "Status", "value": "'"$STATUS"'", "short": true},
                   {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
                   {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "Trivy", "value": "Scanned for CRITICAL & HIGH", "short": true},
-                  {"title": "Composer Audit", "value": "Dependency check completed", "short": true}
+                  {"title": "Trivy Scan", "value": "CRITICAL & HIGH checked", "short": true},
+                  {"title": "Composer Audit", "value": "Dependencies verified", "short": true}
                 ],
-                "footer": "GitHub Actions",
+                "footer": "HNG Portal Backend - Staging CI",
                 "ts": '"$(date +%s)"'
               }]
             }'
@@ -292,9 +296,9 @@ jobs:
             -d '{
               "attachments": [{
                 "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' Staging CI - Test Results",
+                "title": "'"$EMOJI"' [HNG Portal BE] Test Results - Staging",
                 "fields": [
-                  {"title": "Environment", "value": "Staging", "short": true},
+                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                   {"title": "Status", "value": "'"$STATUS"'", "short": true},
                   {"title": "Tests Run", "value": "'"${{ steps.test_results.outputs.tests_run }}"'", "short": true},
                   {"title": "Assertions", "value": "'"${{ steps.test_results.outputs.assertions }}"'", "short": true},
@@ -302,10 +306,10 @@ jobs:
                   {"title": "Errors", "value": "'"${{ steps.test_results.outputs.errors }}"'", "short": true},
                   {"title": "Coverage", "value": "'"${{ steps.test_results.outputs.coverage }}"'", "short": true},
                   {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
-                  {"title": "Author", "value": "'"${{ github.actor }}"'", "short": false},
-                  {"title": "PR Link", "value": "<'"${{ github.event.pull_request.html_url }}"'|View Pull Request #'"${{ github.event.pull_request.number }}"'>", "short": false}
+                  {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
+                  {"title": "PR", "value": "<'"${{ github.event.pull_request.html_url }}"'|#'"${{ github.event.pull_request.number }}"'>", "short": true}
                 ],
-                "footer": "GitHub Actions",
+                "footer": "HNG Portal Backend - Staging CI",
                 "ts": '"$(date +%s)"'
               }]
             }'
@@ -349,20 +353,20 @@ jobs:
             -d '{
               "attachments": [{
                 "color": "'"$COLOR"'",
-                "title": "'"$EMOJI"' Staging CI Pipeline - Final Status",
+                "title": "'"$EMOJI"' [HNG Portal BE] Pipeline Complete - Staging",
                 "text": "'"${{ steps.check_status.outputs.message }}"'",
                 "fields": [
-                  {"title": "Environment", "value": "Staging", "short": true},
+                  {"title": "Repository", "value": "HNG Portal Backend", "short": true},
                   {"title": "Overall Status", "value": "'"${{ steps.check_status.outputs.status }}"'", "short": true},
                   {"title": "Code Quality", "value": "'"${{ needs.code-quality.result }}"'", "short": true},
                   {"title": "Security Scan", "value": "'"${{ needs.security-scan.result }}"'", "short": true},
                   {"title": "Tests", "value": "'"${{ needs.tests.result }}"'", "short": true},
                   {"title": "Branch", "value": "'"${{ github.head_ref }}"'", "short": true},
                   {"title": "Author", "value": "'"${{ github.actor }}"'", "short": true},
-                  {"title": "Triggered By", "value": "PR to staging branch", "short": true},
-                  {"title": "View Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|GitHub Actions Run>", "short": false}
+                  {"title": "Trigger", "value": "PR #'"${{ github.event.pull_request.number }}"' to staging", "short": true},
+                  {"title": "View Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Workflow Run>", "short": false}
                 ],
-                "footer": "HNG Portal Backend CI",
+                "footer": "HNG Portal Backend - Staging CI",
                 "ts": '"$(date +%s)"'
               }]
             }'
