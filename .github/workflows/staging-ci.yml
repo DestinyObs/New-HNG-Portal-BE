@@ -1,16 +1,33 @@
+
 name: CI for Staging
 
 on:
-    pull_request:
+  pull_request:
+    branches:
+      - staging
 
 permissions:
-    contents: read
-    pull-requests: write
+  contents: read
+  pull-requests: write
 
 jobs:
   checks:
-    # runs-on: [self-hosted, hng-13-runner, linux]
     runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -19,21 +36,81 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: mbstring, xml, ctype, json, mysql, pdo_mysql
+          coverage: none
+      
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
           
       - name: Install Composer dependencies
-        # This installs all dependencies, including larastan/phpstan from composer.json
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # - name: PHPStan static analysis (Larastan)
-      #   # This command runs the analysis, automatically picking up the committed phpstan.neon file.
-      #   run: ./vendor/bin/phpstan analyse --level=max app"
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.example .env.testing
+          php artisan key:generate --env=testing
       
+      - name: Configure Test Environment
+        run: |
+          cat >> .env.testing << EOF
+          APP_ENV=testing
+          APP_DEBUG=true
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_DATABASE=testing_db
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          CACHE_DRIVER=array
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          GOOGLE_CLIENT_ID=fake-client-id-for-testing
+          GOOGLE_CLIENT_SECRET=fake-client-secret-for-testing
+          GOOGLE_REDIRECT_URL=http://localhost/auth/callback/google
+          EOF
       
-      - name: Composer security audit
+      - name: Run Migrations
+        run: php artisan migrate --force --env=testing
+      
+      - name: Seed Database
+        run: php artisan db:seed --force --env=testing
+        continue-on-error: true
+      
+      - name: PHPStan Static Analysis
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+        continue-on-error: true
+      
+      - name: Composer Security Audit
         run: composer audit --format=json || true
 
-      # - name: Run PHPUnit tests
-      #   run: ./vendor/bin/phpunit
+      - name: Run PHPUnit Tests
+        run: ./vendor/bin/phpunit --testdox --stop-on-failure
+        env:
+          APP_ENV: testing
+
+      - name: Comment PR with Test Results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${emoji} **CI Pipeline ${status}**\n\n` +
+                    `Tests have been executed. Check the [workflow logs](${context.payload.pull_request.html_url}/checks) for details.`
+            });
 
 
 
@@ -49,7 +126,8 @@ jobs:
 
 # jobs:
 #   checks:
-#     runs-on: [self-hosted, hng-13-runner, linux]
+#     # runs-on: [self-hosted, hng-13-runner, linux]
+#     runs-on: ubuntu-latest
 #     steps:
 #       - name: Checkout source code
 #         uses: actions/checkout@v4
@@ -68,36 +146,8 @@ jobs:
 #       #   run: ./vendor/bin/phpstan analyse --level=max app"
       
       
-#       - name: Create .env.testing from secrets
-#         run: |
-#           echo "APP_KEY=base64:testingkey==" > .env.testing
-#           echo "DB_CONNECTION=${{ secrets.CI_DB_CONNECTION }}" >> .env.testing
-#           echo "DB_HOST=${{ secrets.CI_DB_HOST }}" >> .env.testing
-#           echo "DB_PORT=${{ secrets.CI_DB_PORT }}" >> .env.testing
-#           echo "DB_DATABASE=${{ secrets.CI_DB_DATABASE }}" >> .env.testing
-#           echo "DB_USERNAME=${{ secrets.CI_DB_USERNAME }}" >> .env.testing
-#           echo "DB_PASSWORD=${{ secrets.CI_DB_PASSWORD }}" >> .env.testing
-
-#       - name: Run migrations
-#         env:
-#           DB_CONNECTION: ${{ secrets.CI_DB_CONNECTION }}
-#           DB_HOST: ${{ secrets.CI_DB_HOST }}
-#           DB_PORT: ${{ secrets.CI_DB_PORT }}
-#           DB_DATABASE: ${{ secrets.CI_DB_DATABASE }}
-#           DB_USERNAME: ${{ secrets.CI_DB_USERNAME }}
-#           DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
-#         run: php artisan migrate --force --env=testing
-
 #       - name: Composer security audit
 #         run: composer audit --format=json || true
 
-#       - name: Run PHPUnit tests
-#         env:
-#           APP_ENV: testing
-#           DB_CONNECTION: ${{ secrets.CI_DB_CONNECTION }}
-#           DB_HOST: ${{ secrets.CI_DB_HOST }}
-#           DB_PORT: ${{ secrets.CI_DB_PORT }}
-#           DB_DATABASE: ${{ secrets.CI_DB_DATABASE }}
-#           DB_USERNAME: ${{ secrets.CI_DB_USERNAME }}
-#           DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
-#         run: ./vendor/bin/phpunit
+#       # - name: Run PHPUnit tests
+#       #   run: ./vendor/bin/phpunit
