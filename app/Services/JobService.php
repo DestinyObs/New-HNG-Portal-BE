@@ -168,7 +168,7 @@ class JobService
             // ? store job and skill relationship
             if (isset($data['skills'])) {
                 $skills = $data['skills'];
-                $this->repo->addJobSkills($skills, $updatedDraft->id);
+                $this->repo->addJobSkills($skills, $createdUpdatedJob->id);
             }
 
             DB::commit();

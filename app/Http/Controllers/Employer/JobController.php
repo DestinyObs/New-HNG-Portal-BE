@@ -85,11 +85,15 @@ class JobController extends Controller
 
         // ? case when job is added successfully
         if ($response->success) {
+            // return $this->successWithData(
+            //     $response->data,
+            //     $response->message,
+            //     $response->status
+            // );
             return $this->successWithData(
-                // $response->data,
-                new JobListingResource($response->data),
+                new JobResource($response->job),
                 $response->message,
-                $response->status
+                $response->status,
             );
         }
 
