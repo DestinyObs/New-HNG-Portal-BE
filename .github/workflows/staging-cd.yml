@@ -4,64 +4,145 @@ on:
   push:
     branches:
       - staging
+      
+  workflow_dispatch:
+    inputs:
+      fresh_seed:
+        description: 'Run migrate:fresh and seed? (yes/no)'
+        required: false
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   build-deploy:
-    # runs-on: [self-hosted, hng-13-runner, linux]
     runs-on: ubuntu-latest
+    
     steps:
+      - name: Notify Slack - Deployment Started
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "#36a64f",
+              "title": ":rocket: Staging Deployment Started",
+              "fields": [
+                {"title": "Environment", "value": "Staging", "short": true},
+                {"title": "Status", "value": "In Progress", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
+                {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "'"${GITHUB_SHA:0:7}"'", "short": true}
+              ],
+              "footer": "HNG Portal Deployment",
+              "ts": '$(date +%s)'
+            }]
+          }'
+          fi
+      
+      - name: Deployment Started
+        run: |
+          echo "Starting deployment to staging..."
+          echo "Fresh seed: ${{ github.event.inputs.fresh_seed || 'no' }}"
+      
       - name: Install sshpass
         run: |
-          sudo apt-get update || true
-          sudo apt-get install -y sshpass || true
+          sudo apt-get update -qq
+          sudo apt-get install -y sshpass
 
-      - name: Prepare SSH and Known Hosts
+      - name: Prepare SSH
         env:
           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Git Operations on Remote
+      - name: Deploy Application (Standard Migration)
+        if: ${{ github.event.inputs.fresh_seed != 'yes' }}
         env:
           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git fetch origin && git reset --hard origin/staging && git clean -fd"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "bash -s" << ENDSSH
+            set -e
+            cd "$APP_DIR"
+            
+            echo "Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/staging
+            git clean -fd
+            
+            echo "Installing dependencies..."
+            /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
+            
+            echo "Clearing caches..."
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+            
+            echo "Running migrations..."
+            php artisan migrate 
+            
+            echo "Optimizing application..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+            
+            echo "Standard deployment completed"
+          ENDSSH
 
-      - name: Install Composer Dependencies
+      - name: Deploy Application (Fresh Migration + Seed)
+        if: ${{ github.event.inputs.fresh_seed == 'yes' }}
         env:
           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
-
-      - name: Laravel Cache and Optimize
-        env:
-          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
-          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
-          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
-          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
-        run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize"
-
-      - name: Run Migrations
-        env:
-          SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
-          SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
-          SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
-          APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
-        run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate:fresh --force && php artisan db:seed --force"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "bash -s" << ENDSSH
+            set -e
+            cd "$APP_DIR"
+            
+            echo " Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/staging
+            git clean -fd
+            
+            echo "Installing dependencies..."
+            /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
+            
+            echo "🧹 Clearing caches..."
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+            
+            echo "WARNING: Running migrate:fresh + seed (DATABASE WILL BE WIPED)"
+            php artisan migrate:fresh
+            php artisan db:seed
+            
+            echo "Optimizing application..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+            
+            echo "Fresh migration + seed completed"
+          ENDSSH
 
       - name: Restart Backend Service
         env:
@@ -69,8 +150,153 @@ jobs:
           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "sudo systemctl daemon-reload && sudo systemctl restart staging-backend && sudo systemctl status staging-backend --no-pager"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "bash -s" << ENDSSH
+            set -e
+            echo "Restarting backend service..."
+            sudo systemctl daemon-reload
+            sudo systemctl restart staging-backend
+            sleep 3
+            
+            if systemctl is-active --quiet staging-backend; then
+              echo "Backend service is running"
+              sudo systemctl status staging-backend --no-pager
+            else
+              echo "Backend service failed to start"
+              sudo systemctl status staging-backend --no-pager
+              exit 1
+            fi
+          ENDSSH
 
-      - name: Notify Deployment Status
+      - name: Deployment Summary
         if: always()
-        run: echo "Staging deployment finished."
+        id: deployment_status
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Deployment completed successfully!" >> $GITHUB_OUTPUT
+            echo "Deployment to staging completed successfully!"
+            echo "Fresh seed: ${{ github.event.inputs.fresh_seed || 'no' }}"
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=Deployment failed. Check logs for details." >> $GITHUB_OUTPUT
+            echo "Deployment failed. Check logs above."
+            exit 1
+          fi
+
+      - name: Notify Slack - Deployment Complete
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
+        run: |
+          if [ "${{ steps.deployment_status.outputs.status }}" == "success" ]; then
+            COLOR="good"
+            EMOJI=":white_check_mark:"
+            STATUS="Success"
+          else
+            COLOR="danger"
+            EMOJI=":x:"
+            STATUS="Failed"
+          fi
+          
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST "$SLACK_WEBHOOK_URL" \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "'$COLOR'",
+              "title": "'$EMOJI' Staging Deployment Complete",
+              "text": "'"${{ steps.deployment_status.outputs.message }}"'",
+              "fields": [
+                {"title": "Environment", "value": "Staging", "short": true},
+                {"title": "Status", "value": "'$STATUS'", "short": true},
+                {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                {"title": "Fresh Seed", "value": "'"${{ github.event.inputs.fresh_seed || 'no' }}"'", "short": true},
+                {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
+                {"title": "Commit", "value": "<'"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"'|'"${GITHUB_SHA:0:7}"'>", "short": true},
+                {"title": "Workflow Run", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View Details>", "short": false}
+              ],
+              "footer": "HNG Portal Deployment System",
+              "ts": '$(date +%s)'
+            }]
+          }'
+
+
+
+
+
+# name: Deploy Laravel Backend to Staging
+
+# on:
+#   push:
+#     branches:
+#       - staging
+
+# permissions:
+#   contents: read
+#   pull-requests: write
+
+# jobs:
+#   build-deploy:
+#     # runs-on: [self-hosted, hng-13-runner, linux]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Install sshpass
+#         run: |
+#           sudo apt-get update || true
+#           sudo apt-get install -y sshpass || true
+
+#       - name: Prepare SSH and Known Hosts
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#         run: |
+#           mkdir -p ~/.ssh
+#           chmod 700 ~/.ssh
+#           ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+#       - name: Git Operations on Remote
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+#           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+#           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+#         run: |
+#           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && git fetch origin && git reset --hard origin/staging && git clean -fd"
+
+#       - name: Install Composer Dependencies
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+#           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+#           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+#         run: |
+#           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && /usr/local/bin/composer install --prefer-dist --no-interaction --optimize-autoloader"
+
+#       - name: Laravel Cache and Optimize
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+#           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+#           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+#         run: |
+#           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan optimize"
+
+#       - name: Run Migrations
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+#           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+#           APP_DIR: ${{ secrets.DEPLOY_STAGING_APP_DIR }}
+#         run: |
+#           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "cd $APP_DIR && php artisan migrate:fresh --force && php artisan db:seed --force"
+
+#       - name: Restart Backend Service
+#         env:
+#           SERVER_HOST: ${{ secrets.DEPLOY_SERVER_IP }}
+#           SERVER_USER: ${{ secrets.DEPLOY_SERVER_USER }}
+#           SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+#         run: |
+#           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "sudo systemctl daemon-reload && sudo systemctl restart staging-backend && sudo systemctl status staging-backend --no-pager"
+
+#       - name: Notify Deployment Status
+#         if: always()
+#         run: echo "Staging deployment finished."

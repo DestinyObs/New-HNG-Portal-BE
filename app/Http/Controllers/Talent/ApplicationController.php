@@ -18,7 +18,17 @@ class ApplicationController extends Controller
     public function index(Request $request)
     {
         // dd($request->all());
-        $response = $this->applicationService->listApplications();
+        $perPage = (int) $request->query('per_page', 15);
+        $response = $this->applicationService->listApplications($request->only(
+            [
+                'title',
+                'job_type_id',
+                'category_id',
+                'track_id',
+                'sort_by',
+                'search',
+            ]
+        ), $perPage);
         // dd($response);
 
         if ($response->success) {

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 interface ApplicationServiceInterface
 {
-    public function listApplications(): object|array;
+    public function listApplications(array $params, int $perPage): object|array;
     public function createApplication(array $data, Request $request): object|array;
     public function getSingleApplication(string $appId): object|array;
     public function withdrawApplication(string $appId): object|array;
