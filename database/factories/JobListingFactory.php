@@ -27,32 +27,35 @@ class JobListingFactory extends Factory
             'Technical Lead',
         ];
 
-        $countriesResponse = Http::get('https://countriesnow.space/api/v0.1/countries/positions');
+        // $countriesResponse = Http::get('https://countriesnow.space/api/v0.1/countries/positions');
 
-        $countries = $countriesResponse->successful()
-            ? ($countriesResponse->json()['data'] ?? [])
-            : [];
+        // $countries = $countriesResponse->successful()
+        //     ? ($countriesResponse->json()['data'] ?? [])
+        //     : [];
 
-        $randomCountry = collect($countries)->random();
-        $countryName = $randomCountry['name'] ?? 'Nigeria';
+        // $randomCountry = collect($countries)->random();
+        // $countryName = $randomCountry['name'] ?? 'Nigeria';
 
-        $stateResponse = Http::post('https://countriesnow.space/api/v0.1/countries/states', [
-            'country' => $countryName
-        ]);
+        // $stateResponse = Http::post('https://countriesnow.space/api/v0.1/countries/states', [
+        //     'country' => $countryName
+        // ]);
 
-        $states = $stateResponse->successful()
-            ? ($stateResponse->json()['data']['states'] ?? [])
-            : [];
+        // $states = $stateResponse->successful()
+        //     ? ($stateResponse->json()['data']['states'] ?? [])
+        //     : [];
 
-        $state = collect($states)->random()['name'] ?? null;
+        // $state = collect($states)->random()['name'] ?? null;
 
+        $countries = config('countries');
+        $countryIso = fake()->randomElement(array_keys($countries));
+        $stateIso   = fake()->randomElement(array_keys($countries[$countryIso]));
 
         return [
             'title' => fake()->randomElement($jobTitles),
             'description' => fake()->paragraphs(3, true),
             'acceptance_criteria' => fake()->optional(0.8)->text(200),
-            'state' => $state, // Will be set by seeder if needed
-            'country' => $countryName, // Will be set by seeder if needed
+            'state' => $stateIso, // Will be set by seeder if needed
+            'country' => $countryIso, // Will be set by seeder if needed
             'company_id' => null, // Will be set by seeder
             'price' => fake()->randomFloat(2, 50000, 200000),
             'track_id' => null, // Will be set by seeder
