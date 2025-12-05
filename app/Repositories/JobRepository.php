@@ -80,7 +80,7 @@ class JobRepository
     public function listDraftedJobs(string $companyUuid, int $perPage = 15, array $filters = [])
     {
         $query = JobListing::where('company_id', $companyUuid)
-            ->where('status', 'draft')
+            ->where('status', Status::DRAFT)
             ->with([
                 'category',
                 'jobType',
@@ -128,6 +128,27 @@ class JobRepository
     }
 
 
+    private function filterApplications(Builder $query, array $filters, int $perPage): LengthAwarePaginator
+    {
+        $sortBy = 'desc';
+
+        // Filter by application status
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Sort by newest / oldest
+        if (!empty($filters['sort_by'])) {
+            $sortBy = $filters['sort_by'] === 'oldest' ? 'asc' : 'desc';
+        }
+
+        return $query
+            ->orderBy('created_at', $sortBy)
+            ->paginate($perPage);
+    }
+
+
+
     public function checkIfCompanyIdExist(int|string $companyID): bool
     {
         return Company::where('id', $companyID)
@@ -158,7 +179,7 @@ class JobRepository
 
         // ? Always set the company ID to the logged-in company's UUID
         $data['company_id'] = $companyUuid;
-        $data['status'] = $isDraft ? 'draft' : 'active'; // ? Ensure it's always a draft or active job
+        $data['status'] = $isDraft ? Status::DRAFT : 'active'; // ? Ensure it's always a draft or active job
 
         // dd($data);
 
@@ -171,7 +192,7 @@ class JobRepository
         // ? Job ID provided → try to find the draft belonging to the current user
         $job = JobListing::where('id', $jobId)
             ->where('company_id', $companyUuid)
-            ->where('status', 'draft')
+            ->where('status', Status::DRAFT)
             ->first();
 
         if (! $job) {
@@ -272,19 +293,19 @@ class JobRepository
     }
 
 
-    public function getApplications(string $jobId): JobListing
+    public function getApplications(string $jobId, array $filters = [], int $perPage): LengthAwarePaginator
     {
-        return JobListing::query()
+        //? Ensure job exists
+        JobListing::query()->where('id', $jobId)->firstOrFail();
+
+        $query = Application::query()
+            ->where('job_id', $jobId)
             ->with([
-                'applications.user',
-                'category',
-                'jobType',
-                'track',
-                'skills',
-                'jobLevels',
-                'workModes',
-            ])
-            ->findOrFail($jobId);
+                'user',
+                'job',
+            ]);
+
+        return $this->filterApplications($query, $filters, $perPage);
     }
 
 
