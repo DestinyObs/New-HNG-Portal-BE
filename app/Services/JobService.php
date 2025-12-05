@@ -156,12 +156,14 @@ class JobService
         try {
             DB::beginTransaction();
             // ? create a new job
-            $updatedDraft = $this->repo->createOrUpdateJob(
+            $createdUpdatedJob = $this->repo->createOrUpdateJob(
                 $companyUuid,
                 $data,
                 $isDraft,
                 $isPublish
             );
+
+            // dd($createdUpdatedJob->toArray());
 
             // ? store job and skill relationship
             if (isset($data['skills'])) {
@@ -175,13 +177,13 @@ class JobService
                 'success' => true,
                 'message' => 'Job created or updated successfully',
                 'status' => Http::OK,
-                'data' => $updatedDraft->load([
-                    'category',
+                'data' => $createdUpdatedJob->load([
                     'category',
                     'jobType',
                     'track',
                     'skills',
-                    'jobLevels'
+                    'jobLevels',
+                    'applications',
                 ]),
             ];
 
@@ -260,7 +262,7 @@ class JobService
         return $this->repo->publish($job, $isPublish);
     }
 
-    public function getAllApplication(string $companyUuid, string $uuid)
+    public function getAllApplication(string $companyUuid, string $uuid, array $params = [], int $perPage)
     {
         try {
             if (! $this->repo->checkIfCompanyIdExist($companyUuid)) {
@@ -271,7 +273,7 @@ class JobService
                 ];
             }
 
-            $applications = $this->repo->getApplications($uuid);
+            $applications = $this->repo->getApplications($uuid, $params, $perPage);
 
             return (object) [
                 'success' => true,
@@ -301,6 +303,7 @@ class JobService
             }
 
             $status = $status ? Status::ACTIVE->value : Status::INACTIVE->value;
+            // dd($status);
 
             $job = $this->getForCompany($companyUuid, $uuid);
             if (! $job) {
@@ -312,6 +315,7 @@ class JobService
             }
 
             $job = $this->repo->updateStatus($job, $status);
+            // dd($job);
 
             return (object) [
                 'success' => true,
