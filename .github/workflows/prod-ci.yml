@@ -37,11 +37,11 @@ jobs:
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run PHPStan (Larastan)
-        continue-on-error: true
+        # continue-on-error: true
         run: ./vendor/bin/phpstan analyse --memory-limit=2G
 
       - name: Check code style (Laravel Pint)
-        continue-on-error: true
+        # continue-on-error: true
         run: |
           if [ -f "./vendor/bin/pint" ]; then
             ./vendor/bin/pint --test
@@ -111,14 +111,14 @@ jobs:
 
       - name: Composer security audit
         id: composer_audit
-        continue-on-error: true
+        # continue-on-error: true
         run: |
           composer audit --format=json > audit.json || true
           cat audit.json
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
+        uses: aquasecurity/trivy-action@0.29.0
+        # continue-on-error: true
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v2
-        continue-on-error: true
+        # continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -231,7 +231,7 @@ jobs:
         run: php artisan migrate --env=testing --force
 
       - name: Seed database
-        continue-on-error: true
+        # continue-on-error: true
         run: php artisan db:seed --env=testing --force
 
       - name: Run PHPUnit tests with coverage
