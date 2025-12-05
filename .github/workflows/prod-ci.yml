@@ -228,7 +228,7 @@ jobs:
           echo "GOOGLE_REDIRECT_URI=http://localhost/auth/google/callback" >> .env.testing
 
       - name: Run migrations
-        run: php artisan migrate --env=testing --force
+        run: php artisan migrate:fresh --env=testing --force
 
       - name: Seed database
         # continue-on-error: true
