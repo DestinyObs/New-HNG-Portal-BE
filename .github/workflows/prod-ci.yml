@@ -238,6 +238,12 @@ jobs:
         id: phpunit
         run: |
           ./vendor/bin/phpunit --stop-on-failure --coverage-text --coverage-clover=coverage.xml | tee phpunit.log
+          
+          # Check if tests failed
+          if grep -q "ERRORS!" phpunit.log || grep -q "FAILURES!" phpunit.log; then
+            echo "Tests failed! See errors above."
+            exit 1
+          fi
 
       - name: Extract test results
         if: always()
