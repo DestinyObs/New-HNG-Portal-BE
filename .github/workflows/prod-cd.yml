@@ -23,10 +23,10 @@ jobs:
           -d '{
             "attachments": [{
               "color": "#ff9900",
-              "title": ":warning: [HNG Portal BE] Deployment Started - PRODUCTION",
+              "title": "[HNG Portal BE] Deployment Started - PRODUCTION",
               "fields": [
                 {"title": "Repository", "value": "HNG Portal Backend", "short": true},
-                {"title": "Environment", "value": "PRODUCTION :red_circle:", "short": true},
+                {"title": "Environment", "value": "PRODUCTION", "short": true},
                 {"title": "Status", "value": "In Progress...", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
                 {"title": "Triggered By", "value": "'"${{ github.actor }}"'", "short": true},
@@ -128,12 +128,10 @@ jobs:
         run: |
           if [ "${{ steps.deployment_status.outputs.status }}" == "success" ]; then
             COLOR="good"
-            EMOJI=":tada:"
             STATUS="Success"
-            MESSAGE="Production deployment completed successfully! :rocket:"
+            MESSAGE="Production deployment completed successfully!"
           else
             COLOR="danger"
-            EMOJI=":fire:"
             STATUS="Failed"
             MESSAGE="@channel PRODUCTION DEPLOYMENT FAILED! Immediate attention required!"
           fi
@@ -145,11 +143,11 @@ jobs:
             "text": "'"$MESSAGE"'",
             "attachments": [{
               "color": "'$COLOR'",
-              "title": "'$EMOJI' [HNG Portal BE] Deployment Complete - PRODUCTION",
+              "title": "[HNG Portal BE] Deployment Complete - PRODUCTION",
               "text": "'"${{ steps.deployment_status.outputs.message }}"'",
               "fields": [
                 {"title": "Repository", "value": "HNG Portal Backend", "short": true},
-                {"title": "Environment", "value": "PRODUCTION :red_circle:", "short": true},
+                {"title": "Environment", "value": "PRODUCTION", "short": true},
                 {"title": "Status", "value": "'$STATUS'", "short": true},
                 {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
                 {"title": "Deployed By", "value": "'"${{ github.actor }}"'", "short": true},
