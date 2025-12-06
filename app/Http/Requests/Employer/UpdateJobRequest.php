@@ -55,6 +55,8 @@ class UpdateJobRequest extends FormRequest
             'skills' => 'sometimes|array',
             'skills.*' => 'uuid|exists:skills,id',
 
+            'price' => ['sometimes', 'numeric', 'regex:/^\d{1,10}(\.\d{1,2})?$/'],
+
             // For updating a draft job
             // 'job_id'               => 'sometimes|uuid|exists:job_listings,id',
         ];
@@ -76,6 +78,10 @@ class UpdateJobRequest extends FormRequest
             'skills.*.exists' => 'One or more skills are invalid.',
             'country.sometimes' => 'Country field is required',
             'state.sometimes' => 'State field is required',
+
+            'price.required' => 'Salary is required.',
+            'price.numeric'  => 'Salary must be a valid number.',
+            'price.regex'    => 'Salary must not exceed 10 digits and can only have up to 2 decimal places.',
 
             // 'job_id.exists' => 'The referenced job does not exist.',
         ];

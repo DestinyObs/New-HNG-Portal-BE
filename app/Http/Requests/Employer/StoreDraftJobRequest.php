@@ -42,7 +42,7 @@ class StoreDraftJobRequest extends FormRequest
             'acceptance_criteria' => 'nullable|string',
             'country' => 'nullable|string',
             'state' => 'nullable|string',
-            'price' => 'nullable|numeric',
+            'price' => ['nullable', 'numeric', 'regex:/^\d{1,10}(\.\d{1,2})?$/'],
             'track_id' => 'nullable|uuid|exists:tracks,id',
             'category_id' => 'nullable|uuid|exists:categories,id',
             'job_type_id' => 'nullable|uuid|exists:job_types,id',
@@ -69,6 +69,8 @@ class StoreDraftJobRequest extends FormRequest
             'skills.array' => 'The skills must be an array of skill IDs.',
             'skills.*.exists' => 'One or more selected skills are invalid.',
             'status.in' => 'The status must be set as draft.',
+            'price.numeric'  => 'Salary must be a valid number.',
+            'price.regex'    => 'Salary must not exceed 10 digits and can only have up to 2 decimal places.',
             // 'publication_status.in' => 'The publication status must be either published',
         ];
     }

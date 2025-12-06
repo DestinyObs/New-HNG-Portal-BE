@@ -73,6 +73,7 @@ class JobController extends Controller
      */
     public function storePublishJob(StoreJobRequest $request, string|int $companyId): JsonResponse
     {
+        // dd($request->validated());
         // dd($request->all()['skills']);
 
         $response = $this->service->createOrUpdate(
@@ -84,10 +85,15 @@ class JobController extends Controller
 
         // ? case when job is added successfully
         if ($response->success) {
+            // return $this->successWithData(
+            //     $response->data,
+            //     $response->message,
+            //     $response->status
+            // );
             return $this->successWithData(
-                $response->data,
+                new JobResource($response->job),
                 $response->message,
-                $response->status
+                $response->status,
             );
         }
 
@@ -112,7 +118,8 @@ class JobController extends Controller
         // ? case when job is added successfully
         if ($response->success) {
             return $this->successWithData(
-                $response->data,
+                // $response->data,
+                new JobListingResource($response->data),
                 $response->message,
                 $response->status
             );
@@ -253,32 +260,40 @@ class JobController extends Controller
 
     public function updateStatusToInActive($uuid, $job_id)
     {
-        $job = $this->service->updateStatus($uuid, $job_id, false);
+        // dd($uuid, $job_id);
+        $response = $this->service->updateStatus($uuid, $job_id, false);
 
-        if ($job) {
-            return $this->successWithData(
-                new JobResource($job),
-                'Job status updated successfully',
-                Http::OK,
-            );
-        }
-
-        return $this->success(
-            'Unable to update status',
-            Http::INTERNAL_SERVER_ERROR,
-        );
-    }
-
-    public function applications(string $uuid, string $job_id)
-    {
-        // dd('reached here');
-        $response = $this->service->getAllApplication($uuid, $job_id);
-        // dd($response);
-
+        // dd($job);
         if ($response->success) {
             // $applications = CompanyResource::collection($response->applications);
             return $this->successWithData(
-                new JobListingResource($response->applications),
+                new JobResource($response->job),
+                $response->message,
+                $response->status,
+            );
+        }
+
+        return $this->error(
+            $response->message,
+            $response->status
+        );
+    }
+
+    public function applications(Request $request, string $uuid, string $job_id)
+    {
+        // dd('reached here');
+        $perPage = (int) $request->query('per_page', 15);
+        $response = $this->service->getAllApplication($uuid, $job_id, $request->only(
+            ['status', 'sort_by']
+        ), $perPage);
+
+        // dd($response);
+
+        if ($response->success) {
+            $applications = ApplicationResource::collection($response->applications);
+
+            return $this->paginated(
+                $applications,
                 $response->message,
                 $response->status,
             );
