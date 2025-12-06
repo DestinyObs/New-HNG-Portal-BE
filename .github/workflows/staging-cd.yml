@@ -184,7 +184,7 @@ jobs:
           fi
 
       - name: Notify Slack - Deployment Complete
-        if: failure()
+        if: steps.deployment_status.outputs.status == 'failure'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
         run: |
