@@ -191,6 +191,7 @@ jobs:
           fi
 
       - name: Notify Slack - Final CI Status
+        if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
         run: |

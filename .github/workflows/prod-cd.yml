@@ -122,7 +122,7 @@ jobs:
           fi
 
       - name: Notify Slack - Deployment Complete
-        if: always()
+        if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_WEBHOOK_URL }}
         run: |
